@@ -1,0 +1,741 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>CS 637: Mathematics-II | Spring 2026</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    :root {
+      --bg: #ffffff;
+      --card: #f8fafc;
+      --text: #1e293b;
+      --muted: #64748b;
+      --accent: #0ea5e9;
+      --accent-light: #e0f2fe;
+      --border: #e2e8f0;
+      --success: #10b981;
+      --warning: #f59e0b;
+    }
+
+    [data-theme="dark"] {
+      --bg: #020617;
+      --card: #0f172a;
+      --text: #e5e7eb;
+      --muted: #94a3b8;
+      --accent: #38bdf8;
+      --accent-light: #1e293b;
+      --border: #1e293b;
+      --success: #34d399;
+      --warning: #fbbf24;
+    }
+
+    * { 
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+    }
+
+    /* Sticky Navigation */
+    nav {
+      position: sticky;
+      top: 0;
+      background: var(--card);
+      border-bottom: 1px solid var(--border);
+      z-index: 100;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+
+    .nav-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 20px;
+      gap: 20px;
+    }
+
+    .nav-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .nav-links a {
+      color: var(--muted);
+      text-decoration: none;
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 0.9rem;
+      transition: all 0.2s ease;
+    }
+
+    .nav-links a:hover {
+      background: var(--accent-light);
+      color: var(--accent);
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 40px 20px 70px;
+    }
+
+    /* Hero Header */
+    header {
+      margin-bottom: 48px;
+      padding: 40px 32px;
+      background: linear-gradient(135deg, var(--accent-light) 0%, var(--card) 100%);
+      border-radius: 20px;
+      border: 1px solid var(--border);
+      animation: fadeIn 0.6s ease-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      margin: 0 0 8px;
+      letter-spacing: -0.5px;
+      background: linear-gradient(135deg, var(--accent), #8b5cf6);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    h2 {
+      font-size: 1.2rem;
+      font-weight: 500;
+      margin: 0 0 20px;
+      color: var(--muted);
+    }
+
+    .header-meta {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      margin-top: 20px;
+    }
+
+    .meta-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.95rem;
+      color: var(--muted);
+    }
+
+    .meta-item strong {
+      color: var(--text);
+    }
+
+    .meta-item a {
+      color: var(--accent);
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    .meta-item a:hover {
+      text-decoration: underline;
+    }
+
+    /* Sections */
+    .section {
+      margin-top: 48px;
+      animation: slideUp 0.6s ease-out;
+      animation-fill-mode: both;
+    }
+
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .section:nth-child(2) { animation-delay: 0.1s; }
+    .section:nth-child(3) { animation-delay: 0.2s; }
+    .section:nth-child(4) { animation-delay: 0.3s; }
+
+    .section h3 {
+      font-size: 1.5rem;
+      margin-bottom: 20px;
+      padding-left: 16px;
+      border-left: 4px solid var(--accent);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 24px;
+      transition: all 0.3s ease;
+    }
+
+    .card:hover {
+      box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+      transform: translateY(-2px);
+    }
+
+    /* Alert Banner */
+    .alert {
+      background: linear-gradient(135deg, #fef3c7, #fde68a);
+      border: 1px solid #fbbf24;
+      border-radius: 12px;
+      padding: 16px 20px;
+      margin-bottom: 24px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      animation: slideDown 0.5s ease-out;
+    }
+
+    [data-theme="dark"] .alert {
+      background: linear-gradient(135deg, #451a03, #78350f);
+      border-color: #92400e;
+    }
+
+    @keyframes slideDown {
+      from { opacity: 0; transform: translateY(-20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .alert-icon {
+      font-size: 1.5rem;
+    }
+
+    /* Grid Layouts */
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 24px;
+    }
+
+    .info-box {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+    }
+
+    .info-box h4 {
+      font-size: 1.1rem;
+      margin-bottom: 12px;
+      color: var(--accent);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    ul {
+      list-style: none;
+      padding: 0;
+    }
+
+    li {
+      margin: 10px 0;
+      padding-left: 24px;
+      position: relative;
+    }
+
+    li::before {
+      content: "▸";
+      position: absolute;
+      left: 8px;
+      color: var(--accent);
+      font-weight: bold;
+    }
+
+    /* Progress Indicator */
+    .progress-bar {
+      background: var(--border);
+      height: 8px;
+      border-radius: 4px;
+      overflow: hidden;
+      margin: 16px 0;
+    }
+
+    .progress-fill {
+      background: linear-gradient(90deg, var(--accent), var(--success));
+      height: 100%;
+      border-radius: 4px;
+      transition: width 1s ease;
+    }
+
+    /* Table Styling */
+    .table-container {
+      overflow-x: auto;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.92rem;
+    }
+
+    thead {
+      background: var(--accent-light);
+      position: sticky;
+      top: 0;
+    }
+
+    thead th {
+      text-align: left;
+      padding: 12px 10px;
+      font-weight: 600;
+      color: var(--text);
+      border-bottom: 2px solid var(--border);
+      white-space: nowrap;
+    }
+
+    tbody td {
+      padding: 12px 10px;
+      border-bottom: 1px solid var(--border);
+      vertical-align: top;
+    }
+
+    tbody tr {
+      transition: background 0.2s ease;
+    }
+
+    tbody tr:hover {
+      background: rgba(56, 189, 248, 0.08);
+    }
+
+    tbody tr.current-lecture {
+      background: rgba(16, 185, 129, 0.1);
+      border-left: 4px solid var(--success);
+    }
+
+    tbody td a {
+      color: var(--text);
+      text-decoration: none;
+      transition: color 0.2s ease;
+    }
+
+    tbody td a:hover {
+      color: var(--accent);
+      text-decoration: underline;
+    }
+
+    .lecture { 
+      color: #22d3ee; 
+      font-weight: 600;
+      padding: 4px 8px;
+      background: rgba(34, 211, 238, 0.1);
+      border-radius: 6px;
+      display: inline-block;
+    }
+    
+    .tutorial { 
+      color: #a78bfa; 
+      font-weight: 600;
+      padding: 4px 8px;
+      background: rgba(167, 139, 250, 0.1);
+      border-radius: 6px;
+      display: inline-block;
+    }
+    
+    .noclass { 
+      color: #f87171; 
+      font-weight: 600;
+      padding: 4px 8px;
+      background: rgba(248, 113, 113, 0.1);
+      border-radius: 6px;
+      display: inline-block;
+    }
+
+    /* Theme Toggle */
+    .theme-toggle {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 8px 16px;
+      color: var(--text);
+      cursor: pointer;
+      font-size: 0.9rem;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .theme-toggle:hover {
+      background: var(--accent);
+      color: white;
+      transform: scale(1.05);
+    }
+
+    /* Footer */
+    footer {
+      margin-top: 64px;
+      padding: 24px 0;
+      border-top: 1px solid var(--border);
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+      h1 { font-size: 2rem; }
+      .nav-container { flex-direction: column; align-items: flex-start; }
+      .nav-links { width: 100%; }
+      table { font-size: 0.85rem; }
+      thead th, tbody td { padding: 8px 6px; }
+      .grid-2 { grid-template-columns: 1fr; }
+      header { padding: 24px 20px; }
+    }
+
+    /* Utility Classes */
+    .badge {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-size: 0.85rem;
+      font-weight: 500;
+    }
+
+    .badge-primary {
+      background: var(--accent-light);
+      color: var(--accent);
+    }
+
+    .badge-success {
+      background: rgba(16, 185, 129, 0.1);
+      color: var(--success);
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-container">
+    <div class="nav-title">📚 CS 637: Mathematics-II</div>
+    <div class="nav-links">
+      <a href="#overview">Overview</a>
+      <a href="#schedule">Schedule</a>
+      <a href="#grading">Grading</a>
+      <a href="#resources">Resources</a>
+      <a href="#announcements">Announcements</a>
+    </div>
+    <button class="theme-toggle" id="theme-toggle">
+      <span id="theme-icon">🌙</span>
+      <span id="theme-text">Dark</span>
+    </button>
+  </div>
+</nav>
+
+<div class="container">
+
+  <header>
+    <h1>CS 637: Mathematics-II</h1>
+    <h2>Theory of Computation and Graph Theory</h2>
+    <div class="header-meta">
+      <div class="meta-item">
+        <span>👨‍🏫</span>
+        <span><strong>Instructor:</strong> <a href="https://drdebmath.github.io" target="_blank">Dr. Debasish Pattanayak</a></span>
+      </div>
+      <div class="meta-item">
+        <span>📅</span>
+        <span><strong>Semester:</strong> Spring 2026</span>
+      </div>
+      <div class="meta-item">
+        <span>🏛️</span>
+        <span><strong>Lecture Hall:</strong> L31</span>
+      </div>
+    </div>
+  </header>
+
+  <section id="announcements" class="section">
+    <div class="alert">
+      <span class="alert-icon">📢</span>
+      <div>
+        <strong>Current Week:</strong> Week 1 - Classes have begun! Welcome to CS 637. Today's lecture: "What is a Proof?"
+      </div>
+    </div>
+  </section>
+
+  <section id="overview" class="section">
+    <h3><span>📖</span> Course Overview</h3>
+    <div class="card">
+      <p style="margin-bottom: 16px;">
+        This course provides a rigorous foundation in the mathematics of computation, covering fundamental topics in logic, computability theory, complexity theory, and graph theory. Students will develop skills in formal reasoning, proof techniques, and algorithmic analysis essential for advanced computer science.
+      </p>
+      <div class="progress-bar">
+        <div class="progress-fill" id="course-progress" style="width: 3.5%;"></div>
+      </div>
+      <p style="font-size: 0.9rem; color: var(--muted); margin-top: 8px;">
+        <strong>Course Progress:</strong> Lecture 1 of 28 completed (3.5%)
+      </p>
+    </div>
+  </section>
+
+  <section class="section">
+    <h3><span>🎯</span> Learning Objectives</h3>
+    <div class="grid-2">
+      <div class="info-box">
+        <h4>🧮 Logic & Proofs</h4>
+        <ul>
+          <li>Master propositional and predicate logic</li>
+          <li>Apply formal proof techniques</li>
+          <li>Understand soundness and completeness</li>
+        </ul>
+      </div>
+      <div class="info-box">
+        <h4>💻 Computation Theory</h4>
+        <ul>
+          <li>Understand Turing machines and variants</li>
+          <li>Analyze decidability and undecidability</li>
+          <li>Explore the Church-Turing thesis</li>
+        </ul>
+      </div>
+      <div class="info-box">
+        <h4>⚡ Complexity Theory</h4>
+        <ul>
+          <li>Classify problems by complexity</li>
+          <li>Master NP-completeness concepts</li>
+          <li>Apply polynomial-time reductions</li>
+        </ul>
+      </div>
+      <div class="info-box">
+        <h4>🔗 Graph Theory</h4>
+        <ul>
+          <li>Analyze graph structures and algorithms</li>
+          <li>Understand spectral graph properties</li>
+          <li>Apply probabilistic graph methods</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <h3><span>⏰</span> Class Schedule</h3>
+    <div class="grid-2">
+      <div class="info-box">
+        <h4>📝 Lectures</h4>
+        <ul>
+          <li><strong>Monday:</strong> 2:30 – 3:30 PM</li>
+          <li><strong>Tuesday:</strong> 8:30 – 9:30 AM</li>
+          <li><strong>Location:</strong> Lecture Hall L31</li>
+        </ul>
+      </div>
+      <div class="info-box">
+        <h4>💡 Tutorials</h4>
+        <ul>
+          <li><strong>Thursday:</strong> 4:30 – 5:30 PM (Weekly)</li>
+          <li><strong>Location:</strong> Lecture Hall L31</li>
+          <li>Problem-solving and discussion</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <h3><span>🏢</span> Office Hours</h3>
+    <div class="card">
+      <p style="margin-bottom: 12px;"><strong>Instructor Office Hours:</strong></p>
+      <ul>
+        <li>Wednesday: 3:00 – 4:30 PM</li>
+        <li>Friday: 2:00 – 3:30 PM</li>
+        <li>Or by appointment via email</li>
+      </ul>
+    </div>
+  </section>
+
+  <section id="grading" class="section">
+    <h3><span>📊</span> Grading Scheme</h3>
+    <div class="card">
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px;">
+        <div>
+          <div style="font-size: 2rem; font-weight: bold; color: var(--accent);">25%</div>
+          <div style="color: var(--muted);">Mid-Semester Exam</div>
+          <div style="font-size: 0.85rem; color: var(--muted); margin-top: 4px;">Feb 26 - Mar 5, 2026</div>
+        </div>
+        <div>
+          <div style="font-size: 2rem; font-weight: bold; color: var(--accent);">35%</div>
+          <div style="color: var(--muted);">End-Semester Exam</div>
+          <div style="font-size: 0.85rem; color: var(--muted); margin-top: 4px;">Date TBA</div>
+        </div>
+        <div>
+          <div style="font-size: 2rem; font-weight: bold; color: var(--accent);">40%</div>
+          <div style="color: var(--muted);">Tutorials</div>
+          <div style="font-size: 0.85rem; color: var(--muted); margin-top: 4px;">14 tutorials total</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="resources" class="section">
+    <h3><span>📚</span> Textbooks & Resources</h3>
+    <div class="card">
+      <h4 style="margin-bottom: 12px; color: var(--accent);">Recommended Textbooks</h4>
+      <ul>
+        <li><strong>Introduction to the Theory of Computation</strong> by Michael Sipser (3rd Edition)</li>
+        <li><strong>Computational Complexity: A Modern Approach</strong> by Arora & Barak</li>
+        <li><strong>Introduction to Graph Theory</strong> by Douglas B. West</li>
+        <li><strong>Discrete Mathematics and Its Applications</strong> by Kenneth Rosen</li>
+      </ul>
+      <h4 style="margin: 20px 0 12px; color: var(--accent);">Online Resources</h4>
+      <ul>
+        <li>Lecture notes and slides available on course portal</li>
+        <li>Tutorial problem sets posted weekly</li>
+        <li>Additional reading materials on course website</li>
+      </ul>
+    </div>
+  </section>
+
+  <section id="schedule" class="section">
+    <h3><span>📅</span> Lecture-wise Schedule</h3>
+    <div class="card">
+      <p style="margin-bottom: 16px; color: var(--muted);">
+        <span class="badge badge-success">● Current Lecture</span> marked in the schedule below
+      </p>
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>#</th><th>Date</th><th>Day</th><th>Time</th>
+              <th>Type</th><th>Module</th><th>Topic</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="current-lecture">
+              <td>1</td><td>Jan 6, 2026</td><td>Tue</td><td>8:30–9:30</td>
+              <td><span class="lecture">Lecture</span></td>
+              <td>Logic and Proofs</td>
+              <td><a href="lecture1.html">What is a Proof?</a></td>
+            </tr>
+            <tr><td>T1</td><td>Jan 8, 2026</td><td>Thu</td><td>4:30–5:30</td><td><span class="tutorial">Tutorial</span></td><td>—</td><td><a href="tutorial1.html">Tutorial 1: Problems from Logic and Proofs</a></td></tr>
+            <tr><td>2</td><td>Jan 12, 2026</td><td>Mon</td><td>2:30–3:30</td><td><span class="lecture">Lecture</span></td><td>Logic and Proofs</td><td><a href="lecture2.html">Propositional Logic: Syntax, Semantics, and Models</a></td></tr>
+            <tr><td>3</td><td>Jan 13, 2026</td><td>Tue</td><td>8:30–9:30</td><td><span class="lecture">Lecture</span></td><td>Logic and Proofs</td><td><a href="lecture3.html">Proof Systems and Formal Proof Techniques</a></td></tr>
+            <tr><td>T2</td><td>Jan 15, 2026</td><td>Thu</td><td>4:30–5:30</td><td><span class="tutorial">Tutorial</span></td><td>—</td><td><a href="tutorial2.html">Tutorial 2: Problems from Logic and Proofs</a></td></tr>
+            <tr><td>4</td><td>Jan 19, 2026</td><td>Mon</td><td>2:30–3:30</td><td><span class="lecture">Lecture</span></td><td>Logic and Proofs</td><td><a href="lecture4.html">Soundness, Completeness, and Reduction-Based Reasoning</a></td></tr>
+            <tr><td>5</td><td>Jan 20, 2026</td><td>Tue</td><td>8:30–9:30</td><td><span class="lecture">Lecture</span></td><td>Models of Computation</td><td><a href="lecture5.html">Deterministic Turing Machines: Definition and Intuition</a></td></tr>
+            <tr><td>T3</td><td>Jan 22, 2026</td><td>Thu</td><td>4:30–5:30</td><td><span class="tutorial">Tutorial</span></td><td>—</td><td><a href="tutorial3.html">Tutorial 3: Problems from Models of Computation</a></td></tr>
+            <tr><td>6</td><td>Jan 27, 2026</td><td>Tue</td><td>8:30–9:30</td><td><span class="lecture">Lecture</span></td><td>Models of Computation</td><td><a href="lecture6.html">Nondeterministic and Multitape Turing Machines</a></td></tr>
+            <tr><td>T4</td><td>Jan 29, 2026</td><td>Thu</td><td>4:30–5:30</td><td><span class="tutorial">Tutorial</span></td><td>—</td><td><a href="tutorial4.html">Tutorial 4: Problems from Models of Computation</a></td></tr>
+            <tr><td>7</td><td>Feb 2, 2026</td><td>Mon</td><td>2:30–3:30</td><td><span class="lecture">Lecture</span></td><td>Models of Computation</td><td><a href="lecture7.html">Configuration Graphs and Computation as Reachability</a></td></tr>
+            <tr><td>8</td><td>Feb 3, 2026</td><td>Tue</td><td>8:30–9:30</td><td><span class="lecture">Lecture</span></td><td>Models of Computation</td><td><a href="lecture8.html">Equivalence of Computational Models</a></td></tr>
+            <tr><td>T5</td><td>Feb 5, 2026</td><td>Thu</td><td>4:30–5:30</td><td><span class="tutorial">Tutorial</span></td><td>—</td><td><a href="tutorial5.html">Tutorial 5: Problems from Models of Computation</a></td></tr>
+            <tr><td>9</td><td>Feb 9, 2026</td><td>Mon</td><td>2:30–3:30</td><td><span class="lecture">Lecture</span></td><td>Models of Computation</td><td><a href="lecture9.html">Church–Turing Thesis and Its Implications</a></td></tr>
+            <tr><td>10</td><td>Feb 10, 2026</td><td>Tue</td><td>8:30–9:30</td><td><span class="lecture">Lecture</span></td><td>Models of Computation</td><td><a href="lecture10.html">Decidable and Undecidable Problems</a></td></tr>
+            <tr><td>T6</td><td>Feb 12, 2026</td><td>Thu</td><td>4:30–5:30</td><td><span class="tutorial">Tutorial</span></td><td>—</td><td><a href="tutorial6.html">Tutorial 6: Problems from Undecidability</a></td></tr>
+            <tr><td>11</td><td>Feb 16, 2026</td><td>Mon</td><td>2:30–3:30</td><td><span class="lecture">Lecture</span></td><td>Undecidability</td><td><a href="lecture11.html">Reductions and Undecidability Proof Techniques</a></td></tr>
+            <tr><td>12</td><td>Feb 17, 2026</td><td>Tue</td><td>8:30–9:30</td><td><span class="lecture">Lecture</span></td><td>Undecidability</td><td><a href="lecture12.html">The Halting Problem</a></td></tr>
+            <tr><td>T7</td><td>Feb 19, 2026</td><td>Thu</td><td>4:30–5:30</td><td><span class="tutorial">Tutorial</span></td><td>—</td><td><a href="tutorial7.html">Tutorial 7: Problems from Undecidability</a></td></tr>
+            <tr><td>13</td><td>Feb 23, 2026</td><td>Mon</td><td>2:30–3:30</td><td><span class="lecture">Lecture</span></td><td>Undecidability</td><td><a href="lecture13.html">Rice's Theorem and Structural Undecidability</a></td></tr>
+            <tr><td>14</td><td>Feb 24, 2026</td><td>Mon</td><td>2:30–3:30</td><td><span class="lecture">Lecture</span></td><td>Undecidability</td><td><a href="lecture14.html">Measuring Time and Space Complexity</a></td></tr>
+            <tr><td>—</td><td>Feb 26, 2026</td><td>Thu</td><td>—</td><td><span class="noclass">No Class</span></td><td>—</td><td>Mid-Semester Examination</td></tr>
+            <tr><td>—</td><td>Mar 2, 2026</td><td>Mon</td><td>—</td><td><span class="noclass">No Class</span></td><td>—</td><td>Mid-Semester Examination</td></tr>
+            <tr><td>—</td><td>Mar 3, 2026</td><td>Tue</td><td>—</td><td><span class="noclass">No Class</span></td><td>—</td><td>Mid-Semester Examination</td></tr>
+            <tr><td>—</td><td>Mar 5, 2026</td><td>Thu</td><td>—</td><td><span class="noclass">No Class</span></td><td>—</td><td>Mid-Semester Examination</td></tr>
+            <tr><td>15</td><td>Mar 10, 2026</td><td>Tue</td><td>8:30–9:30</td><td><span class="lecture">Lecture</span></td><td>Complexity Theory</td><td><a href="lecture15.html">Complexity Classes: P, NP, and co-NP</a></td></tr>
+            <tr><td>T8</td><td>Mar 12, 2026</td><td>Thu</td><td>4:30–5:30</td><td><span class="tutorial">Tutorial</span></td><td>—</td><td><a href="tutorial8.html">Tutorial 8: Problems from Complexity Theory</a></td></tr>
+            <tr><td>16</td><td>Mar 16, 2026</td><td>Mon</td><td>2:30–3:30</td><td><span class="lecture">Lecture</span></td><td>Complexity Theory</td><td><a href="lecture16.html">Polynomial-Time Reductions</a></td></tr>
+            <tr><td>17</td><td>Mar 17, 2026</td><td>Tue</td><td>8:30–9:30</td><td><span class="lecture">Lecture</span></td><td>Complexity Theory</td><td><a href="lecture17.html">NP-Completeness: Definitions and Framework</a></td></tr>
+            <tr><td>T9</td><td>Mar 19, 2026</td><td>Thu</td><td>4:30–5:30</td><td><span class="tutorial">Tutorial</span></td><td>—</td><td><a href="tutorial9.html">Tutorial 9: Problems from Complexity Theory</a></td></tr>
+            <tr><td>18</td><td>Mar 23, 2026</td><td>Mon</td><td>2:30–3:30</td><td><span class="lecture">Lecture</span></td><td>Complexity Theory</td><td><a href="lecture18.html">Canonical NP-Complete Problems</a></td></tr>
+            <tr><td>19</td><td>Mar 24, 2026</td><td>Tue</td><td>8:30–9:30</td><td><span class="lecture">Lecture</span></td><td>Complexity Theory</td><td><a href="lecture19.html">Structural Consequences of NP-Completeness</a></td></tr>
+            <tr><td>T10</td><td>Mar 26, 2026</td><td>Thu</td><td>4:30–5:30</td><td><span class="tutorial">Tutorial</span></td><td>—</td><td><a href="tutorial10.html">Tutorial 10: Problems from Complexity Theory</a></td></tr>
+            <tr><td>20</td><td>Mar 30, 2026</td><td>Mon</td><td>2:30–3:30</td><td><span class="lecture">Lecture</span></td><td>Complexity Theory</td><td><a href="lecture20.html">Graph Representations and Algorithmic Viewpoints</a></td></tr>
+            <tr><td>T11</td><td>Apr 2, 2026</td><td>Thu</td><td>4:30–5:30</td><td><span class="tutorial">Tutorial</span></td><td>—</td><td><a href="tutorial11.html">Tutorial 11: Problems from Graph Theory for Computation</a></td></tr>
+            <tr><td>21</td><td>Apr 6, 2026</td><td>Mon</td><td>2:30–3:30</td><td><span class="lecture">Lecture</span></td><td>Graph Theory for Computation</td><td><a href="lecture21.html">Matchings and Bipartite Graphs</a></td></tr>
+            <tr><td>22</td><td>Apr 7, 2026</td><td>Tue</td><td>8:30–9:30</td><td><span class="lecture">Lecture</span></td><td>Graph Theory for Computation</td><td><a href="lecture22.html">Planar Graphs and Structural Constraints</a></td></tr>
+            <tr><td>T12</td><td>Apr 9, 2026</td><td>Thu</td><td>4:30–5:30</td><td><span class="tutorial">Tutorial</span></td><td>—</td><td><a href="tutorial12.html">Tutorial 12: Problems from Graph Theory for Computation</a></td></tr>
+            <tr><td>23</td><td>Apr 13, 2026</td><td>Mon</td><td>2:30–3:30</td><td><span class="lecture">Lecture</span></td><td>Graph Theory for Computation</td><td><a href="lecture23.html">Complexity of Graph Problems</a></td></tr>
+            <tr><td>T13</td><td>Apr 16, 2026</td><td>Thu</td><td>4:30–5:30</td><td><span class="tutorial">Tutorial</span></td><td>—</td><td><a href="tutorial13.html">Tutorial 13: Problems from Graph Theory for Computation</a></td></tr>
+            <tr><td>24</td><td>Apr 20, 2026</td><td>Mon</td><td>2:30–3:30</td><td><span class="lecture">Lecture</span></td><td>Graph Theory for Computation</td><td><a href="lecture24.html">Random Walks on Graphs</a></td></tr>
+            <tr><td>25</td><td>Apr 21, 2026</td><td>Tue</td><td>8:30–9:30</td><td><span class="lecture">Lecture</span></td><td>Probabilistic & Spectral Graphs</td><td><a href="lecture25.html">Markov Chains and Mixing Time</a></td></tr>
+            <tr><td>T14</td><td>Apr 23, 2026</td><td>Thu</td><td>4:30–5:30</td><td><span class="tutorial">Tutorial</span></td><td>—</td><td><a href="tutorial14.html">Tutorial 14: Problems from Probabilistic & Spectral Graphs</a></td></tr>
+            <tr><td>26</td><td>Apr 27, 2026</td><td>Mon</td><td>2:30–3:30</td><td><span class="lecture">Lecture</span></td><td>Probabilistic & Spectral Graphs</td><td><a href="lecture26.html">Connectivity and Expansion</a></td></tr>
+            <tr><td>27</td><td>Apr 28, 2026</td><td>Tue</td><td>8:30–9:30</td><td><span class="lecture">Lecture</span></td><td>Probabilistic & Spectral Graphs</td><td><a href="lecture27.html">Spectral Properties of Graphs</a></td></tr>
+            <tr><td>28</td><td>Apr 29, 2026</td><td>Tue</td><td>8:30–9:30</td><td><span class="lecture">Lecture</span></td><td>Probabilistic & Spectral Graphs</td><td><a href="lecture28.html">Graph Structure, Randomness, and Computation</a></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div style="margin-bottom: 8px; font-weight: 500;">Department of Computer Science and Engineering</div>
+    <div style="font-size: 0.85rem;">Spring Semester 2026 • Last updated: January 6, 2026</div>
+  </footer>
+
+</div>
+
+<script>
+  const themeToggle = document.getElementById('theme-toggle');
+  const themeIcon = document.getElementById('theme-icon');
+  const themeText = document.getElementById('theme-text');
+  const html = document.documentElement;
+
+  // Check for saved theme preference or default to light mode
+  const currentTheme = localStorage.getItem('theme') || 'light';
+
+  // Set initial theme
+  if (currentTheme === 'dark') {
+    html.setAttribute('data-theme', 'dark');
+    themeIcon.textContent = '☀️';
+    themeText.textContent = 'Light';
+  } else {
+    html.removeAttribute('data-theme');
+    themeIcon.textContent = '🌙';
+    themeText.textContent = 'Dark';
+  }
+
+  // Toggle theme on button click
+  themeToggle.addEventListener('click', () => {
+    const currentTheme = html.getAttribute('data-theme');
+
+    if (currentTheme === 'dark') {
+      html.removeAttribute('data-theme');
+      themeIcon.textContent = '🌙';
+      themeText.textContent = 'Dark';
+      localStorage.setItem('theme', 'light');
+    } else {
+      html.setAttribute('data-theme', 'dark');
+      themeIcon.textContent = '☀️';
+      themeText.textContent = 'Light';
+      localStorage.setItem('theme', 'dark');
+    }
+  });
+
+  // Smooth scroll for navigation links
+  document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener('click', function (e) {
+      e.preventDefault();
+      const target = document.querySelector(this.getAttribute('href'));
+      if (target) {
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    });
+  });
+</script>
+
+</body>
+</html>

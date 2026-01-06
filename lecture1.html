@@ -1,0 +1,926 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>CS 637 – Lecture 1: What is a Proof?</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      line-height: 1.6;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 20px;
+    }
+    
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+      overflow: hidden;
+    }
+    
+    header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 40px;
+      text-align: center;
+    }
+    
+    h1 {
+      font-size: 2.5em;
+      margin-bottom: 10px;
+      font-weight: 700;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+    }
+    
+    .subtitle {
+      font-size: 1.3em;
+      margin-bottom: 15px;
+      opacity: 0.95;
+    }
+    
+    .instructor {
+      margin-top: 15px;
+      font-size: 1.05em;
+      opacity: 0.9;
+    }
+    
+    .instructor a {
+      color: #ffd700;
+      text-decoration: none;
+      font-weight: 600;
+      transition: opacity 0.3s;
+    }
+    
+    .instructor a:hover {
+      opacity: 0.8;
+      text-decoration: underline;
+    }
+    
+    .content {
+      padding: 40px;
+    }
+    
+    .nav-tabs {
+      display: flex;
+      border-bottom: 2px solid #e2e8f0;
+      margin-bottom: 30px;
+      gap: 5px;
+      overflow-x: auto;
+    }
+    
+    .tab-btn {
+      padding: 12px 20px;
+      background: none;
+      border: none;
+      font-size: 1em;
+      cursor: pointer;
+      color: #64748b;
+      font-weight: 600;
+      border-bottom: 3px solid transparent;
+      transition: all 0.3s;
+      white-space: nowrap;
+    }
+    
+    .tab-btn:hover {
+      color: #667eea;
+      background: #f8fafc;
+    }
+    
+    .tab-btn.active {
+      color: #667eea;
+      border-bottom-color: #667eea;
+    }
+    
+    .tab-content {
+      display: none;
+    }
+    
+    .tab-content.active {
+      display: block;
+      animation: fadeIn 0.4s;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .section-title {
+      font-size: 1.8em;
+      color: #1e293b;
+      margin-bottom: 25px;
+      padding-bottom: 10px;
+      border-bottom: 3px solid #667eea;
+      font-weight: 700;
+    }
+    
+    .subsection-title {
+      font-size: 1.4em;
+      color: #334155;
+      margin: 30px 0 15px 0;
+      font-weight: 600;
+    }
+    
+    .definition-card {
+      background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
+      border-left: 4px solid #667eea;
+      padding: 20px;
+      margin-bottom: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      transition: all 0.3s;
+    }
+    
+    .definition-card:hover {
+      transform: translateX(5px);
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+    }
+    
+    .def-number {
+      display: inline-block;
+      background: #667eea;
+      color: white;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-weight: 700;
+      font-size: 0.9em;
+      margin-right: 10px;
+    }
+    
+    .def-term {
+      font-weight: 700;
+      color: #1e293b;
+      font-size: 1.15em;
+      display: inline-block;
+      margin-bottom: 8px;
+    }
+    
+    .def-content {
+      color: #475569;
+      margin-top: 8px;
+      line-height: 1.7;
+    }
+    
+    .def-content ul {
+      margin-top: 10px;
+      margin-left: 20px;
+    }
+    
+    .def-content li {
+      margin: 6px 0;
+    }
+    
+    .example-card {
+      background: linear-gradient(135deg, #fef3c7 0%, #fef9c3 100%);
+      border-left: 4px solid #f59e0b;
+      padding: 18px;
+      margin-bottom: 15px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+    
+    .example-number {
+      display: inline-block;
+      background: #f59e0b;
+      color: white;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-weight: 700;
+      font-size: 0.9em;
+      margin-right: 10px;
+    }
+    
+    .example-content {
+      color: #78350f;
+      margin-top: 8px;
+      font-weight: 500;
+    }
+    
+    .theorem-card {
+      background: linear-gradient(135deg, #dfe9f3 0%, #ffffff 100%);
+      border-left: 4px solid #3b82f6;
+      padding: 18px;
+      margin-bottom: 15px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+    
+    .theorem-number {
+      display: inline-block;
+      background: #3b82f6;
+      color: white;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-weight: 700;
+      font-size: 0.9em;
+      margin-right: 10px;
+    }
+    
+    .note-card {
+      background: linear-gradient(135deg, #f0fdf4 0%, #ffffff 100%);
+      border-left: 4px solid #10b981;
+      padding: 18px;
+      margin-bottom: 15px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+    
+    .note-label {
+      display: inline-block;
+      background: #10b981;
+      color: white;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-weight: 700;
+      font-size: 0.9em;
+      margin-right: 10px;
+    }
+    
+    .search-box {
+      width: 100%;
+      padding: 15px 20px;
+      font-size: 1em;
+      border: 2px solid #e2e8f0;
+      border-radius: 8px;
+      margin-bottom: 25px;
+      transition: all 0.3s;
+    }
+    
+    .search-box:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+    
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+      margin-top: 20px;
+    }
+    
+    .info-box {
+      background: linear-gradient(135deg, #e0e7ff 0%, #f3f4f6 100%);
+      padding: 20px;
+      border-radius: 8px;
+      border-left: 4px solid #6366f1;
+    }
+    
+    .info-box h3 {
+      color: #1e293b;
+      margin-bottom: 10px;
+      font-size: 1.1em;
+    }
+    
+    .info-box p {
+      color: #475569;
+      font-size: 0.95em;
+    }
+    
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 15px 0;
+      background: white;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+    
+    th, td {
+      padding: 12px;
+      text-align: center;
+      border: 1px solid #e2e8f0;
+    }
+    
+    th {
+      background: #667eea;
+      color: white;
+      font-weight: 600;
+    }
+    
+    tr:nth-child(even) {
+      background: #f8fafc;
+    }
+    
+    footer {
+      background: #1e293b;
+      color: white;
+      text-align: center;
+      padding: 25px;
+      font-size: 0.9em;
+    }
+    
+    .katex {
+      font-size: 1.1em;
+    }
+    
+    @media (max-width: 768px) {
+      h1 { font-size: 1.8em; }
+      .subtitle { font-size: 1.1em; }
+      .content { padding: 25px; }
+      .nav-tabs { flex-wrap: wrap; }
+      .tab-btn { padding: 10px 15px; font-size: 0.9em; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <header>
+    <h1>CS 637: Mathematics-II</h1>
+    <div class="subtitle">Theory of Computation and Graph Theory</div>
+    <div class="instructor">
+      <strong>Instructor:</strong> <a href="https://drdebmath.github.io" target="_blank">Dr. Debasish Pattanayak</a>
+    </div>
+  </header>
+
+  <div class="content">
+    <div class="nav-tabs">
+      <button class="tab-btn active" onclick="switchTab('definitions')">Foundations</button>
+      <button class="tab-btn" onclick="switchTab('predicates')">Predicates & Quantifiers</button>
+      <button class="tab-btn" onclick="switchTab('proofs')">Proof Techniques</button>
+      <button class="tab-btn" onclick="switchTab('laws')">Logical Laws</button>
+      <button class="tab-btn" onclick="switchTab('examples')">Examples</button>
+      <button class="tab-btn" onclick="switchTab('summary')">Quick Reference</button>
+    </div>
+
+    <input type="text" class="search-box" id="searchBox" placeholder="🔍 Search definitions, theorems, examples..." onkeyup="searchDefinitions()">
+
+    <div id="definitions" class="tab-content active">
+      <h2 class="section-title">Lecture 1: What is a Proof?</h2>
+      
+      <div class="searchable">
+        <h3 class="subsection-title">Propositional Logic Foundations</h3>
+
+        <div class="definition-card">
+          <div><span class="def-number">Def 1</span><span class="def-term">Statement</span></div>
+          <div class="def-content">A declarative sentence that is either true or false, but not both.</div>
+        </div>
+
+        <div class="definition-card">
+          <div><span class="def-number">Def 2</span><span class="def-term">Proposition</span></div>
+          <div class="def-content">A statement whose truth value is well-defined and can be determined to be true or false.</div>
+        </div>
+
+        <div class="definition-card">
+          <div><span class="def-number">Def 3</span><span class="def-term">Truth Value</span></div>
+          <div class="def-content">One of the two logical constants: True (T, 1) or False (F, 0).</div>
+        </div>
+
+        <div class="definition-card">
+          <div><span class="def-number">Def 4</span><span class="def-term">Propositional Variable</span></div>
+          <div class="def-content">A variable (typically denoted p, q, r, etc.) that represents a proposition and can take truth values T or F.</div>
+        </div>
+
+        <div class="definition-card">
+          <div><span class="def-number">Def 5</span><span class="def-term">Atomic Proposition</span></div>
+          <div class="def-content">A simple, indivisible proposition that cannot be broken down into simpler propositions.</div>
+        </div>
+
+        <div class="definition-card">
+          <div><span class="def-number">Def 6</span><span class="def-term">Compound Proposition</span></div>
+          <div class="def-content">A proposition formed by combining atomic propositions using logical connectives.</div>
+        </div>
+
+        <div class="definition-card">
+          <div><span class="def-number">Def 7</span><span class="def-term">Logical Connectives</span></div>
+          <div class="def-content">
+            Given propositions <em>p</em> and <em>q</em>:
+            <ul>
+              <li><strong>Negation:</strong> \( \neg p \) (NOT p) — opposite truth value</li>
+              <li><strong>Conjunction:</strong> \( p \land q \) (p AND q) — true only if both are true</li>
+              <li><strong>Disjunction:</strong> \( p \lor q \) (p OR q) — true if at least one is true</li>
+              <li><strong>Exclusive OR:</strong> \( p \oplus q \) (p XOR q) — true if exactly one is true</li>
+              <li><strong>Implication:</strong> \( p \to q \) (if p then q) — false only when p is true and q is false</li>
+              <li><strong>Biconditional:</strong> \( p \leftrightarrow q \) (p if and only if q) — true when both have same truth value</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="definition-card">
+          <div><span class="def-number">Def 8</span><span class="def-term">Well-Formed Formula (WFF)</span></div>
+          <div class="def-content">A finite expression constructed from propositions using logical connectives according to syntactic rules. Every WFF is syntactically correct.</div>
+        </div>
+
+        <div class="definition-card">
+          <div><span class="def-number">Def 9</span><span class="def-term">Truth Assignment</span></div>
+          <div class="def-content">A function assigning each propositional variable a value from \( \{T, F\} \). Also called a valuation or interpretation.</div>
+        </div>
+
+        <div class="definition-card">
+          <div><span class="def-number">Def 10</span><span class="def-term">Truth Table</span></div>
+          <div class="def-content">A table showing all possible truth values of a formula for all possible truth assignments of its variables.</div>
+        </div>
+
+        <div class="definition-card">
+          <div><span class="def-number">Def 11</span><span class="def-term">Semantics</span></div>
+          <div class="def-content">The meaning or truth value of a formula under a given truth assignment.</div>
+        </div>
+
+        <h3 class="subsection-title">Formula Classifications</h3>
+
+        <div class="definition-card">
+          <div><span class="def-number">Def 12</span><span class="def-term">Tautology</span></div>
+          <div class="def-content">A formula that evaluates to true under every truth assignment. Example: \( p \lor \neg p \) (Law of Excluded Middle)</div>
+        </div>
+
+        <div class="definition-card">
+          <div><span class="def-number">Def 13</span><span class="def-term">Contradiction</span></div>
+          <div class="def-content">A formula that evaluates to false under every truth assignment. Example: \( p \land \neg p \) (Law of Non-Contradiction)</div>
+        </div>
+
+        <div class="definition-card">
+          <div><span class="def-number">Def 14</span><span class="def-term">Contingency</span></div>
+          <div class="def-content">A formula that is neither a tautology nor a contradiction; it is true for some truth assignments and false for others.</div>
+        </div>
+
+        <div class="definition-card">
+          <div><span class="def-number">Def 15</span><span class="def-term">Satisfiable Formula</span></div>
+          <div class="def-content">A formula that evaluates to true under at least one truth assignment. Both tautologies and contingencies are satisfiable.</div>
+        </div>
+
+        <div class="definition-card">
+          <div><span class="def-number">Def 16</span><span class="def-term">Unsatisfiable Formula</span></div>
+          <div class="def-content">A formula that evaluates to false under all truth assignments (equivalent to a contradiction).</div>
+        </div>
+
+        <div class="definition-card">
+          <div><span class="def-number">Def 17</span><span class="def-term">Logical Equivalence</span></div>
+          <div class="def-content">Two formulas \( \phi \) and \( \psi \) are logically equivalent (denoted \( \phi \equiv \psi \) or \( \phi \Leftrightarrow \psi \)) if they have the same truth value under all truth assignments.</div>
+        </div>
+
+        <div class="definition-card">
+          <div><span class="def-number">Def 18</span><span class="def-term">Logical Implication</span></div>
+          <div class="def-content">A formula \( \phi \) logically implies \( \psi \) (denoted \( \phi \models \psi \)) if whenever \( \phi \) is true, \( \psi \) must also be true.</div>
+        </div>
+
+        <h3 class="subsection-title">Arguments and Reasoning</h3>
+
+        <div class="definition-card">
+          <div><span class="def-number">Def 19</span><span class="def-term">Argument</span></div>
+          <div class="def-content">A finite sequence of propositions consisting of premises \( p_1, p_2, \ldots, p_n \) followed by a conclusion \( q \).</div>
+        </div>
+
+        <div class="definition-card">
+          <div><span class="def-number">Def 20</span><span class="def-term">Valid Argument</span></div>
+          <div class="def-content">An argument where, whenever all premises are true, the conclusion must also be true. Formally: \( (p_1 \land p_2 \land \cdots \land p_n) \to q \) is a tautology.</div>
+        </div>
+
+        <div class="definition-card">
+          <div><span class="def-number">Def 21</span><span class="def-term">Sound Argument</span></div>
+          <div class="def-content">A valid argument where all premises are actually true. Sound arguments always have true conclusions.</div>
+        </div>
+
+        <div class="definition-card">
+          <div><span class="def-number">Def 22</span><span class="def-term">Fallacy</span></div>
+          <div class="def-content">An invalid form of reasoning or argument that appears correct but contains a logical error.</div>
+        </div>
+
+        <div class="definition-card">
+          <div><span class="def-number">Def 23</span><span class="def-term">Inference Rule</span></div>
+          <div class="def-content">A logical pattern that allows deriving a conclusion from premises. Examples: Modus Ponens, Modus Tollens, Hypothetical Syllogism.</div>
+        </div>
+      </div>
+    </div>
+
+    <div id="predicates" class="tab-content">
+      <h2 class="section-title">Predicate Logic & Quantifiers</h2>
+      
+      <div class="definition-card">
+        <div><span class="def-number">Def 24</span><span class="def-term">Predicate</span></div>
+        <div class="def-content">A statement involving variables that becomes a proposition when specific values are assigned to the variables. Example: P(x) = "x is even"</div>
+      </div>
+
+      <div class="definition-card">
+        <div><span class="def-number">Def 25</span><span class="def-term">Domain of Discourse (Universe)</span></div>
+        <div class="def-content">The set of all possible values that variables in a predicate can take. Denoted as \( \mathcal{U} \) or \( D \).</div>
+      </div>
+
+      <div class="definition-card">
+        <div><span class="def-number">Def 26</span><span class="def-term">Universal Quantifier</span></div>
+        <div class="def-content">
+          The symbol \( \forall \) (for all) that asserts a predicate is true for every element in the domain.
+          <br><strong>Notation:</strong> \( \forall x \, P(x) \) means "P(x) is true for all x in the domain"
+        </div>
+      </div>
+
+      <div class="definition-card">
+        <div><span class="def-number">Def 27</span><span class="def-term">Existential Quantifier</span></div>
+        <div class="def-content">
+          The symbol \( \exists \) (there exists) that asserts a predicate is true for at least one element in the domain.
+          <br><strong>Notation:</strong> \( \exists x \, P(x) \) means "there exists at least one x such that P(x) is true"
+        </div>
+      </div>
+
+      <div class="definition-card">
+        <div><span class="def-number">Def 28</span><span class="def-term">Unique Existential Quantifier</span></div>
+        <div class="def-content">
+          The symbol \( \exists! \) that asserts a predicate is true for exactly one element in the domain.
+          <br><strong>Notation:</strong> \( \exists! x \, P(x) \) means "there exists exactly one x such that P(x) is true"
+        </div>
+      </div>
+
+      <div class="definition-card">
+        <div><span class="def-number">Def 29</span><span class="def-term">Bound Variable</span></div>
+        <div class="def-content">A variable that appears within the scope of a quantifier. Example: in \( \forall x \, P(x) \), x is bound.</div>
+      </div>
+
+      <div class="definition-card">
+        <div><span class="def-number">Def 30</span><span class="def-term">Free Variable</span></div>
+        <div class="def-content">A variable that is not bound by any quantifier. Example: in \( P(x) \land Q(y, x) \), if only x is quantified, y is free.</div>
+      </div>
+
+      <div class="definition-card">
+        <div><span class="def-number">Def 31</span><span class="def-term">Nested Quantifiers</span></div>
+        <div class="def-content">
+          Multiple quantifiers appearing in sequence. The order matters!
+          <ul>
+            <li>\( \forall x \, \forall y \, P(x,y) \) — for all x and all y, P(x,y) is true</li>
+            <li>\( \exists x \, \exists y \, P(x,y) \) — there exist x and y such that P(x,y) is true</li>
+            <li>\( \forall x \, \exists y \, P(x,y) \) — for every x, there exists a y such that P(x,y)</li>
+            <li>\( \exists x \, \forall y \, P(x,y) \) — there exists an x such that for all y, P(x,y)</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="note-card">
+        <span class="note-label">Important</span>
+        <strong>Negation of Quantifiers:</strong>
+        <ul style="margin-top: 10px;">
+          <li>\( \neg (\forall x \, P(x)) \equiv \exists x \, \neg P(x) \)</li>
+          <li>\( \neg (\exists x \, P(x)) \equiv \forall x \, \neg P(x) \)</li>
+        </ul>
+      </div>
+
+      <h3 class="subsection-title">Examples of Predicates</h3>
+
+      <div class="example-card">
+        <div><span class="example-number">Ex 1</span><strong>Simple Predicate</strong></div>
+        <div class="example-content">Let P(x) = "x > 5" with domain \( \mathbb{N} \). Then P(7) is true, but P(3) is false.</div>
+      </div>
+
+      <div class="example-card">
+        <div><span class="example-number">Ex 2</span><strong>Universal Statement</strong></div>
+        <div class="example-content">\( \forall x \in \mathbb{Z} \, (x^2 \geq 0) \) — "The square of every integer is non-negative" (TRUE)</div>
+      </div>
+
+      <div class="example-card">
+        <div><span class="example-number">Ex 3</span><strong>Existential Statement</strong></div>
+        <div class="example-content">\( \exists x \in \mathbb{R} \, (x^2 = 2) \) — "There exists a real number whose square is 2" (TRUE, x = √2)</div>
+      </div>
+
+      <div class="example-card">
+        <div><span class="example-number">Ex 4</span><strong>Nested Quantifiers</strong></div>
+        <div class="example-content">\( \forall x \in \mathbb{R} \, \exists y \in \mathbb{R} \, (y > x) \) — "For every real number, there exists a larger one" (TRUE)</div>
+      </div>
+    </div>
+
+    <div id="proofs" class="tab-content">
+      <h2 class="section-title">Proof Techniques</h2>
+      
+      <div class="definition-card">
+        <div><span class="def-number">Def 32</span><span class="def-term">Proof</span></div>
+        <div class="def-content">A finite sequence of logically valid steps deriving a conclusion from assumptions using established rules of inference and axioms.</div>
+      </div>
+
+      <div class="definition-card">
+        <div><span class="def-number">Def 33</span><span class="def-term">Axiom (Postulate)</span></div>
+        <div class="def-content">A statement accepted as true without proof, serving as a starting point for further reasoning.</div>
+      </div>
+
+      <div class="definition-card">
+        <div><span class="def-number">Def 34</span><span class="def-term">Theorem</span></div>
+        <div class="def-content">A mathematical statement that has been proven to be true based on axioms and previously proven theorems.</div>
+      </div>
+
+      <div class="definition-card">
+        <div><span class="def-number">Def 35</span><span class="def-term">Lemma</span></div>
+        <div class="def-content">A minor theorem used as a stepping stone to prove a larger theorem. Often called a "helper theorem."</div>
+      </div>
+
+      <div class="definition-card">
+        <div><span class="def-number">Def 36</span><span class="def-term">Corollary</span></div>
+        <div class="def-content">A statement that follows readily from a theorem with little or no additional proof.</div>
+      </div>
+
+      <div class="definition-card">
+        <div><span class="def-number">Def 37</span><span class="def-term">Conjecture</span></div>
+        <div class="def-content">A statement believed to be true but not yet proven. It remains a conjecture until proven or disproven.</div>
+      </div>
+
+      <h3 class="subsection-title">Proof Methods</h3>
+
+      <div class="definition-card">
+        <div><span class="def-number">Def 38</span><span class="def-term">Direct Proof</span></div>
+        <div class="def-content">
+          A proof that derives the conclusion directly from the premises using logical deductions. 
+          <br><strong>Strategy:</strong> To prove \( p \to q \), assume p is true and show q must be true through logical steps.
+        </div>
+      </div>
+
+      <div class="definition-card">
+        <div><span class="def-number">Def 39</span><span class="def-term">Proof by Contrapositive</span></div>
+        <div class="def-content">
+          A proof that establishes an implication \( p \to q \) by proving its</div>
+      </div>
+
+      <div class="definition-card">
+        <div><span class="def-number">Def 40</span><span class="def-term">Proof by Contradiction</span></div>
+        <div class="def-content">
+          A method where one assumes the statement to be proven is false, and then derives a logical contradiction (e.g., \( r \land \neg r \)). Since contradictions cannot exist, the assumption must be false, making the original statement true.
+          <br><strong>Strategy:</strong> To prove \( p \), assume \( \neg p \) is true and derive a contradiction.
+        </div>
+      </div>
+
+      <div class="definition-card">
+        <div><span class="def-number">Def 41</span><span class="def-term">Proof by Cases</span></div>
+        <div class="def-content">
+          A method used when the hypothesis contains a disjunction of cases. One must prove the conclusion is true for every possible case.
+          <br><strong>Strategy:</strong> To prove \( (p_1 \lor p_2 \lor \dots \lor p_n) \to q \), prove \( p_1 \to q \), \( p_2 \to q \), ..., and \( p_n \to q \).
+        </div>
+      </div>
+
+      <div class="definition-card">
+        <div><span class="def-number">Def 42</span><span class="def-term">Mathematical Induction</span></div>
+        <div class="def-content">
+          A technique to prove a statement \( P(n) \) for all natural numbers \( n \geq n_0 \).
+          <ul>
+            <li><strong>Base Case:</strong> Verify \( P(n_0) \) is true.</li>
+            <li><strong>Inductive Hypothesis:</strong> Assume \( P(k) \) is true for an arbitrary \( k \geq n_0 \).</li>
+            <li><strong>Inductive Step:</strong> Prove that \( P(k) \to P(k+1) \) is true.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="definition-card">
+        <div><span class="def-number">Def 43</span><span class="def-term">Existence Proofs</span></div>
+        <div class="def-content">
+          Proofs used to show \( \exists x P(x) \).
+          <ul>
+            <li><strong>Constructive:</strong> Find a specific element \( a \) such that \( P(a) \) is true.</li>
+            <li><strong>Non-constructive:</strong> Prove that such an element must exist without explicitly finding it (often via contradiction).</li>
+          </ul>
+        </div>
+      </div>
+      
+      <div class="definition-card">
+        <div><span class="def-number">Def 44</span><span class="def-term">Counterexample</span></div>
+        <div class="def-content">
+          A specific instance that shows a universal statement \( \forall x P(x) \) is false. Finding one counterexample is sufficient to disprove a universal claim.
+        </div>
+      </div>
+    </div>
+
+    <div id="laws" class="tab-content">
+      <h2 class="section-title">Logical Laws & Equivalences</h2>
+      
+      <div class="info-box" style="margin-bottom: 20px;">
+        <p>The symbol \( \equiv \) denotes logical equivalence. These laws allow us to simplify complex compound propositions.</p>
+      </div>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Name of Law</th>
+            <th>Equivalence</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Identity Laws</strong></td>
+            <td>\( p \land T \equiv p \)<br>\( p \lor F \equiv p \)</td>
+          </tr>
+          <tr>
+            <td><strong>Domination Laws</strong></td>
+            <td>\( p \lor T \equiv T \)<br>\( p \land F \equiv F \)</td>
+          </tr>
+          <tr>
+            <td><strong>Idempotent Laws</strong></td>
+            <td>\( p \lor p \equiv p \)<br>\( p \land p \equiv p \)</td>
+          </tr>
+          <tr>
+            <td><strong>Double Negation</strong></td>
+            <td>\( \neg(\neg p) \equiv p \)</td>
+          </tr>
+          <tr>
+            <td><strong>Commutative Laws</strong></td>
+            <td>\( p \lor q \equiv q \lor p \)<br>\( p \land q \equiv q \land p \)</td>
+          </tr>
+          <tr>
+            <td><strong>Associative Laws</strong></td>
+            <td>\( (p \lor q) \lor r \equiv p \lor (q \lor r) \)<br>\( (p \land q) \land r \equiv p \land (q \land r) \)</td>
+          </tr>
+          <tr>
+            <td><strong>Distributive Laws</strong></td>
+            <td>\( p \lor (q \land r) \equiv (p \lor q) \land (p \lor r) \)<br>\( p \land (q \lor r) \equiv (p \land q) \lor (p \land r) \)</td>
+          </tr>
+          <tr>
+            <td><strong>De Morgan's Laws</strong></td>
+            <td>\( \neg(p \land q) \equiv \neg p \lor \neg q \)<br>\( \neg(p \lor q) \equiv \neg p \land \neg q \)</td>
+          </tr>
+          <tr>
+            <td><strong>Absorption Laws</strong></td>
+            <td>\( p \lor (p \land q) \equiv p \)<br>\( p \land (p \lor q) \equiv p \)</td>
+          </tr>
+          <tr>
+            <td><strong>Implication Law</strong></td>
+            <td>\( p \to q \equiv \neg p \lor q \)</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div id="examples" class="tab-content">
+      <h2 class="section-title">Proof Examples</h2>
+      
+      <div class="example-card">
+        <div><span class="example-number">Ex 5</span><strong>Direct Proof</strong></div>
+        <div class="example-content">
+          <strong>Theorem:</strong> If \( n \) is an odd integer, then \( n^2 \) is odd.
+          <br><strong>Proof:</strong> 
+          1. Assume \( n \) is odd. By definition, \( n = 2k + 1 \) for some integer \( k \).
+          <br>2. Square both sides: \( n^2 = (2k+1)^2 = 4k^2 + 4k + 1 \).
+          <br>3. Factor out 2: \( n^2 = 2(2k^2 + 2k) + 1 \).
+          <br>4. Let \( m = 2k^2 + 2k \). Since \( k \) is an integer, \( m \) is an integer.
+          <br>5. \( n^2 = 2m + 1 \), which fits the definition of an odd number. Q.E.D.
+        </div>
+      </div>
+
+      <div class="example-card">
+        <div><span class="example-number">Ex 6</span><strong>Proof by Contrapositive</strong></div>
+        <div class="example-content">
+          <strong>Theorem:</strong> If \( 3n + 2 \) is odd, then \( n \) is odd.
+          <br><strong>Proof:</strong> We prove the contrapositive: "If \( n \) is even, then \( 3n + 2 \) is even."
+          <br>1. Assume \( n \) is even. So \( n = 2k \).
+          <br>2. Then \( 3n + 2 = 3(2k) + 2 = 6k + 2 = 2(3k + 1) \).
+          <br>3. Since \( 3k+1 \) is an integer, \( 3n + 2 \) is essentially \( 2 \times \text{integer} \), which is even.
+          <br>4. Since the contrapositive is true, the original statement is true.
+        </div>
+      </div>
+
+      <div class="example-card">
+        <div><span class="example-number">Ex 7</span><strong>Proof by Contradiction</strong></div>
+        <div class="example-content">
+          <strong>Theorem:</strong> \( \sqrt{2} \) is irrational.
+          <br><strong>Proof:</strong>
+          1. Assume for the sake of contradiction that \( \sqrt{2} \) is rational.
+          <br>2. Then \( \sqrt{2} = a/b \) for integers \( a, b \) with no common factors (simplified).
+          <br>3. \( 2 = a^2/b^2 \implies a^2 = 2b^2 \). Thus \( a^2 \) is even, implying \( a \) is even (\( a=2k \)).
+          <br>4. Substitute back: \( (2k)^2 = 2b^2 \implies 4k^2 = 2b^2 \implies 2k^2 = b^2 \).
+          <br>5. This implies \( b^2 \) is even, so \( b \) is even.
+          <br>6. Contradiction: We assumed \( a \) and \( b \) had no common factors, but both are even.
+          <br>7. Therefore, \( \sqrt{2} \) must be irrational.
+        </div>
+      </div>
+      
+      <div class="example-card">
+        <div><span class="example-number">Ex 8</span><strong>Counterexample</strong></div>
+        <div class="example-content">
+          <strong>Conjecture:</strong> For every integer \( n \), \( n^2 \geq n \).
+          <br><strong>Check:</strong>
+          <br>If \( n = 2, 4 \geq 2 \) (True).
+          <br>If \( n = -3, 9 \geq -3 \) (True).
+          <br>If \( n = 0, 0 \geq 0 \) (True).
+          <br><strong>Wait:</strong> Is the domain integers or real numbers? If domain is \( \mathbb{R} \), let \( n = 0.5 \).
+          <br>\( 0.5^2 = 0.25 \). Is \( 0.25 \geq 0.5 \)? <strong>False.</strong>
+          <br>\( n = 0.5 \) is a counterexample for the domain of real numbers.
+        </div>
+      </div>
+    </div>
+
+    <div id="summary" class="tab-content">
+      <h2 class="section-title">Quick Reference</h2>
+      
+      <div class="grid-2">
+        <div class="info-box">
+          <h3>📋 Foundations</h3>
+          <p><strong>Propositions</strong> are statements that are strictly True or False. We build complex logic using connectives (\( \land, \lor, \neg, \to \)).</p>
+        </div>
+        
+        <div class="info-box">
+          <h3>🔍 Quantifiers</h3>
+          <p><strong>Universal (\( \forall \))</strong>: True for all elements.<br><strong>Existential (\( \exists \))</strong>: True for at least one element.<br>Remember: \( \neg(\forall x P(x)) \equiv \exists x \neg P(x) \).</p>
+        </div>
+        
+        <div class="info-box">
+          <h3>🛠️ Proof Strategy</h3>
+          <p>
+            1. Try <strong>Direct Proof</strong> first.<br>
+            2. If "If...then", try <strong>Contrapositive</strong>.<br>
+            3. If proving non-existence or irrationality, try <strong>Contradiction</strong>.<br>
+            4. If dealing with \( \mathbb{N} \), try <strong>Induction</strong>.
+          </p>
+        </div>
+        
+        <div class="info-box">
+          <h3>⚠️ Common Pitfalls</h3>
+          <p>
+            - Confusing \( p \to q \) with \( q \to p \) (Converse error).<br>
+            - Assuming "some" implies "not all".<br>
+            - Division by zero in algebraic steps.<br>
+            - Circular reasoning (assuming what you want to prove).
+          </p>
+        </div>
+      </div>
+
+      <div class="note-card" style="margin-top: 25px;">
+        <span class="note-label">Review</span>
+        <strong>Key Equivalences to Memorize:</strong>
+        <ul style="margin-top: 10px; list-style-type: none; padding-left: 0;">
+          <li>\( p \to q \equiv \neg p \lor q \)</li>
+          <li>\( p \to q \equiv \neg q \to \neg p \)</li>
+          <li>\( \neg (p \to q) \equiv p \land \neg q \) (Negation of Implication)</li>
+          <li>\( p \leftrightarrow q \equiv (p \to q) \land (q \to p) \)</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    CS 637 – Lecture 1: What is a Proof? • Theory of Computation and Graph Theory<br>
+    © 2025 Dr. Debasish Pattanayak • Department of Computer Science
+  </footer>
+</div>
+
+<script>
+function switchTab(tabName) {
+  // Hide all contents
+  const tabs = document.querySelectorAll('.tab-content');
+  tabs.forEach(tab => tab.classList.remove('active'));
+  
+  // Deactivate all buttons
+  const btns = document.querySelectorAll('.tab-btn');
+  btns.forEach(btn => btn.classList.remove('active'));
+  
+  // Show target content
+  const target = document.getElementById(tabName);
+  if (target) {
+    target.classList.add('active');
+  }
+  
+  // Activate clicked button
+  // Note: This relies on the button calling the function being the event target
+  const clickedBtn = Array.from(btns).find(btn => btn.getAttribute('onclick').includes(tabName));
+  if (clickedBtn) {
+    clickedBtn.classList.add('active');
+  }
+}
+
+function searchDefinitions() {
+  const input = document.getElementById('searchBox').value.toLowerCase();
+  
+  // Search in all definitions, theorems, and examples
+  const cards = document.querySelectorAll('.definition-card, .example-card, .theorem-card, .note-card');
+  
+  cards.forEach(card => {
+    const text = card.textContent.toLowerCase();
+    // We only want to toggle display if the parent tab is active? 
+    // Or do we search across all tabs? 
+    // Simple implementation: search within the currently visible tab or all tabs.
+    // Better UX: Search implies filtering the visible list.
+    
+    // However, to make it work across tabs, the tabs need to be handled carefully.
+    // For this simple template, we will filter elements regardless of tab,
+    // but usually, users expect to see results in the current list.
+    // Let's stick to filtering visible cards in the active tab for simplicity,
+    // OR filter all and let the user switch tabs.
+    
+    // Current implementation: Filter items. If an item is in a hidden tab, it stays hidden effectively.
+    // But if we want global search, we might need to search specifically.
+    
+    if (text.includes(input)) {
+      card.style.display = 'block';
+    } else {
+      card.style.display = 'none';
+    }
+  });
+}
+
+// Initialize KaTeX
+document.addEventListener("DOMContentLoaded", function() {
+  renderMathInElement(document.body, {
+    delimiters: [
+      {left: "$$", right: "$$", display: true},
+      {left: "\\[", right: "\\]", display: true},
+      {left: "\\(", right: "\\)", display: false}
+    ]
+  });
+});
+</script>
+
+</body>
+</html>
