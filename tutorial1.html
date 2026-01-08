@@ -1,88 +1,415 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="utf-8">
-  <title>CS 637 – Tutorial 1 Definitions</title>
+  <title>CS 637 – Tutorial 1: Logic and Proofs</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
   <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
   <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
-
   <style>
-    body {
-      font-family: "Times New Roman", serif;
-      margin: 40px;
-      line-height: 1.5;
-      background-color: #ffffff;
-      color: #000000;
+    /* Styles ported from lecture1.html */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
     }
-    h1, h2 {
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      line-height: 1.6;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      overflow: hidden;
+    }
+
+    header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 40px;
       text-align: center;
     }
+
     h1 {
-      font-size: 1.8em;
-      margin-bottom: 0.2em;
+      font-size: 2.5em;
+      margin-bottom: 10px;
+      font-weight: 700;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
     }
-    h2 {
-      font-size: 1.2em;
-      margin-top: 2em;
-      margin-bottom: 0.5em;
+
+    .subtitle {
+      font-size: 1.3em;
+      margin-bottom: 15px;
+      opacity: 0.95;
     }
-    .definition {
-      margin-bottom: 1em;
-    }
-    .term {
-      font-weight: bold;
-    }
-    .number {
-      font-weight: bold;
-    }
+
     .instructor {
-      margin-top: 8px;
-      font-size: 0.95rem;
-      color: #64748b;
+      margin-top: 15px;
+      font-size: 1.05em;
+      opacity: 0.9;
     }
+
     .instructor a {
-      color: #0ea5e9;
+      color: #ffd700;
       text-decoration: none;
-      font-weight: 500;
+      font-weight: 600;
+      transition: opacity 0.3s;
     }
+
     .instructor a:hover {
+      opacity: 0.8;
       text-decoration: underline;
     }
-    footer {
-      margin-top: 3em;
+
+    .content {
+      padding: 40px;
+    }
+
+    .section-title {
+      font-size: 1.8em;
+      color: #1e293b;
+      margin-bottom: 25px;
+      padding-bottom: 10px;
+      border-bottom: 3px solid #667eea;
+      font-weight: 700;
       text-align: center;
-      font-size: 0.85em;
-      color: #333;
+    }
+
+    /* Tutorial Question Card Style (based on definition-card) */
+    .question-card {
+      background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
+      border-left: 4px solid #667eea;
+      padding: 20px;
+      margin-bottom: 25px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+      transition: all 0.3s;
+    }
+
+    .question-card:hover {
+      transform: translateX(5px);
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+    }
+
+    .question-title {
+      font-size: 1.15em;
+      font-weight: 700;
+      color: #1e293b;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+    }
+
+    .question-number {
+      display: inline-block;
+      background: #667eea;
+      color: white;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-weight: 700;
+      font-size: 0.9em;
+      margin-right: 10px;
+    }
+
+    .question-content {
+      color: #475569;
+      margin-top: 8px;
+      line-height: 1.7;
+    }
+
+    pre {
+      background: #f1f5f9;
+      padding: 15px;
+      border-radius: 6px;
+      overflow-x: auto;
+      margin-top: 10px;
+      border: 1px solid #e2e8f0;
+      font-family: 'Consolas', 'Monaco', monospace;
+      font-size: 0.95em;
+    }
+
+    footer {
+      background: #1e293b;
+      color: white;
+      text-align: center;
+      padding: 25px;
+      font-size: 0.9em;
+    }
+
+    .katex {
+      font-size: 1.1em;
+    }
+
+    @media (max-width: 768px) {
+      h1 {
+        font-size: 1.8em;
+      }
+
+      .subtitle {
+        font-size: 1.1em;
+      }
+
+      .content {
+        padding: 25px;
+      }
     }
   </style>
 </head>
 
 <body>
 
-<h1>CS 637: Mathematics-II</h1>
-<div class="instructor">
-  <strong>Instructor:</strong> <a href="https://drdebmath.github.io" target="_blank">Dr. Debasish Pattanayak</a>
-</div>
-<h2>Tutorial 1: Problems from Logic and Proofs</h2>
+  <div class="container">
+    <header>
+      <h1>CS 637: Mathematics-II</h1>
+      <div class="subtitle">Tutorial 1: Problems from Logic and Proofs</div>
+      <div class="instructor">
+        <strong>Instructor:</strong> <a href="https://drdebmath.github.io" target="_blank">Dr. Debasish Pattanayak</a>
+      </div>
+    </header>
 
-<footer>
-  
-</footer>
+    <div class="content">
+      <h2 class="section-title">Problem Set</h2>
 
-<script>
-document.addEventListener("DOMContentLoaded", function() {
-    renderMathInElement(document.body, {
+      <div class="question-card">
+        <div class="question-title">
+          <span class="question-number">Q1</span> Direct Proof
+        </div>
+        <div class="question-content">
+          <p>Prove that the sum of two even integers is always even.</p>
+        </div>
+      </div>
+
+      <div class="question-card">
+        <div class="question-title">
+          <span class="question-number">Q2</span> Proof by Contradiction
+        </div>
+        <div class="question-content">
+          <p>Prove that \( \sqrt{2} \) is irrational. Generalize the proof for any prime \( p \) to say \( \sqrt{p} \)
+            is irrational.</p>
+        </div>
+      </div>
+
+      <div class="question-card">
+        <div class="question-title">
+          <span class="question-number">Q3</span> Proof by Contrapositive
+        </div>
+        <div class="question-content">
+          <p>Prove that if \( n^2 \) is even, then \( n \) is even, where \( n \) is an integer.</p>
+        </div>
+      </div>
+
+      <div class="question-card">
+        <div class="question-title">
+          <span class="question-number">Q4</span> Mathematical Induction
+        </div>
+        <div class="question-content">
+          <p>Prove by induction that for all positive integers \( n \):</p>
+          <p>\[ 1 + 2 + 3 + \cdots + n = \frac{n(n+1)}{2} \]</p>
+          <p>Generalize the technique of proof for any series \( \sum_{i=1}^{n} i^k = f(n) \). Find a closed form
+            formula for \( f(n) \). <em>Hint: Use binomial expansion.</em></p>
+        </div>
+      </div>
+
+      <div class="question-card">
+        <div class="question-title">
+          <span class="question-number">Q5</span> Pythagorean Triplets — Three Methods
+        </div>
+        <div class="question-content">
+          <p>A Pythagorean triplet is a set of three positive integers \( (a, b, c) \) such that \( a^2 + b^2 = c^2 \).
+            Prove that there are infinitely many Pythagorean triplets using three different methods.</p>
+        </div>
+      </div>
+
+      <div class="question-card">
+        <div class="question-title">
+          <span class="question-number">Q6</span> Proof by Cases
+        </div>
+        <div class="question-content">
+          <p>Prove that \( n^2 + n \) is even for all integers \( n \). What would be a function that says \( f(n) \) is
+            divisible by a prime \( p \) for all integers \( n \in \mathbb{N} \)?</p>
+        </div>
+      </div>
+
+      <div class="question-card">
+        <div class="question-title">
+          <span class="question-number">Q7</span> Existence Proof
+        </div>
+        <div class="question-content">
+          <p>Prove that there exist irrational numbers \( a \) and \( b \) such that \( a^b \) is rational.</p>
+        </div>
+      </div>
+
+      <div class="question-card">
+        <div class="question-title">
+          <span class="question-number">Q8</span> Divisibility
+        </div>
+        <div class="question-content">
+          <p>Prove that for any integer \( n \), the number \( n^3 - n \) is divisible by \( 6 \). What is a function \(
+            f(n) \) that is divisible by \( k \)?</p>
+        </div>
+      </div>
+
+      <div class="question-card">
+        <div class="question-title">
+          <span class="question-number">Q9</span> Bogus Proof
+        </div>
+        <div class="question-content">
+          <p>Prove that Arithmetic Mean \( \ge \) Geometric Mean.</p>
+          $$
+          \begin{aligned}
+          \dfrac{a+b}{2} &\ge \sqrt{ab} \\
+          a+b &\ge 2\sqrt{ab} \\
+          a^2 + 2ab + b^2 &\ge 4ab \\
+          a^2 - 2ab + b^2 &\ge 0 \\
+          (a-b)^2 &\ge 0
+          \end{aligned}
+          $$
+          <p>The last statement is true because \( a-b \) is a real number, and the square of a real number is never
+            negative. This proves the claim.</p>
+          <p>In the above proof, identify what is wrong.</p>
+        </div>
+      </div>
+
+      <div class="question-card">
+        <div class="question-title">
+          <span class="question-number">Q10</span> Uniqueness Proof
+        </div>
+        <div class="question-content">
+          <p>Prove that if \( x^2 = 4 \) and \( x > 0 \), then \( x = 2 \) is the unique solution.</p>
+        </div>
+      </div>
+
+      <h2 class="section-title" style="margin-top: 50px;">Logical Equivalences</h2>
+
+      <div class="question-card">
+        <div class="question-title">
+          <span class="question-number">Q11</span>
+        </div>
+        <div class="question-content">
+          <p>Show that \( \neg(p \vee (\neg p \wedge q)) \) and \( \neg p \wedge \neg q \) are logically equivalent by
+            developing a series of logical equivalences.</p>
+        </div>
+      </div>
+
+      <div class="question-card">
+        <div class="question-title">
+          <span class="question-number">Q12</span>
+        </div>
+        <div class="question-content">
+          <p>Prove that \( (p \rightarrow q) \wedge (p \rightarrow r) \) and \( p \rightarrow (q \wedge r) \) are
+            logically equivalent using logical equivalence laws.</p>
+        </div>
+      </div>
+
+      <div class="question-card">
+        <div class="question-title">
+          <span class="question-number">Q13</span>
+        </div>
+        <div class="question-content">
+          <p>Show that \( \neg(p \rightarrow q) \) and \( p \wedge \neg q \) are logically equivalent by applying
+            logical equivalence transformations.</p>
+        </div>
+      </div>
+
+      <div class="question-card">
+        <div class="question-title">
+          <span class="question-number">Q14</span>
+        </div>
+        <div class="question-content">
+          <p>Prove that \( (p \vee q) \wedge (\neg p \vee r) \) and \( (p \wedge r) \vee (q \wedge \neg p) \vee (q
+            \wedge r) \) are logically equivalent using the distributive laws.</p>
+        </div>
+      </div>
+
+      <div class="question-card">
+        <div class="question-title">
+          <span class="question-number">Q15</span>
+        </div>
+        <div class="question-content">
+          <p>Show that \( \neg((p \vee q) \wedge (\neg p \vee \neg q)) \) and \( \neg p \wedge \neg q \) are logically
+            equivalent by developing a series of logical equivalences.</p>
+        </div>
+      </div>
+
+      <div class="question-card">
+        <div class="question-title">
+          <span class="question-number">Q16</span>
+        </div>
+        <div class="question-content">
+          <p>Prove that \( (p \rightarrow q) \vee (q \rightarrow p) \) is a tautology using logical equivalences.</p>
+        </div>
+      </div>
+
+      <div class="question-card">
+        <div class="question-title">
+          <span class="question-number">Q17</span>
+        </div>
+        <div class="question-content">
+          <p>Show that \( \neg(p \wedge (q \vee \neg r)) \) and \( \neg p \vee (\neg q \wedge r) \) are logically
+            equivalent by applying De Morgan's laws and other logical equivalences.</p>
+        </div>
+      </div>
+
+      <div class="question-card">
+        <div class="question-title">
+          <span class="question-number">Q18</span>
+        </div>
+        <div class="question-content">
+          <p>Prove that \( (p \rightarrow q) \wedge (q \rightarrow r) \) and \( (p \rightarrow r) \wedge ((p \wedge \neg
+            r) \rightarrow \neg q) \) are logically equivalent.</p>
+        </div>
+      </div>
+
+      <div class="question-card">
+        <div class="question-title">
+          <span class="question-number">Q19</span>
+        </div>
+        <div class="question-content">
+          <p>Show that \( ((p \vee q) \rightarrow r) \) and \( (p \rightarrow r) \wedge (q \rightarrow r) \) are
+            logically equivalent using logical equivalence laws.</p>
+        </div>
+      </div>
+
+      <div class="question-card">
+        <div class="question-title">
+          <span class="question-number">Q20</span>
+        </div>
+        <div class="question-content">
+          <p>Prove that \( \neg(p \leftrightarrow q) \) and \( (p \wedge \neg q) \vee (\neg p \wedge q) \) are logically
+            equivalent by developing a series of logical equivalences.</p>
+        </div>
+      </div>
+
+    </div>
+
+    <footer>
+      CS 637 – Tutorial 1: Problems from Logic and Proofs • Spring 2026<br>
+      Department of Computer Science and Engineering
+    </footer>
+  </div>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      renderMathInElement(document.body, {
         delimiters: [
-            {left: "31952", right: "31952", display: true},
-            {left: "\[", right: "\]", display: true},
-            {left: "\(", right: "\)", display: false}
+          { left: "$$", right: "$$", display: true },
+          { left: "\\[", right: "\\]", display: true },
+          { left: "\\(", right: "\\)", display: false }
         ]
+      });
     });
-});
-</script>
+  </script>
 
 </body>
+
 </html>
