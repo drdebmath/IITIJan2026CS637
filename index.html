@@ -1160,6 +1160,75 @@
         }
       });
     });
+
+    // Dynamic Schedule Highlighting
+    async function updateSchedule() {
+      let now = new Date();
+
+      try {
+        // Try fetching from WorldTimeAPI
+        const response = await fetch('https://worldtimeapi.org/api/timezone/Asia/Kolkata');
+        if (response.ok) {
+          const data = await response.json();
+          // Extract date parts manually to avoid timezone confusion in Date constructor if needed
+          // But standard Date(data.datetime) works well if formatted correctly
+          now = new Date(data.datetime);
+          console.log("Fetched time:", now);
+        }
+      } catch (e) {
+        console.warn("Time API failed, falling back to system time", e);
+      }
+
+      // Normalize today's date for comparison (clear time)
+      const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+      // Find schedule rows
+      const rows = document.querySelectorAll('#schedule tbody tr');
+      let matchedRow = null;
+
+      rows.forEach(row => {
+        // Remove existing highlights
+        row.classList.remove('current-lecture');
+
+        const dateCell = row.children[1];
+        if (!dateCell) return;
+
+        const rowDateStr = dateCell.textContent.trim();
+        const rowDate = new Date(rowDateStr);
+
+        // Compare dates
+        if (rowDate.getFullYear() === today.getFullYear() &&
+          rowDate.getMonth() === today.getMonth() &&
+          rowDate.getDate() === today.getDate()) {
+
+          row.classList.add('current-lecture');
+          matchedRow = row;
+        }
+      });
+
+      if (matchedRow) {
+        // Update Alert Banner
+        const type = matchedRow.children[4].textContent.trim(); // Lecture/Tutorial
+        const topic = matchedRow.children[6].textContent.trim();
+        const time = matchedRow.children[3].textContent.trim();
+
+        const alertDiv = document.querySelector('#announcements .alert div');
+        if (alertDiv) {
+          // Calculate Week Number (Rough approximation starting Jan 6)
+          const startDate = new Date(2026, 0, 6); // Jan 6
+          const diffDays = Math.floor((today - startDate) / (1000 * 60 * 60 * 24));
+          const weekNum = Math.floor(diffDays / 7) + 1;
+
+          const isTutorial = type.toLowerCase().includes('tutorial');
+          const sessionName = isTutorial ? type : `${type} - "${topic}"`;
+
+          alertDiv.innerHTML = `<strong>Current Week:</strong> Week ${weekNum} - Welcome! Today's session: <strong>${sessionName}</strong> (${time}, Hall L31).`;
+        }
+      }
+    }
+
+    // Run on load
+    updateSchedule();
   </script>
 
 </body>
