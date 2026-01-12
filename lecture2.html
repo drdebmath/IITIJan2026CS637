@@ -1,88 +1,1470 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="utf-8">
-  <title>CS 637 – Lecture 2 Definitions</title>
+  <title>CS 637 – Lecture 2: Propositional Logic</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
   <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
   <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
-
   <style>
-    body {
-      font-family: "Times New Roman", serif;
-      margin: 40px;
-      line-height: 1.5;
-      background-color: #ffffff;
-      color: #000000;
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
     }
-    h1, h2 {
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      line-height: 1.6;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      overflow: hidden;
+    }
+
+    header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 40px;
       text-align: center;
     }
+
     h1 {
-      font-size: 1.8em;
-      margin-bottom: 0.2em;
+      font-size: 2.5em;
+      margin-bottom: 10px;
+      font-weight: 700;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
     }
-    h2 {
-      font-size: 1.2em;
-      margin-top: 2em;
-      margin-bottom: 0.5em;
+
+    .subtitle {
+      font-size: 1.3em;
+      margin-bottom: 15px;
+      opacity: 0.95;
     }
-    .definition {
-      margin-bottom: 1em;
-    }
-    .term {
-      font-weight: bold;
-    }
-    .number {
-      font-weight: bold;
-    }
+
     .instructor {
-      margin-top: 8px;
-      font-size: 0.95rem;
-      color: #64748b;
+      margin-top: 15px;
+      font-size: 1.05em;
+      opacity: 0.9;
     }
+
     .instructor a {
-      color: #0ea5e9;
+      color: #ffd700;
       text-decoration: none;
-      font-weight: 500;
+      font-weight: 600;
+      transition: opacity 0.3s;
     }
+
     .instructor a:hover {
+      opacity: 0.8;
       text-decoration: underline;
     }
-    footer {
-      margin-top: 3em;
+
+    .content {
+      padding: 40px;
+    }
+
+    .nav-tabs {
+      display: flex;
+      border-bottom: 2px solid #e2e8f0;
+      margin-bottom: 30px;
+      gap: 5px;
+      overflow-x: auto;
+    }
+
+    .tab-btn {
+      padding: 12px 20px;
+      background: none;
+      border: none;
+      font-size: 1em;
+      cursor: pointer;
+      color: #64748b;
+      font-weight: 600;
+      border-bottom: 3px solid transparent;
+      transition: all 0.3s;
+      white-space: nowrap;
+    }
+
+    .tab-btn:hover {
+      color: #667eea;
+      background: #f8fafc;
+    }
+
+    .tab-btn.active {
+      color: #667eea;
+      border-bottom-color: #667eea;
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+      animation: fadeIn 0.4s;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .section-title {
+      font-size: 1.8em;
+      color: #1e293b;
+      margin-bottom: 25px;
+      padding-bottom: 10px;
+      border-bottom: 3px solid #667eea;
+      font-weight: 700;
+    }
+
+    .subsection-title {
+      font-size: 1.4em;
+      color: #334155;
+      margin: 30px 0 15px 0;
+      font-weight: 600;
+    }
+
+    .definition-card {
+      background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
+      border-left: 4px solid #667eea;
+      padding: 20px;
+      margin-bottom: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+      transition: all 0.3s;
+    }
+
+    .definition-card:hover {
+      transform: translateX(5px);
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+    }
+
+    .def-number {
+      display: inline-block;
+      background: #667eea;
+      color: white;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-weight: 700;
+      font-size: 0.9em;
+      margin-right: 10px;
+    }
+
+    .def-term {
+      font-weight: 700;
+      color: #1e293b;
+      font-size: 1.15em;
+      display: inline-block;
+      margin-bottom: 8px;
+    }
+
+    .def-content {
+      color: #475569;
+      margin-top: 8px;
+      line-height: 1.7;
+    }
+
+    .def-content ul {
+      margin-top: 10px;
+      margin-left: 20px;
+    }
+
+    .def-content li {
+      margin: 6px 0;
+    }
+
+    .example-card {
+      background: linear-gradient(135deg, #fef3c7 0%, #fef9c3 100%);
+      border-left: 4px solid #f59e0b;
+      padding: 18px;
+      margin-bottom: 15px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    }
+
+    .example-number {
+      display: inline-block;
+      background: #f59e0b;
+      color: white;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-weight: 700;
+      font-size: 0.9em;
+      margin-right: 10px;
+    }
+
+    .example-content {
+      color: #78350f;
+      margin-top: 8px;
+      font-weight: 500;
+    }
+
+    .theorem-card {
+      background: linear-gradient(135deg, #dfe9f3 0%, #ffffff 100%);
+      border-left: 4px solid #3b82f6;
+      padding: 18px;
+      margin-bottom: 15px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    }
+
+    .theorem-number {
+      display: inline-block;
+      background: #3b82f6;
+      color: white;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-weight: 700;
+      font-size: 0.9em;
+      margin-right: 10px;
+    }
+
+    .note-card {
+      background: linear-gradient(135deg, #f0fdf4 0%, #ffffff 100%);
+      border-left: 4px solid #10b981;
+      padding: 18px;
+      margin-bottom: 15px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    }
+
+    .note-label {
+      display: inline-block;
+      background: #10b981;
+      color: white;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-weight: 700;
+      font-size: 0.9em;
+      margin-right: 10px;
+    }
+
+    .warning-card {
+      background: linear-gradient(135deg, #fee2e2 0%, #ffffff 100%);
+      border-left: 4px solid #ef4444;
+      padding: 18px;
+      margin-bottom: 15px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    }
+
+    .warning-label {
+      display: inline-block;
+      background: #ef4444;
+      color: white;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-weight: 700;
+      font-size: 0.9em;
+      margin-right: 10px;
+    }
+
+    .search-box {
+      width: 100%;
+      padding: 15px 20px;
+      font-size: 1em;
+      border: 2px solid #e2e8f0;
+      border-radius: 8px;
+      margin-bottom: 25px;
+      transition: all 0.3s;
+    }
+
+    .search-box:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+      margin-top: 20px;
+    }
+
+    .info-box {
+      background: linear-gradient(135deg, #e0e7ff 0%, #f3f4f6 100%);
+      padding: 20px;
+      border-radius: 8px;
+      border-left: 4px solid #6366f1;
+    }
+
+    .info-box h3 {
+      color: #1e293b;
+      margin-bottom: 10px;
+      font-size: 1.1em;
+    }
+
+    .info-box p {
+      color: #475569;
+      font-size: 0.95em;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 15px 0;
+      background: white;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    }
+
+    th,
+    td {
+      padding: 12px;
       text-align: center;
-      font-size: 0.85em;
-      color: #333;
+      border: 1px solid #e2e8f0;
+    }
+
+    th {
+      background: #667eea;
+      color: white;
+      font-weight: 600;
+    }
+
+    tr:nth-child(even) {
+      background: #f8fafc;
+    }
+
+    footer {
+      background: #1e293b;
+      color: white;
+      text-align: center;
+      padding: 25px;
+      font-size: 0.9em;
+    }
+
+    .katex {
+      font-size: 1.1em;
+    }
+
+    code {
+      background: #f1f5f9;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-family: 'Courier New', monospace;
+      color: #dc2626;
+    }
+
+    @media (max-width: 768px) {
+      h1 {
+        font-size: 1.8em;
+      }
+
+      .subtitle {
+        font-size: 1.1em;
+      }
+
+      .content {
+        padding: 25px;
+      }
+
+      .nav-tabs {
+        flex-wrap: wrap;
+      }
+
+      .tab-btn {
+        padding: 10px 15px;
+        font-size: 0.9em;
+      }
     }
   </style>
 </head>
 
 <body>
 
-<h1>CS 637: Mathematics-II</h1>
-<div class="instructor">
-  <strong>Instructor:</strong> <a href="https://drdebmath.github.io" target="_blank">Dr. Debasish Pattanayak</a>
-</div>
-<h2>Lecture 2 – Propositional Logic: Syntax, Semantics, and Models</h2>
+  <div class="container">
+    <header>
+      <h1>CS 637: Mathematics-II</h1>
+      <div class="subtitle">Theory of Computation and Graph Theory</div>
+      <div class="instructor">
+        <strong>Instructor:</strong> <a href="https://drdebmath.github.io" target="_blank">Dr. Debasish Pattanayak</a>
+      </div>
+    </header>
 
-<footer>
-  
-</footer>
+    <div class="content">
+      <div class="nav-tabs">
+        <button class="tab-btn active" onclick="switchTab('implication')">Implication</button>
+        <button class="tab-btn" onclick="switchTab('predicates')">Predicate Equivalence</button>
+        <button class="tab-btn" onclick="switchTab('dnf')">Normal Forms</button>
+        <button class="tab-btn" onclick="switchTab('algebra')">Propositional Algebra</button>
+        <button class="tab-btn" onclick="switchTab('sat')">SAT Problem</button>
+        <button class="tab-btn" onclick="switchTab('basis')">Functional Completeness</button>
+        <button class="tab-btn" onclick="switchTab('inference')">Rules of Inference</button>
+        <button class="tab-btn" onclick="switchTab('summary')">Quick Reference</button>
+      </div>
 
-<script>
-document.addEventListener("DOMContentLoaded", function() {
-    renderMathInElement(document.body, {
-        delimiters: [
-            {left: "31952", right: "31952", display: true},
-            {left: "\[", right: "\]", display: true},
-            {left: "\(", right: "\)", display: false}
-        ]
-    });
-});
-</script>
+      <input type="text" class="search-box" id="searchBox" placeholder="🔍 Search definitions, theorems, examples..."
+        onkeyup="searchDefinitions()">
+
+      <div id="implication" class="tab-content active">
+        <h2 class="section-title">Lecture 2: Deep Dive into Implication</h2>
+
+        <div class="searchable">
+          <h3 class="subsection-title">Understanding Implication</h3>
+
+          <div class="definition-card">
+            <div><span class="def-number">Def 1</span><span class="def-term">Implication (Material Conditional)</span>
+            </div>
+            <div class="def-content">
+              An implication \( p \to q \) is a compound proposition that is false only when \( p \) is true and \( q \)
+              is false. In all other cases, it is true.
+              <br><br><strong>Truth Table:</strong>
+              <table style="width: 60%; margin: 15px auto;">
+                <tr>
+                  <th>\( p \)</th>
+                  <th>\( q \)</th>
+                  <th>\( p \to q \)</th>
+                </tr>
+                <tr>
+                  <td>T</td>
+                  <td>T</td>
+                  <td>T</td>
+                </tr>
+                <tr>
+                  <td>T</td>
+                  <td>F</td>
+                  <td>F</td>
+                </tr>
+                <tr>
+                  <td>F</td>
+                  <td>T</td>
+                  <td>T</td>
+                </tr>
+                <tr>
+                  <td>F</td>
+                  <td>F</td>
+                  <td>T</td>
+                </tr>
+              </table>
+            </div>
+          </div>
+
+          <div class="definition-card">
+            <div><span class="def-number">Def 2</span><span class="def-term">Hypothesis (Antecedent)</span></div>
+            <div class="def-content">In an implication \( p \to q \), the proposition \( p \) is called the hypothesis,
+              antecedent, or premise.</div>
+          </div>
+
+          <div class="definition-card">
+            <div><span class="def-number">Def 3</span><span class="def-term">Conclusion (Consequent)</span></div>
+            <div class="def-content">In an implication \( p \to q \), the proposition \( q \) is called the conclusion,
+              consequent, or result.</div>
+          </div>
+
+          <div class="note-card">
+            <span class="note-label">Key Insight</span>
+            <strong>Why is \( F \to T \) and \( F \to F \) both true?</strong>
+            <br>When the hypothesis is false, the implication is vacuously true regardless of the conclusion. This is
+            called a <strong>vacuous truth</strong>. Example: "If the moon is made of cheese, then I am the king of
+            France" is considered true because the hypothesis is false.
+          </div>
+
+          <h3 class="subsection-title">Variants of Implication</h3>
+
+          <div class="definition-card">
+            <div><span class="def-number">Def 4</span><span class="def-term">Converse</span></div>
+            <div class="def-content">
+              The converse of \( p \to q \) is \( q \to p \).
+              <br><strong>Important:</strong> \( p \to q \not\equiv q \to p \) in general.
+              <br><strong>Example:</strong> "If it rains, the ground is wet" does not mean "If the ground is wet, it
+              rained" (could be a sprinkler).
+            </div>
+          </div>
+
+          <div class="definition-card">
+            <div><span class="def-number">Def 5</span><span class="def-term">Contrapositive</span></div>
+            <div class="def-content">
+              The contrapositive of \( p \to q \) is \( \neg q \to \neg p \).
+              <br><strong>Critical Property:</strong> \( p \to q \equiv \neg q \to \neg p \) (always logically
+              equivalent!)
+              <br><strong>Example:</strong> "If it rains, the ground is wet" is equivalent to "If the ground is not wet,
+              it did not rain."
+            </div>
+          </div>
+
+          <div class="definition-card">
+            <div><span class="def-number">Def 6</span><span class="def-term">Inverse</span></div>
+            <div class="def-content">
+              The inverse of \( p \to q \) is \( \neg p \to \neg q \).
+              <br><strong>Important:</strong> \( p \to q \not\equiv \neg p \to \neg q \) in general.
+              <br><strong>Note:</strong> The inverse is the contrapositive of the converse.
+            </div>
+          </div>
+
+          <div class="theorem-card">
+            <div><span class="theorem-number">Theorem 1</span><strong>Equivalence Relationships</strong></div>
+            <div class="def-content">
+              For any implication \( p \to q \):
+              <ul>
+                <li>Original \( p \to q \) is equivalent to its contrapositive \( \neg q \to \neg p \)</li>
+                <li>Converse \( q \to p \) is equivalent to inverse \( \neg p \to \neg q \)</li>
+                <li>But original is NOT equivalent to converse or inverse</li>
+              </ul>
+            </div>
+          </div>
+
+          <h3 class="subsection-title">Important Equivalences for Implication</h3>
+
+          <div class="definition-card">
+            <div><span class="def-number">Thm 2</span><span class="def-term">Implication as Disjunction</span></div>
+            <div class="def-content">
+              \( p \to q \equiv \neg p \lor q \)
+              <br><br>This is the most fundamental equivalence for implication. It shows that an implication can always
+              be rewritten as a disjunction.
+            </div>
+          </div>
+
+          <div class="example-card">
+            <div><span class="example-number">Ex 1</span><strong>Verifying Implication Equivalence</strong></div>
+            <div class="example-content">
+              Verify \( p \to q \equiv \neg p \lor q \) using truth table:
+              <table style="width: 80%; margin: 10px auto;">
+                <tr>
+                  <th>\( p \)</th>
+                  <th>\( q \)</th>
+                  <th>\( \neg p \)</th>
+                  <th>\( p \to q \)</th>
+                  <th>\( \neg p \lor q \)</th>
+                </tr>
+                <tr>
+                  <td>T</td>
+                  <td>T</td>
+                  <td>F</td>
+                  <td>T</td>
+                  <td>T</td>
+                </tr>
+                <tr>
+                  <td>T</td>
+                  <td>F</td>
+                  <td>F</td>
+                  <td>F</td>
+                  <td>F</td>
+                </tr>
+                <tr>
+                  <td>F</td>
+                  <td>T</td>
+                  <td>T</td>
+                  <td>T</td>
+                  <td>T</td>
+                </tr>
+                <tr>
+                  <td>F</td>
+                  <td>F</td>
+                  <td>T</td>
+                  <td>T</td>
+                  <td>T</td>
+                </tr>
+              </table>
+              The last two columns are identical, confirming the equivalence.
+            </div>
+          </div>
+
+          <div class="definition-card">
+            <div><span class="def-number">Thm 3</span><span class="def-term">Negation of Implication</span></div>
+            <div class="def-content">
+              \( \neg(p \to q) \equiv p \land \neg q \)
+              <br><br>To negate an implication, the hypothesis must be true AND the conclusion must be false.
+            </div>
+          </div>
+
+          <div class="warning-card">
+            <span class="warning-label">Common Error</span>
+            <strong>Many students incorrectly think:</strong> \( \neg(p \to q) \equiv \neg p \to \neg q \)
+            <br>This is WRONG! The correct negation is \( p \land \neg q \).
+          </div>
+        </div>
+      </div>
+
+      <div id="predicates" class="tab-content">
+        <h2 class="section-title">Predicate Logic Equivalences</h2>
+
+        <div class="definition-card">
+          <div><span class="def-number">Def 7</span><span class="def-term">Logically Equivalent Predicates</span></div>
+          <div class="def-content">
+            Two predicate expressions are logically equivalent if they have the same truth value for all possible values
+            of their variables in the domain and for all possible predicates.
+          </div>
+        </div>
+
+        <h3 class="subsection-title">Quantifier Equivalences</h3>
+
+        <div class="theorem-card">
+          <div><span class="theorem-number">Theorem 4</span><strong>De Morgan's Laws for Quantifiers</strong></div>
+          <div class="def-content">
+            <ul>
+              <li>\( \neg (\forall x \, P(x)) \equiv \exists x \, \neg P(x) \)</li>
+              <li>\( \neg (\exists x \, P(x)) \equiv \forall x \, \neg P(x) \)</li>
+            </ul>
+            <strong>Intuition:</strong> "Not everyone likes pizza" means "Someone doesn't like pizza." "Nobody likes
+            anchovies" means "Everyone doesn't like anchovies."
+          </div>
+        </div>
+
+        <div class="theorem-card">
+          <div><span class="theorem-number">Theorem 5</span><strong>Distributive Laws for Quantifiers</strong></div>
+          <div class="def-content">
+            For conjunction:
+            <ul>
+              <li>\( \forall x \, (P(x) \land Q(x)) \equiv (\forall x \, P(x)) \land (\forall x \, Q(x)) \)</li>
+              <li>\( \exists x \, (P(x) \land Q(x)) \implies (\exists x \, P(x)) \land (\exists x \, Q(x)) \) (but NOT
+                equivalence!)</li>
+            </ul>
+            For disjunction:
+            <ul>
+              <li>\( \exists x \, (P(x) \lor Q(x)) \equiv (\exists x \, P(x)) \lor (\exists x \, Q(x)) \)</li>
+              <li>\( \forall x \, (P(x) \lor Q(x)) \impliedby (\forall x \, P(x)) \lor (\forall x \, Q(x)) \) (but NOT
+                equivalence!)</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="example-card">
+          <div><span class="example-number">Ex 2</span><strong>Non-equivalence Example</strong></div>
+          <div class="example-content">
+            Consider domain of people: Let \( P(x) \) = "x is male" and \( Q(x) \) = "x is female".
+            <br><br>\( (\exists x \, P(x)) \land (\exists x \, Q(x)) \) is true (there exist males and females).
+            <br><br>\( \exists x \, (P(x) \land Q(x)) \) is false (no person is both male and female).
+            <br><br>This shows the implication in Theorem 5 doesn't reverse!
+          </div>
+        </div>
+
+        <div class="theorem-card">
+          <div><span class="theorem-number">Theorem 6</span><strong>Nested Quantifier Relationships</strong></div>
+          <div class="def-content">
+            <ul>
+              <li>\( \forall x \, \forall y \, P(x,y) \equiv \forall y \, \forall x \, P(x,y) \) (order doesn't matter
+                for same quantifiers)</li>
+              <li>\( \exists x \, \exists y \, P(x,y) \equiv \exists y \, \exists x \, P(x,y) \) (order doesn't matter
+                for same quantifiers)</li>
+              <li>\( \forall x \, \exists y \, P(x,y) \implies \exists y \, \forall x \, P(x,y) \) (but NOT
+                equivalence!)</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="example-card">
+          <div><span class="example-number">Ex 3</span><strong>Order Matters!</strong></div>
+          <div class="example-content">
+            Let domain be real numbers.
+            <br><br>\( \forall x \, \exists y \, (y > x) \) means "For every number, there's a bigger one" — TRUE
+            <br><br>\( \exists y \, \forall x \, (y > x) \) means "There's a number bigger than all numbers" — FALSE
+            <br><br>The order of different quantifiers is crucial!
+          </div>
+        </div>
+      </div>
+
+      <div id="dnf" class="tab-content">
+        <h2 class="section-title">Normal Forms</h2>
+
+        <h3 class="subsection-title">Fundamental Concepts</h3>
+
+        <div class="definition-card">
+          <div><span class="def-number">Def 8</span><span class="def-term">Literal</span></div>
+          <div class="def-content">
+            A propositional variable or its negation. Examples: \( p, \neg q, r, \neg s \)
+          </div>
+        </div>
+
+        <div class="definition-card">
+          <div><span class="def-number">Def 9</span><span class="def-term">Minterm</span></div>
+          <div class="def-content">
+            A conjunction (AND) of literals in which each variable appears exactly once (either positive or negated).
+            <br><strong>Example:</strong> For variables \( p, q, r \): \( p \land \neg q \land r \) is a minterm.
+          </div>
+        </div>
+
+        <div class="definition-card">
+          <div><span class="def-number">Def 10</span><span class="def-term">Maxterm</span></div>
+          <div class="def-content">
+            A disjunction (OR) of literals in which each variable appears exactly once (either positive or negated).
+            <br><strong>Example:</strong> For variables \( p, q, r \): \( p \lor \neg q \lor r \) is a maxterm.
+          </div>
+        </div>
+
+        <div class="definition-card">
+          <div><span class="def-number">Def 11</span><span class="def-term">Disjunctive Normal Form (DNF)</span></div>
+          <div class="def-content">
+            A formula is in DNF if it is a disjunction (OR) of conjunctions (AND) of literals.
+            <br><strong>Form:</strong> \( (l_{11} \land l_{12} \land \cdots) \lor (l_{21} \land l_{22} \land \cdots)
+            \lor \cdots \)
+            <br><strong>Example:</strong> \( (p \land q) \lor (\neg p \land r) \lor (q \land \neg r) \)
+          </div>
+        </div>
+
+        <div class="definition-card">
+          <div><span class="def-number">Def 12</span><span class="def-term">Conjunctive Normal Form (CNF)</span></div>
+          <div class="def-content">
+            A formula is in CNF if it is a conjunction (AND) of disjunctions (OR) of literals.
+            <br><strong>Form:</strong> \( (l_{11} \lor l_{12} \lor \cdots) \land (l_{21} \lor l_{22} \lor \cdots) \land
+            \cdots \)
+            <br><strong>Example:</strong> \( (p \lor q) \land (\neg p \lor r) \land (q \lor \neg r) \)
+          </div>
+        </div>
+
+        <div class="note-card">
+          <span class="note-label">Mnemonic</span>
+          <strong>Remember:</strong>
+          <ul style="margin-top: 8px;">
+            <li><strong>DNF:</strong> "Disjunction of conjunctions" = "OR of ANDs" = "Sum of products"</li>
+            <li><strong>CNF:</strong> "Conjunction of disjunctions" = "AND of ORs" = "Product of sums"</li>
+          </ul>
+        </div>
+
+        <div class="theorem-card">
+          <div><span class="theorem-number">Theorem 7</span><strong>Existence of Normal Forms</strong></div>
+          <div class="def-content">
+            Every propositional formula can be converted to an equivalent formula in DNF and also to an equivalent
+            formula in CNF.
+          </div>
+        </div>
+
+        <h3 class="subsection-title">Converting to DNF</h3>
+
+        <div class="example-card">
+          <div><span class="example-number">Ex 4</span><strong>Converting to DNF</strong></div>
+          <div class="example-content">
+            Convert \( (p \to q) \land r \) to DNF:
+            <br><br><strong>Step 1:</strong> Eliminate implication: \( (\neg p \lor q) \land r \)
+            <br><strong>Step 2:</strong> Apply distributive law: \( (\neg p \land r) \lor (q \land r) \)
+            <br><br>This is now in DNF form!
+          </div>
+        </div>
+
+        <div class="example-card">
+          <div><span class="example-number">Ex 5</span><strong>Truth Table to DNF</strong></div>
+          <div class="example-content">
+            Given this truth table, construct DNF:
+            <table style="width: 60%; margin: 10px auto;">
+              <tr>
+                <th>\( p \)</th>
+                <th>\( q \)</th>
+                <th>\( f \)</th>
+              </tr>
+              <tr>
+                <td>T</td>
+                <td>T</td>
+                <td>T</td>
+              </tr>
+              <tr>
+                <td>T</td>
+                <td>F</td>
+                <td>F</td>
+              </tr>
+              <tr>
+                <td>F</td>
+                <td>T</td>
+                <td>T</td>
+              </tr>
+              <tr>
+                <td>F</td>
+                <td>F</td>
+                <td>F</td>
+              </tr>
+            </table>
+            <strong>Solution:</strong> Take rows where \( f = T \):
+            <br>Row 1: \( p \land q \)
+            <br>Row 3: \( \neg p \land q \)
+            <br><strong>DNF:</strong> \( (p \land q) \lor (\neg p \land q) \)
+            <br>Can be simplified to: \( q \)
+          </div>
+        </div>
+
+        <h3 class="subsection-title">Converting to CNF</h3>
+
+        <div class="example-card">
+          <div><span class="example-number">Ex 6</span><strong>Truth Table to CNF</strong></div>
+          <div class="example-content">
+            Using the same truth table from Ex 5, construct CNF:
+            <br>Take rows where \( f = F \):
+            <br>Row 2: \( p \land \neg q \) is false, so \( \neg p \lor q \) must be true
+            <br>Row 4: \( \neg p \land \neg q \) is false, so \( p \lor q \) must be true
+            <br><strong>CNF:</strong> \( (\neg p \lor q) \land (p \lor q) \)
+            <br>Can be simplified to: \( q \)
+          </div>
+        </div>
+      </div>
+
+      <div id="algebra" class="tab-content">
+        <h2 class="section-title">Algebra of Propositions</h2>
+
+        <div class="definition-card">
+          <div><span class="def-number">Def 13</span><span class="def-term">Propositional Algebra</span></div>
+          <div class="def-content">
+            A mathematical system consisting of propositions with operations \( \land, \lor, \neg \) that satisfies
+            certain algebraic laws. This allows us to manipulate logical formulas algebraically, similar to how we
+            manipulate algebraic expressions.
+          </div>
+        </div>
+
+        <h3 class="subsection-title">Fundamental Laws</h3>
+
+        <table>
+          <thead>
+            <tr>
+              <th>Law Name</th>
+              <th>AND Form</th>
+              <th>OR Form</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Identity</strong></td>
+              <td>\( p \land T \equiv p \)</td>
+              <td>\( p \lor F \equiv p \)</td>
+            </tr>
+            <tr>
+              <td><strong>Domination</strong></td>
+              <td>\( p \land F \equiv F \)</td>
+              <td>\( p \lor T \equiv T \)</td>
+            </tr>
+            <tr>
+              <td><strong>Idempotent</strong></td>
+              <td>\( p \land p \equiv p \)</td>
+              <td>\( p \lor p \equiv p \)</td>
+            </tr>
+            <tr>
+              <td><strong>Complement</strong></td>
+              <td>\( p \land \neg p \equiv F \)</td>
+              <td>\( p \lor \neg p \equiv T \)</td>
+            </tr>
+            <tr>
+              <td><strong>Commutative</strong></td>
+              <td>\( p \land q \equiv q \land p \)</td>
+              <td>\( p \lor q \equiv q \lor p \)</td>
+            </tr>
+            <tr>
+              <td><strong>Associative</strong></td>
+              <td>\( (p \land q) \land r \equiv p \land (q \land r) \)</td>
+              <td>\( (p \lor q) \lor r \equiv p \lor (q \lor r) \)</td>
+            </tr>
+            <tr>
+              <td><strong>Distributive</strong></td>
+              <td>\( p \land (q \lor r) \equiv (p \land q) \lor (p \land r) \)</td>
+              <td>\( p \lor (q \land r) \equiv (p \lor q) \land (p \lor r) \)</td>
+            </tr>
+            <tr>
+              <td><strong>De Morgan's</strong></td>
+              <td>\( \neg(p \land q) \equiv \neg p \lor \neg q \)</td>
+              <td>\( \neg(p \lor q) \equiv \neg p \land \neg q \)</td>
+            </tr>
+            <tr>
+              <td><strong>Absorption</strong></td>
+              <td>\( p \land (p \lor q) \equiv p \)</td>
+              <td>\( p \lor (p \land q) \equiv p \)</td>
+            </tr>
+            <tr>
+              <td><strong>Double Negation</strong></td>
+              <td colspan="2">\( \neg(\neg p) \equiv p \)</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="note-card">
+          <span class="note-label">Duality Principle</span>
+          <strong>Principle of Duality:</strong> Every logical law has a dual obtained by:
+          <ul style="margin-top: 8px;">
+            <li>Swapping \( \land \) with \( \lor \)</li>
+            <li>Swapping \( T \) with \( F \)</li>
+          </ul>
+          If a law is true, its dual is also true.
+        </div>
+
+        <div class="example-card">
+          <div><span class="example-number">Ex 7</span><strong>Algebraic Simplification</strong></div>
+          <div class="example-content">
+            Simplify: \( (p \lor q) \land (p \lor \neg q) \)
+            <br><br><strong>Solution:</strong>
+            <br>Step 1: Apply distributive law: \( p \lor (q \land \neg q) \)
+            <br>Step 2: Apply complement law: \( p \lor F \)
+            <br>Step 3: Apply identity law: \( p \)
+          </div>
+        </div>
+
+        <div class="example-card">
+          <div><span class="example-number">Ex 8</span><strong>Proving Equivalence Algebraically</strong></div>
+          <div class="example-content">
+            Prove: \( (p \to q) \land (p \to r) \equiv p \to (q \land r) \)
+            <br><br><strong>Left side:</strong>
+            <br>= \( (\neg p \lor q) \land (\neg p \lor r) \)
+            <br>= \( \neg p \lor (q \land r) \) [Distributive law]
+            <br>= \( p \to (q \land r) \) [Implication definition]
+            <br><br>Both sides are equal. Q.E.D.
+          </div>
+        </div>
+      </div>
+
+      <div id="sat" class="tab-content">
+        <h2 class="section-title">The SAT Problem</h2>
+
+        <div class="definition-card">
+          <div><span class="def-number">Def 14</span><span class="def-term">Boolean Satisfiability Problem (SAT)</span>
+          </div>
+          <div class="def-content">
+            Given a propositional formula, determine whether there exists a truth assignment that makes the formula
+            true.
+            <br><br><strong>Input:</strong> A propositional formula \( \phi \)
+            <br><strong>Question:</strong> Does there exist a truth assignment such that \( \phi \) evaluates to true?
+          </div>
+        </div>
+
+        <div class="example-card">
+          <div><span class="example-number">Ex 9</span><strong>SAT Instance</strong></div>
+          <div class="example-content">
+            Is \( (p \lor q) \land (\neg p \lor q) \land (\neg q) \) satisfiable?
+            <br><br><strong>Analysis:</strong>
+            <br>From clause 3: \( q = F \)
+            <br>Substitute into clause 1: \( p \lor F \equiv p \), so \( p = T \)
+            <br>Check clause 2: \( \neg T \lor F \equiv F \lor F \equiv F \)
+            <br><br><strong>Result:</strong> UNSATISFIABLE (no assignment makes all clauses true)
+          </div>
+        </div>
+
+        <h3 class="subsection-title">Variants of SAT</h3>
+
+        <div class="definition-card">
+          <div><span class="def-number">Def 15</span><span class="def-term">k-SAT Problem</span></div>
+          <div class="def-content">
+            The SAT problem restricted to formulas in CNF where each clause has at most \( k \) literals.
+            <br><strong>2-SAT:</strong> Each clause has at most 2 literals (solvable in polynomial time!)
+            <br><strong>3-SAT:</strong> Each clause has at most 3 literals (NP-complete)
+          </div>
+        </div>
+
+        <div class="definition-card">
+          <div><span class="def-number">Def 16</span><span class="def-term">NP-Completeness</span></div>
+          <div class="def-content">
+            A problem is NP-complete if:
+            <ul>
+              <li>It is in NP (solutions can be verified in polynomial time)</li>
+              <li>Every problem in NP can be reduced to it in polynomial time</li>
+            </ul>
+            SAT was the first problem proven to be NP-complete (Cook-Levin Theorem, 1971).
+          </div>
+        </div>
+
+        <div class="theorem-card">
+          <div><span class="theorem-number">Theorem 8</span><strong>Cook-Levin Theorem</strong></div>
+          <div class="def-content">
+            The Boolean satisfiability problem (SAT) is NP-complete. This means that if we can solve SAT efficiently, we
+            can solve all NP problems efficiently.
+          </div>
+        </div>
+
+        <h3 class="subsection-title">Motivations for Studying SAT</h3>
+
+        <div class="info-box" style="margin-bottom: 15px;">
+          <h3>🔬 Theoretical Importance</h3>
+          <p>SAT is the foundational problem in computational complexity theory. Understanding SAT helps us understand
+            the limits of efficient computation.</p>
+        </div>
+
+        <div class="info-box" style="margin-bottom: 15px;">
+          <h3>💻 Practical Applications</h3>
+          <p>Modern SAT solvers are used in:
+          <ul style="margin-top: 8px;">
+            <li>Hardware verification and design</li>
+            <li>Software verification and testing</li>
+            <li>Artificial intelligence and planning</li>
+            <li>Bioinformatics</li>
+            <li>Cryptanalysis</li>
+          </ul>
+          </p>
+        </div>
+
+        <div class="example-card">
+          <div><span class="example-number">Ex 10</span><strong>SAT in Circuit Design</strong></div>
+          <div class="example-content">
+            <strong>Problem:</strong> Verify that a circuit always outputs 1 given certain constraints.
+            <br><br><strong>Approach:</strong> Encode the circuit as a Boolean formula. Use a SAT solver to check if
+            there's an input that makes output = 0.
+            <br><br>If SAT solver finds no such input, the circuit is correct!
+          </div>
+        </div>
+
+        <div class="note-card">
+          <span class="note-label">Modern SAT Solvers</span>
+          Despite SAT being NP-complete (no known polynomial-time algorithm), modern SAT solvers can efficiently solve
+          instances with millions of variables in practice using heuristics like:
+          <ul style="margin-top: 8px;">
+            <li>Conflict-driven clause learning (CDCL)</li>
+            <li>Boolean constraint propagation</li>
+            <li>Intelligent backtracking</li>
+          </ul>
+        </div>
+      </div>
+
+      <div id="basis" class="tab-content">
+        <h2 class="section-title">Functional Completeness</h2>
+
+        <div class="definition-card">
+          <div><span class="def-number">Def 17</span><span class="def-term">Functionally Complete Set</span></div>
+          <div class="def-content">
+            A set of logical connectives is functionally complete (or adequate) if every possible Boolean function can
+            be expressed using only the connectives in that set.
+            <br><br><strong>Also called:</strong> Universal set of connectives, adequate set, basis
+          </div>
+        </div>
+
+        <div class="theorem-card">
+          <div><span class="theorem-number">Theorem 9</span><strong>Standard Complete Sets</strong></div>
+          <div class="def-content">
+            The following sets are functionally complete:
+            <ul>
+              <li>\( \{\neg, \land, \lor\} \) - Standard basis</li>
+              <li>\( \{\neg, \land\} \) - Minimal basis (since \( p \lor q \equiv \neg(\neg p \land \neg q) \))</li>
+              <li>\( \{\neg, \lor\} \) - Minimal basis (since \( p \land q \equiv \neg(\neg p \lor \neg q) \))</li>
+              <li>\( \{\neg, \to\} \) - Since \( p \land q \equiv \neg(p \to \neg q) \)</li>
+            </ul>
+          </div>
+        </div>
+
+        <h3 class="subsection-title">Single Connective Bases</h3>
+
+        <div class="definition-card">
+          <div><span class="def-number">Def 18</span><span class="def-term">NAND Operator (Sheffer Stroke)</span></div>
+          <div class="def-content">
+            The NAND operator \( p \mid q \) (also written \( p \uparrow q \)) is defined as \( \neg(p \land q) \).
+            <br><br><strong>Truth Table:</strong>
+            <table style="width: 50%; margin: 10px auto;">
+              <tr>
+                <th>\( p \)</th>
+                <th>\( q \)</th>
+                <th>\( p \mid q \)</th>
+              </tr>
+              <tr>
+                <td>T</td>
+                <td>T</td>
+                <td>F</td>
+              </tr>
+              <tr>
+                <td>T</td>
+                <td>F</td>
+                <td>T</td>
+              </tr>
+              <tr>
+                <td>F</td>
+                <td>T</td>
+                <td>T</td>
+              </tr>
+              <tr>
+                <td>F</td>
+                <td>F</td>
+                <td>T</td>
+              </tr>
+            </table>
+          </div>
+        </div>
+
+        <div class="definition-card">
+          <div><span class="def-number">Def 19</span><span class="def-term">NOR Operator (Peirce Arrow)</span></div>
+          <div class="def-content">
+            The NOR operator \( p \downarrow q \) is defined as \( \neg(p \lor q) \).
+            <br><br><strong>Truth Table:</strong>
+            <table style="width: 50%; margin: 10px auto;">
+              <tr>
+                <th>\( p \)</th>
+                <th>\( q \)</th>
+                <th>\( p \downarrow q \)</th>
+              </tr>
+              <tr>
+                <td>T</td>
+                <td>T</td>
+                <td>F</td>
+              </tr>
+              <tr>
+                <td>T</td>
+                <td>F</td>
+                <td>F</td>
+              </tr>
+              <tr>
+                <td>F</td>
+                <td>T</td>
+                <td>F</td>
+              </tr>
+              <tr>
+                <td>F</td>
+                <td>F</td>
+                <td>T</td>
+              </tr>
+            </table>
+          </div>
+        </div>
+
+        <div class="theorem-card">
+          <div><span class="theorem-number">Theorem 10</span><strong>NAND and NOR are Complete</strong></div>
+          <div class="def-content">
+            Both \( \{\mid\} \) (NAND) and \( \{\downarrow\} \) (NOR) are functionally complete by themselves.
+            <br><br><strong>Proof for NAND:</strong>
+            <ul>
+              <li>NOT: \( \neg p \equiv p \mid p \)</li>
+              <li>AND: \( p \land q \equiv (p \mid q) \mid (p \mid q) \)</li>
+              <li>OR: \( p \lor q \equiv (p \mid p) \mid (q \mid q) \)</li>
+            </ul>
+            Since we can express \( \{\neg, \land, \lor\} \) using only NAND, NAND is complete.
+          </div>
+        </div>
+
+        <div class="example-card">
+          <div><span class="example-number">Ex 11</span><strong>Expressing OR using NAND</strong></div>
+          <div class="example-content">
+            Show \( p \lor q \equiv (p \mid p) \mid (q \mid q) \):
+            <br><br>RHS = \( \neg p \mid \neg q \)
+            <br>= \( \neg(\neg p \land \neg q) \)
+            <br>= \( p \lor q \) [De Morgan's Law]
+            <br><br>Verified!
+          </div>
+        </div>
+
+        <h3 class="subsection-title">Analogy to Vector Space Basis</h3>
+
+        <div class="info-box">
+          <h3>🔢 Linear Algebra Connection</h3>
+          <p>Just as a basis for an \( n \)-dimensional vector space consists of \( n \) linearly independent vectors
+            that can express any vector in that space, a functionally complete set of logical operators can express any
+            Boolean function.</p>
+        </div>
+
+        <div class="definition-card">
+          <div><span class="def-number">Def 20</span><span class="def-term">Boolean Function Space</span></div>
+          <div class="def-content">
+            For \( n \) Boolean variables, there are \( 2^{2^n} \) possible Boolean functions (since each function maps
+            \( 2^n \) input combinations to T or F).
+            <br><br><strong>Examples:</strong>
+            <ul>
+              <li>1 variable: \( 2^{2^1} = 4 \) functions</li>
+              <li>2 variables: \( 2^{2^2} = 16 \) functions</li>
+              <li>3 variables: \( 2^{2^3} = 256 \) functions</li>
+            </ul>
+          </div>
+        </div>
+
+        <table>
+          <thead>
+            <tr>
+              <th>Concept</th>
+              <th>Vector Spaces</th>
+              <th>Boolean Functions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Space</strong></td>
+              <td>\( \mathbb{R}^n \)</td>
+              <td>All Boolean functions on \( n \) variables</td>
+            </tr>
+            <tr>
+              <td><strong>Basis</strong></td>
+              <td>Set of \( n \) linearly independent vectors</td>
+              <td>Functionally complete set of operators</td>
+            </tr>
+            <tr>
+              <td><strong>Span</strong></td>
+              <td>Linear combinations</td>
+              <td>Compositions of operators</td>
+            </tr>
+            <tr>
+              <td><strong>Minimal Basis</strong></td>
+              <td>No vector is redundant</td>
+              <td>No operator can be expressed by others</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="note-card">
+          <span class="note-label">Key Insight</span>
+          A functionally complete set is like a "basis" for Boolean logic - you can build any logical expression you
+          need from just these basic operations, similar to how any vector can be built from basis vectors.
+        </div>
+
+        <div class="warning-card">
+          <span class="warning-label">Non-Complete Sets</span>
+          <strong>These sets are NOT functionally complete:</strong>
+          <ul style="margin-top: 8px;">
+            <li>\( \{\land, \lor\} \) - Cannot express negation</li>
+            <li>\( \{\neg\} \) - Can only negate, not combine propositions</li>
+            <li>\( \{\to\} \) - Cannot express conjunction</li>
+            <li>\( \{\oplus\} \) (XOR) - Cannot express AND or OR</li>
+          </ul>
+        </div>
+      </div>
+
+      <div id="inference" class="tab-content">
+        <h2 class="section-title">Rules of Inference</h2>
+
+        <div class="definition-card">
+          <div><span class="def-number">Def 21</span><span class="def-term">Valid Argument</span></div>
+          <div class="def-content">
+            An argument is a sequence of propositions where the final proposition (conclusion) follows from the truth of
+            the preceding propositions (premises).
+            <br>An argument is <strong>valid</strong> if and only if:
+            <br>Whenever all premises are true, the conclusion is also true.
+            <br><br>Formally: \( (p_1 \land p_2 \land \dots \land p_n) \to q \) is a tautology.
+          </div>
+        </div>
+
+        <h3 class="subsection-title">Standard Rules of Inference</h3>
+
+        <table>
+          <thead>
+            <tr>
+              <th>Rule Name</th>
+              <th>Rule Form</th>
+              <th>Tautology</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Modus Ponens</strong></td>
+              <td>\( \begin{aligned} & p \to q \\ & p \\ \hline \therefore & q \end{aligned} \)</td>
+              <td>\( ((p \to q) \land p) \to q \)</td>
+            </tr>
+            <tr>
+              <td><strong>Modus Tollens</strong></td>
+              <td>\( \begin{aligned} & p \to q \\ & \neg q \\ \hline \therefore & \neg p \end{aligned} \)</td>
+              <td>\( ((p \to q) \land \neg q) \to \neg p \)</td>
+            </tr>
+            <tr>
+              <td><strong>Hypothetical Syllogism</strong></td>
+              <td>\( \begin{aligned} & p \to q \\ & q \to r \\ \hline \therefore & p \to r \end{aligned} \)</td>
+              <td>\( ((p \to q) \land (q \to r)) \to (p \to r) \)</td>
+            </tr>
+            <tr>
+              <td><strong>Disjunctive Syllogism</strong></td>
+              <td>\( \begin{aligned} & p \lor q \\ & \neg p \\ \hline \therefore & q \end{aligned} \)</td>
+              <td>\( ((p \lor q) \land \neg p) \to q \)</td>
+            </tr>
+            <tr>
+              <td><strong>Addition</strong></td>
+              <td>\( \begin{aligned} & p \\ \hline \therefore & p \lor q \end{aligned} \)</td>
+              <td>\( p \to (p \lor q) \)</td>
+            </tr>
+            <tr>
+              <td><strong>Simplification</strong></td>
+              <td>\( \begin{aligned} & p \land q \\ \hline \therefore & p \end{aligned} \)</td>
+              <td>\( (p \land q) \to p \)</td>
+            </tr>
+            <tr>
+              <td><strong>Conjunction</strong></td>
+              <td>\( \begin{aligned} & p \\ & q \\ \hline \therefore & p \land q \end{aligned} \)</td>
+              <td>\( ((p) \land (q)) \to (p \land q) \)</td>
+            </tr>
+            <tr>
+              <td><strong>Resolution</strong></td>
+              <td>\( \begin{aligned} & p \lor q \\ & \neg p \lor r \\ \hline \therefore & q \lor r \end{aligned} \)</td>
+              <td>\( ((p \lor q) \land (\neg p \lor r)) \to (q \lor r) \)</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h3 class="subsection-title">Common Fallacies</h3>
+
+        <div class="warning-card">
+          <span class="warning-label">Fallacy 1</span>
+          <strong>Affirming the Consequent</strong> (Invalid)
+          <div style="margin-top: 10px;">
+            \( \begin{aligned} & p \to q \\ & q \\ \hline \therefore & p \end{aligned} \)
+            <br>
+            <br><strong>Why it's wrong:</strong> If \( p \to q \) is true and \( q \) is true, \( p \) could still be
+            false.
+            <br><em>"If it rains, the grass is wet. The grass is wet. Therefore, it rained."</em> (Maybe the sprinkler
+            was on!)
+          </div>
+        </div>
+
+        <div class="warning-card">
+          <span class="warning-label">Fallacy 2</span>
+          <strong>Denying the Antecedent</strong> (Invalid)
+          <div style="margin-top: 10px;">
+            \( \begin{aligned} & p \to q \\ & \neg p \\ \hline \therefore & \neg q \end{aligned} \)
+            <br>
+            <br><strong>Why it's wrong:</strong> If \( p \) is false, \( q \) could still be true.
+            <br><em>"If it rains, the grass is wet. It didn't rain. Therefore, the grass is not wet."</em> (Again,
+            sprinklers!)
+          </div>
+        </div>
+
+        <h3 class="subsection-title">Detailed Examples</h3>
+
+        <div class="example-card">
+          <div><span class="example-number">Ex 12</span><strong>Building a Valid Argument</strong></div>
+          <div class="example-content">
+            <strong>Premises:</strong>
+            <ol>
+              <li>"It is not sunny this afternoon and it is colder than yesterday."</li>
+              <li>"We will go swimming only if it is sunny."</li>
+              <li>"If we do not go swimming, then we will take a canoe trip."</li>
+              <li>"If we take a canoe trip, then we will be home by sunset."</li>
+            </ol>
+            <strong>Conclusion:</strong> "We will be home by sunset."
+            <br><br><strong>Proof:</strong>
+            <br>Let \( p \): "It is sunny", \( q \): "Colder than yesterday", \( r \): "Go swimming", \( s \): "Canoe
+            trip", \( t \): "Home by sunset".
+            <br>1. \( \neg p \land q \) (Premise 1)
+            <br>2. \( \neg p \) (Simplification on 1)
+            <br>3. \( r \to p \) (Premise 2: "only if" introduces necessary condition)
+            <br>4. \( \neg r \) (Modus Tollens on 2 and 3)
+            <br>5. \( \neg r \to s \) (Premise 3)
+            <br>6. \( s \) (Modus Ponens on 4 and 5)
+            <br>7. \( s \to t \) (Premise 4)
+            <br>8. \( t \) (Modus Ponens on 6 and 7)
+            <br><br><strong>Conclusion:</strong> \( t \) is true. Valid argument!
+          </div>
+        </div>
+
+        <div id="summary" class="tab-content">
+          <h2 class="section-title">Quick Reference</h2>
+
+          <div class="grid-2">
+            <div class="info-box">
+              <h3>📋 Implication Essentials</h3>
+              <p>
+                • \( p \to q \equiv \neg p \lor q \)<br>
+                • Contrapositive: \( p \to q \equiv \neg q \to \neg p \)<br>
+                • Negation: \( \neg(p \to q) \equiv p \land \neg q \)<br>
+                • Original ≠ Converse ≠ Inverse
+              </p>
+            </div>
+
+            <div class="info-box">
+              <h3>🔄 Normal Forms</h3>
+              <p>
+                <strong>DNF:</strong> OR of ANDs (sum of products)<br>
+                <strong>CNF:</strong> AND of ORs (product of sums)<br>
+                Every formula has equivalent DNF and CNF forms.
+              </p>
+            </div>
+
+            <div class="info-box">
+              <h3>🧮 Algebraic Laws</h3>
+              <p>
+                Key laws: Identity, Domination, Distributive, De Morgan's, Absorption<br>
+                <strong>Duality:</strong> Swap \( \land \leftrightarrow \lor \) and \( T \leftrightarrow F \)
+              </p>
+            </div>
+
+            <div class="info-box">
+              <h3>🎯 SAT Problem</h3>
+              <p>
+                <strong>Question:</strong> Is formula satisfiable?<br>
+                <strong>Status:</strong> NP-complete (Cook-Levin)<br>
+                <strong>Use:</strong> Verification, AI, design
+              </p>
+            </div>
+
+            <div class="info-box">
+              <h3>⚡ Functional Completeness</h3>
+              <p>
+                <strong>Complete sets:</strong><br>
+                • \( \{\neg, \land, \lor\} \) - Standard<br>
+                • \( \{\neg, \land\} \) or \( \{\neg, \lor\} \) - Minimal<br>
+                • \( \{\mid\} \) (NAND) or \( \{\downarrow\} \) (NOR) - Single operator
+              </p>
+            </div>
+
+            <div class="info-box">
+              <h3>🔗 Vector Space Analogy</h3>
+              <p>
+                Functionally complete set ≈ Basis of vector space<br>
+                Both span entire space using combinations<br>
+                Minimal sets have no redundancy
+              </p>
+            </div>
+          </div>
+
+          <div class="note-card" style="margin-top: 25px;">
+            <span class="note-label">Study Tips</span>
+            <strong>Mastery Checklist:</strong>
+            <ul style="margin-top: 10px; list-style-type: none; padding-left: 0;">
+              <li>✓ Can you convert any formula to DNF and CNF?</li>
+              <li>✓ Can you prove contrapositive equivalence?</li>
+              <li>✓ Do you understand why NAND alone is complete?</li>
+              <li>✓ Can you apply algebraic laws to simplify formulas?</li>
+              <li>✓ Do you know why SAT is important?</li>
+            </ul>
+          </div>
+
+          <div class="theorem-card" style="margin-top: 20px;">
+            <div><span class="theorem-number">Key Takeaway</span><strong>The Big Picture</strong></div>
+            <div class="def-content">
+              This lecture bridges theory and practice: implication forms the basis of logical reasoning, normal forms
+              provide canonical representations, the algebra lets us manipulate formulas systematically, SAT connects to
+              real-world applications, and functional completeness shows us the minimal tools needed to express all of
+              logic. These concepts form the foundation for computation theory and formal verification.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <footer>
+        CS 637 – Lecture 2: Propositional Logic • Theory of Computation and Graph Theory<br>
+        © 2025 Dr. Debasish Pattanayak • Department of Computer Science
+      </footer>
+    </div>
+
+    <script>
+      function switchTab(tabName) {
+        const tabs = document.querySelectorAll('.tab-content');
+        tabs.forEach(tab => tab.classList.remove('active'));
+
+        const btns = document.querySelectorAll('.tab-btn');
+        btns.forEach(btn => btn.classList.remove('active'));
+
+        const target = document.getElementById(tabName);
+        if (target) {
+          target.classList.add('active');
+        }
+
+        const clickedBtn = Array.from(btns).find(btn => btn.getAttribute('onclick').includes(tabName));
+        if (clickedBtn) {
+          clickedBtn.classList.add('active');
+        }
+      }
+
+      function searchDefinitions() {
+        const input = document.getElementById('searchBox').value.toLowerCase();
+        const cards = document.querySelectorAll('.definition-card, .example-card, .theorem-card, .note-card, .warning-card');
+
+        cards.forEach(card => {
+          const text = card.textContent.toLowerCase();
+          if (text.includes(input)) {
+            card.style.display = 'block';
+          } else {
+            card.style.display = 'none';
+          }
+        });
+      }
+
+      document.addEventListener("DOMContentLoaded", function () {
+        renderMathInElement(document.body, {
+          delimiters: [
+            { left: "$", right: "$", display: true },
+            { left: "\\[", right: "\\]", display: true },
+            { left: "\\(", right: "\\)", display: false }
+          ]
+        });
+      });
+    </script>
 
 </body>
+
 </html>
