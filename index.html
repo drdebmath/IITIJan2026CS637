@@ -356,7 +356,7 @@
       background: rgba(56, 189, 248, 0.08);
     }
 
-    tbody tr.current-lecture {
+    tbody tr.upcoming-lecture {
       background: rgba(16, 185, 129, 0.1);
       border-left: 4px solid var(--success);
     }
@@ -529,8 +529,7 @@
       <div class="alert">
         <span class="alert-icon">📢</span>
         <div>
-          <strong>Current Week:</strong> Week 1 - Welcome! Today's session: <strong>Tutorial 1</strong> (4:30 PM, Hall
-          L31).
+          <strong>Upcoming Lecture:</strong> Lecture 2 - "Propositional Logic: Syntax, Semantics, and Models" (Jan 12, 2026, 2:30–3:30 PM, Hall L31).
         </div>
       </div>
     </section>
@@ -669,7 +668,7 @@
       <h3><span>📅</span> Lecture-wise Schedule</h3>
       <div class="card">
         <p style="margin-bottom: 16px; color: var(--muted);">
-          <span class="badge badge-success">● Current Lecture</span> marked in the schedule below
+          <span class="badge badge-success">● Upcoming Lecture</span> marked in the schedule below
         </p>
         <div class="table-container">
           <table>
@@ -694,7 +693,7 @@
                 <td>Logic and Proofs</td>
                 <td><a href="lecture1.html">What is a Proof?</a></td>
               </tr>
-              <tr class="current-lecture">
+              <tr>
                 <td>T1</td>
                 <td>Jan 8, 2026</td>
                 <td>Thu</td>
@@ -703,7 +702,7 @@
                 <td>—</td>
                 <td><a href="tutorial1.html">Tutorial 1: Problems from Logic and Proofs</a></td>
               </tr>
-              <tr>
+              <tr class="upcoming-lecture">
                 <td>2</td>
                 <td>Jan 12, 2026</td>
                 <td>Mon</td>
@@ -1101,7 +1100,7 @@
               </tr>
               <tr>
                 <td>-</td>
-                <td>May 4-11, 2026</td>
+                <td>May 4, 2026</td>
                 <td>--</td>
                 <td>10:00- 1:00</td>
                 <td><span class="noclass">No Class</span></td>
@@ -1115,7 +1114,7 @@
     </section>
 
     <footer>
-      <div style="margin-bottom: 8px; font-weight: 500;">Department of Computer Science and Engineering</div>
+      <div style="margin-bottom: 8px; font-weight: 500;">Department of Computer Science and Engineering, IIT Indore.</div>
       <div style="font-size: 0.85rem;">Spring Semester 2026 • Last updated: January 6, 2026</div>
     </footer>
 
@@ -1192,11 +1191,12 @@
 
       // Find schedule rows
       const rows = document.querySelectorAll('#schedule tbody tr');
-      let matchedRow = null;
+      let upcomingRow = null;
+      let nextDate = null;
 
       rows.forEach(row => {
         // Remove existing highlights
-        row.classList.remove('current-lecture');
+        row.classList.remove('upcoming-lecture');
 
         const dateCell = row.children[1];
         if (!dateCell) return;
@@ -1204,33 +1204,35 @@
         const rowDateStr = dateCell.textContent.trim();
         const rowDate = new Date(rowDateStr);
 
-        // Compare dates
-        if (rowDate.getFullYear() === today.getFullYear() &&
-          rowDate.getMonth() === today.getMonth() &&
-          rowDate.getDate() === today.getDate()) {
-
-          row.classList.add('current-lecture');
-          matchedRow = row;
+        // Find the next upcoming date
+        if (rowDate >= today && (!nextDate || rowDate < nextDate)) {
+          nextDate = rowDate;
+          upcomingRow = row;
         }
       });
 
-      if (matchedRow) {
+      if (upcomingRow) {
+        upcomingRow.classList.add('upcoming-lecture');
+
         // Update Alert Banner
-        const type = matchedRow.children[4].textContent.trim(); // Lecture/Tutorial
-        const topic = matchedRow.children[6].textContent.trim();
-        const time = matchedRow.children[3].textContent.trim();
+        const number = upcomingRow.children[0].textContent.trim(); // Lecture/Tutorial number
+        const type = upcomingRow.children[4].textContent.trim(); // Lecture/Tutorial
+        const topic = upcomingRow.children[6].textContent.trim();
+        const time = upcomingRow.children[3].textContent.trim();
+        const date = upcomingRow.children[1].textContent.trim();
 
         const alertDiv = document.querySelector('#announcements .alert div');
         if (alertDiv) {
-          // Calculate Week Number (Rough approximation starting Jan 6)
-          const startDate = new Date(2026, 0, 6); // Jan 6
-          const diffDays = Math.floor((today - startDate) / (1000 * 60 * 60 * 24));
-          const weekNum = Math.floor(diffDays / 7) + 1;
-
           const isTutorial = type.toLowerCase().includes('tutorial');
-          const sessionName = isTutorial ? type : `${type} - "${topic}"`;
+          let sessionName;
+          if (isTutorial) {
+            const tutNum = number.replace('T', ''); // Remove 'T' from 'T1' to get '1'
+            sessionName = `Tutorial ${tutNum}: ${topic}`;
+          } else {
+            sessionName = `Lecture ${number} - "${topic}"`;
+          }
 
-          alertDiv.innerHTML = `<strong>Current Week:</strong> Week ${weekNum} - Welcome! Today's session: <strong>${sessionName}</strong> (${time}, Hall L31).`;
+          alertDiv.innerHTML = `<strong>Upcoming Lecture:</strong> ${sessionName} (${date}, ${time}, Hall L31).`;
         }
       }
     }
