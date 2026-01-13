@@ -3,7 +3,7 @@
 
 <head>
   <meta charset="utf-8">
-  <title>CS 637 – Lecture 3: Proof Systems and Formal Proof Techniques</title>
+  <title>CS 637 – Lecture 3: How to write a proof?</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
   <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
@@ -182,13 +182,23 @@
       line-height: 1.7;
     }
 
-    .def-content ul {
+    .def-content ul,
+    .def-content ol {
       margin-top: 10px;
       margin-left: 20px;
+      padding-left: 20px;
     }
 
     .def-content li {
       margin: 6px 0;
+    }
+
+    .example-content ol,
+    .theorem-card .def-content ol,
+    .note-card ul,
+    .warning-card ul {
+      margin-left: 0;
+      padding-left: 20px;
     }
 
     .example-card {
@@ -413,7 +423,7 @@
         onkeyup="searchDefinitions()">
 
       <div id="inference" class="tab-content active">
-        <h2 class="section-title">Lecture 3: Proof Systems and Formal Proof Techniques</h2>
+        <h2 class="section-title">Lecture 3: How to write a proof?</h2>
 
         <div class="searchable">
           <h3 class="subsection-title">Inference Rules in Action</h3>
@@ -707,7 +717,7 @@
         </div>
 
         <div class="theorem-card" style="margin-top: 20px;">
-          <div><span class="theorem-number">Key Takeaway</span><strong>From Logic to Proof</strong></div>
+          <div><span class="theorem-number">Theorem 4</span><strong>From Logic to Proof</strong></div>
           <div class="def-content">
             This lecture bridges propositional logic with predicate logic and proof techniques. Inference rules provide the tools for constructing valid arguments, mathematical induction proves properties of infinite sets, and predicate logic allows us to formalize complex mathematical concepts. Military examples provide concrete intuition for abstract mathematical principles.
           </div>
