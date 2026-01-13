@@ -483,32 +483,33 @@
     }
   </style>
 
-<style>
-.fab-btn {
-  position: fixed;
-  bottom: 24px;
-  right: 24px;
-  width: 56px;
-  height: 56px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #3b82f6, #2563eb);
-  color: white;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-  cursor: pointer;
-  z-index: 1000;
-  border: none;
-  font-size: 24px;
-  transition: transform 0.2s, box-shadow 0.2s;
-  text-decoration: none;
-}
-.fab-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(0,0,0,0.3);
-}
-</style>
+  <style>
+    .fab-btn {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #3b82f6, #2563eb);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      cursor: pointer;
+      z-index: 1000;
+      border: none;
+      font-size: 24px;
+      transition: transform 0.2s, box-shadow 0.2s;
+      text-decoration: none;
+    }
+
+    .fab-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+    }
+  </style>
 
 </head>
 
@@ -1198,7 +1199,7 @@
       });
     });
 
-    // Dynamic Schedule Highlighting
+    // Dynamic Schedule Highlighting & Course Progress
     async function updateSchedule() {
       let now = new Date();
 
@@ -1207,8 +1208,6 @@
         const response = await fetch('https://worldtimeapi.org/api/timezone/Asia/Kolkata');
         if (response.ok) {
           const data = await response.json();
-          // Extract date parts manually to avoid timezone confusion in Date constructor if needed
-          // But standard Date(data.datetime) works well if formatted correctly
           now = new Date(data.datetime);
           console.log("Fetched time:", now);
         }
@@ -1224,22 +1223,96 @@
       let upcomingRow = null;
       let nextDate = null;
 
+      let totalLectures = 0;
+      let completedLectures = 0;
+
       rows.forEach(row => {
         // Remove existing highlights
         row.classList.remove('upcoming-lecture');
 
+        if (row.children.length < 5) return;
+
         const dateCell = row.children[1];
-        if (!dateCell) return;
+        const timeCell = row.children[3];
+        const typeCell = row.children[4];
+
+        if (!dateCell || !timeCell || !typeCell) return;
 
         const rowDateStr = dateCell.textContent.trim();
-        const rowDate = new Date(rowDateStr);
+        const rowTimeStr = timeCell.textContent.trim();
+        const typeStr = typeCell.textContent.trim();
 
-        // Find the next upcoming date
-        if (rowDate >= today && (!nextDate || rowDate < nextDate)) {
-          nextDate = rowDate;
+        // Parse Date
+        const rowDate = new Date(rowDateStr);
+        if (isNaN(rowDate.getTime())) return; // Skip invalid dates
+
+        // Parse Time (e.g., "2:30–3:30")
+        const times = rowTimeStr.split(/[–-]/); // Split by en-dash or hyphen
+        let endTime = times.length > 1 ? times[1].trim() : null;
+
+        // Construct full end date object
+        let lectureEnd = new Date(rowDate);
+        if (endTime) {
+          // Assume PM if not specified, unless it's explicitly AM or 8/9/10/11
+          // This is a bit heuristic, but given the schedule:
+          // 8:30-9:30 -> AM
+          // 2:30-3:30 -> PM
+          // 4:30-5:30 -> PM
+          // Simple logic: if hour < 8, add 12. 
+          let [hours, minutes] = endTime.split(':');
+          hours = parseInt(hours);
+          minutes = parseInt(minutes || '0');
+
+          if (hours < 8) hours += 12; // 1, 2, 3, 4, 5... -> PM
+          if (hours === 12) { /* 12 PM is 12 */ }
+          // Note: 1:00 in "10:00- 1:00" for exam might need care, but exams are "No Class" usually
+
+          lectureEnd.setHours(hours, minutes, 0, 0);
+        } else {
+          // Default to end of day if no time
+          lectureEnd.setHours(23, 59, 59, 999);
+        }
+
+        // Logic for Progress (Only count Lectures)
+        if (typeStr.includes('Lecture')) {
+          totalLectures++;
+          if (now > lectureEnd) {
+            completedLectures++;
+          }
+        }
+
+        // Logic for Upcoming Highlight (Nearest future start date)
+        // We use rowDate (start of day) for simple upcoming check, or we could be more precise
+        // Let's stick to date-based for "Upcoming" to match previous behavior essentially, 
+        // but verify it's not passed today.
+
+        // Actually, if it's today but time has passed, is it upcoming? No.
+        // So use lectureEnd for upcoming check too? 
+        // Or better: Is the lecture *over*? If not, and it's in the future (or today), it's upcoming.
+
+        if (lectureEnd > now && (!nextDate || lectureEnd < nextDate)) {
+          // This logic finds the *earliest* ending event that is strictly in the future.
+          // Wait, we want the earliest number row.
+          // Let's use start time logic for upcoming if possible, but rowDate is start of day.
+          // If today is the day, and now < lectureEnd, it's upcoming (or current).
+          nextDate = lectureEnd;
           upcomingRow = row;
         }
       });
+
+      // Update Progress Bar
+      if (totalLectures > 0) {
+        const percentage = (completedLectures / totalLectures) * 100;
+        const progressBar = document.getElementById('course-progress');
+        if (progressBar) {
+          progressBar.style.width = `${percentage}%`;
+          // Find the text container below the bar
+          const progressText = progressBar.parentElement.nextElementSibling;
+          if (progressText) {
+            progressText.innerHTML = `<strong>Course Progress:</strong> Lecture ${completedLectures} of ${totalLectures} completed (${percentage.toFixed(1)}%)`;
+          }
+        }
+      }
 
       if (upcomingRow) {
         upcomingRow.classList.add('upcoming-lecture');
@@ -1256,7 +1329,7 @@
           const isTutorial = type.toLowerCase().includes('tutorial');
           let sessionName;
           if (isTutorial) {
-            const tutNum = number.replace('T', ''); // Remove 'T' from 'T1' to get '1'
+            const tutNum = number.replace('T', '');
             sessionName = `Tutorial ${tutNum}: ${topic}`;
           } else {
             sessionName = `Lecture ${number} - "${topic}"`;
@@ -1271,7 +1344,7 @@
     updateSchedule();
   </script>
 
-<button class="fab-btn" onclick="window.scrollTo({top: 0, behavior: 'smooth'})" title="Back to Top">↑</button>
+  <button class="fab-btn" onclick="window.scrollTo({top: 0, behavior: 'smooth'})" title="Back to Top">↑</button>
 </body>
 
 </html>
