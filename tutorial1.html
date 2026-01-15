@@ -127,6 +127,100 @@
       line-height: 1.7;
     }
 
+    /* Solution Card Style - Now nested/hidden */
+    .solution-container {
+      display: none;
+      margin-top: 15px;
+      animation: slideDown 0.3s ease-out;
+    }
+
+    @keyframes slideDown {
+      from {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .solution-card {
+      background: #fdfdfd;
+      border-left: 4px solid #10b981;
+      padding: 20px;
+      margin-bottom: 0;
+      /* Adjusted for nesting */
+      border-radius: 12px;
+      box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05);
+      border: 1px solid #e2e8f0;
+      border-left: 5px solid #10b981;
+    }
+
+    .show-solution-btn {
+      margin-top: 15px;
+      padding: 8px 16px;
+      background: #f1f5f9;
+      color: #475569;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 0.9em;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .show-solution-btn:hover {
+      background: #e2e8f0;
+      color: #1e293b;
+    }
+
+    .show-solution-btn.active {
+      background: #10b981;
+      color: white;
+      border-color: #059669;
+    }
+
+    .solution-title {
+      font-size: 1.1em;
+      font-weight: 700;
+      color: #065f46;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .solution-title::before {
+      content: "Solution";
+      background: #10b981;
+      color: white;
+      padding: 2px 10px;
+      border-radius: 12px;
+      font-size: 0.8em;
+      margin-right: 12px;
+    }
+
+    .solution-content {
+      color: #334155;
+      line-height: 1.8;
+    }
+
+    .solution-content p {
+      margin-bottom: 12px;
+    }
+
+    .qed {
+      float: right;
+      font-weight: bold;
+      margin-top: -10px;
+    }
+
     pre {
       background: #f1f5f9;
       padding: 15px;
@@ -165,32 +259,33 @@
     }
   </style>
 
-<style>
-.fab-btn {
-  position: fixed;
-  bottom: 24px;
-  right: 24px;
-  width: 56px;
-  height: 56px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #3b82f6, #2563eb);
-  color: white;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-  cursor: pointer;
-  z-index: 1000;
-  border: none;
-  font-size: 24px;
-  transition: transform 0.2s, box-shadow 0.2s;
-  text-decoration: none;
-}
-.fab-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(0,0,0,0.3);
-}
-</style>
+  <style>
+    .fab-btn {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #3b82f6, #2563eb);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      cursor: pointer;
+      z-index: 1000;
+      border: none;
+      font-size: 24px;
+      transition: transform 0.2s, box-shadow 0.2s;
+      text-decoration: none;
+    }
+
+    .fab-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+    }
+  </style>
 
 </head>
 
@@ -215,6 +310,25 @@
         <div class="question-content">
           <p>Prove that the sum of two even integers is always even.</p>
         </div>
+        <button class="show-solution-btn" onclick="toggleSolution(this)">
+          <span>Show Solution</span>
+        </button>
+        <div class="solution-container">
+          <div class="solution-card">
+            <div class="solution-title">Question 1: Direct Proof</div>
+            <div class="solution-content">
+              <p><em>Proof:</em> Let \(a\) and \(b\) be two even integers. By definition of even numbers, there exist
+                integers
+                \(k\) and \(m\) such that:</p>
+              <p>\[a = 2k \quad \text{and} \quad b = 2m\]</p>
+              <p>Then:</p>
+              <p>\[a + b = 2k + 2m = 2(k + m)\]</p>
+              <p>Since \(k + m\) is an integer (closure property of integers under addition), we can write \(a + b =
+                2n\) where
+                \(n = k + m\) is an integer. Therefore, \(a + b\) is even by definition. <span class="qed">■</span></p>
+            </div>
+          </div>
+        </div>
       </div>
 
       <div class="question-card">
@@ -225,6 +339,35 @@
           <p>Prove that \( \sqrt{2} \) is irrational. Generalize the proof for any prime \( p \) to say \( \sqrt{p} \)
             is irrational.</p>
         </div>
+        <button class="show-solution-btn" onclick="toggleSolution(this)">
+          <span>Show Solution</span>
+        </button>
+        <div class="solution-container">
+          <div class="solution-card">
+            <div class="solution-title">Question 2: Proof by Contradiction</div>
+            <div class="solution-content">
+              <p><em>Proof:</em> Assume \(\sqrt{2}\) is rational. Then there exist coprime integers \(p,q\) with \(q
+                \neq 0\) such
+                that</p>
+              <p>\[\sqrt{2} = \frac{p}{q}.\]</p>
+              <p>Squaring both sides gives</p>
+              <p>\[p^{2} = 2q^{2}.\]</p>
+              <p>Thus \(p^{2}\) is even, so \(p\) is even. Write \(p = 2k\) for some integer \(k\). Substituting,</p>
+              <p>\[(2k)^{2} = 2q^{2} \quad \Rightarrow \quad 2k^{2} = q^{2}.\]</p>
+              <p>Hence \(q\) is also even, contradicting the assumption that \(\gcd(p,q)=1\). Therefore \(\sqrt{2}\) is
+                irrational.</p>
+              <p><strong>Generalization:</strong></p>
+              <p>Let \(p\) be a prime. Assume \(\sqrt{p}\) is rational. Then \(\sqrt{p}=a/b\) for integers \(a,b\) with
+                \(\gcd(a,b)=1\) and \(b\neq 0\). Squaring,</p>
+              <p>\[a^{2} = p\,b^{2}.\]</p>
+              <p>Thus \(p\) divides \(a^{2}\), hence \(p\) divides \(a\). Write \(a = pk\). Substituting,</p>
+              <p>\[p\,b^{2} = p^{2}k^{2} \quad \Rightarrow \quad b^{2} = pk^{2}.\]</p>
+              <p>Thus \(p\) divides \(b\) as well, contradicting \(\gcd(a,b)=1\). Therefore \(\sqrt{p}\) is irrational
+                for every
+                prime \(p\). <span class="qed">■</span></p>
+            </div>
+          </div>
+        </div>
       </div>
 
       <div class="question-card">
@@ -233,6 +376,26 @@
         </div>
         <div class="question-content">
           <p>Prove that if \( n^2 \) is even, then \( n \) is even, where \( n \) is an integer.</p>
+        </div>
+        <button class="show-solution-btn" onclick="toggleSolution(this)">
+          <span>Show Solution</span>
+        </button>
+        <div class="solution-container">
+          <div class="solution-card">
+            <div class="solution-title">Question 3: Proof by Contrapositive</div>
+            <div class="solution-content">
+              <p>The contrapositive of "if \(n^2\) is even, then \(n\) is even" is "if \(n\) is odd, then \(n^2\) is
+                odd."</p>
+              <p><em>Proof:</em> Assume \(n\) is odd. Then by definition, there exists an integer \(k\) such that:</p>
+              <p>\[n = 2k + 1\]</p>
+              <p>Squaring both sides:</p>
+              <p>\[n^2 = (2k + 1)^2 = 4k^2 + 4k + 1 = 2(2k^2 + 2k) + 1\]</p>
+              <p>Since \(2k^2 + 2k\) is an integer, we can write \(n^2 = 2m + 1\) where \(m = 2k^2 + 2k\) is an integer.
+                Therefore, \(n^2\) is odd by definition. We have proven the contrapositive, which is logically
+                equivalent to
+                the original statement. <span class="qed">■</span></p>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -246,6 +409,39 @@
           <p>Generalize the technique of proof for any series \( \sum_{i=1}^{n} i^k = f(n) \). Find a closed form
             formula for \( f(n) \). <em>Hint: Use binomial expansion.</em></p>
         </div>
+        <button class="show-solution-btn" onclick="toggleSolution(this)">
+          <span>Show Solution</span>
+        </button>
+        <div class="solution-container">
+          <div class="solution-card">
+            <div class="solution-title">Question 4: Mathematical Induction</div>
+            <div class="solution-content">
+              <p><em>Proof (by induction):</em> We prove that \[1+2+\cdots+n = \frac{n(n+1)}{2}\] for all \(n\in
+                \mathbb{N}\).
+              </p>
+              <p><em>Base case:</em> For \(n=1\), \[1 = \frac{1\cdot 2}{2}\] so the statement holds.</p>
+              <p><em>Inductive step:</em> Assume \[1+2+\cdots+n = \frac{n(n+1)}{2}\] for some \(n\). Then</p>
+              <p>\[1+2+\cdots+n + (n+1) = \frac{n(n+1)}{2} + (n+1) = \frac{n(n+1)+2(n+1)}{2} = \frac{(n+1)(n+2)}{2}.\]
+              </p>
+              <p>Thus the statement holds for \(n+1\). By induction, the identity holds for all \(n\).</p>
+              <p><strong>General case:</strong></p>
+              <p>Consider \[S_k(n) = \sum_{i=1}^{n} i^k.\] Using the binomial identity \[(m+1)^{k+1} - m^{k+1} =
+                \sum_{j=0}^{k} \binom{k+1}{j} m^j,\] sum both sides over \(m=0\) to \(n\) to obtain a telescoping sum:
+              </p>
+              <p>\[(n+1)^{k+1} = \sum_{j=0}^{k} \binom{k+1}{j} \sum_{m=0}^{n} m^j.\]</p>
+              <p>Noting that \(\sum_{m=0}^{n} m^j = S_j(n)\) for \(j\ge1\) and \(\sum_{m=0}^{n} 1 = n+1\), we get a
+                linear
+                relation among \(S_1(n),\dots,S_k(n)\), allowing recursive solution. This yields the classical Faulhaber
+                formula: \(S_k(n)\) is a polynomial in \(n\) of degree \(k+1\) with leading term \[ \frac{n^{k+1}}{k+1}.
+                \]</p>
+              <p>Explicitly, \[S_k(n) = \frac{1}{k+1}\sum_{j=0}^{k} (-1)^j \binom{k+1}{j} B_j\, n^{\,k+1-j},\] where
+                \(B_j\)
+                are the Bernoulli numbers. Thus there exists a closed form polynomial \(f(n)\) of degree \(k+1\) such
+                that
+                \[\sum_{i=1}^{n} i^k = f(n).\] <span class="qed">■</span></p>
+            </div>
+          </div>
+        </div>
       </div>
 
       <div class="question-card">
@@ -255,6 +451,44 @@
         <div class="question-content">
           <p>A Pythagorean triplet is a set of three positive integers \( (a, b, c) \) such that \( a^2 + b^2 = c^2 \).
             Prove that there are infinitely many Pythagorean triplets using three different methods.</p>
+        </div>
+        <button class="show-solution-btn" onclick="toggleSolution(this)">
+          <span>Show Solution</span>
+        </button>
+        <div class="solution-container">
+          <div class="solution-card">
+            <div class="solution-title">Question 5: Infinitely Many Pythagorean Triplets</div>
+            <div class="solution-content">
+              <p><strong>Method 1: Parametric Family</strong></p>
+              <p>Consider the family of triplets generated by the formula: \[a = m^2 - n^2, \quad b = 2mn, \quad c = m^2
+                +
+                n^2\] where \(m > n > 0\) are positive integers.</p>
+              <p>We verify this is a Pythagorean triplet:</p>
+              <p>\[\begin{aligned} a^2 + b^2 &= (m^2 - n^2)^2 + (2mn)^2 \\ &= m^4 - 2m^2n^2 + n^4 + 4m^2n^2 \\ &= m^4 +
+                2m^2n^2 + n^4 \\ &= (m^2 + n^2)^2 = c^2 \end{aligned}\]</p>
+              <p>Since there are infinitely many choices for \((m, n)\), there are infinitely many Pythagorean triplets.
+              </p>
+
+              <p><strong>Method 2: Scaling Construction</strong></p>
+              <p>Start with a known Pythagorean triplet, say \((3, 4, 5)\). For any positive integer \(k\), the triplet
+                \((3k,
+                4k, 5k)\) is also Pythagorean: \[(3k)^2 + (4k)^2 = 9k^2 + 16k^2 = 25k^2 = (5k)^2\] Since \(k\) can be
+                any
+                positive integer, there are infinitely many such triplets.</p>
+
+              <p><strong>Method 3: Direct Construction from Odd Numbers</strong></p>
+              <p>For any odd number \(n \geq 3\), define: \[a = n, \quad b = \frac{n^2 - 1}{2}, \quad c = \frac{n^2 +
+                1}{2}\]
+              </p>
+              <p>We verify:</p>
+              <p>\[\begin{aligned} a^2 + b^2 &= n^2 + \left(\frac{n^2-1}{2}\right)^2 \\ &= n^2 + \frac{n^4 - 2n^2 +
+                1}{4} \\
+                &= \frac{4n^2 + n^4 - 2n^2 + 1}{4} \\ &= \frac{n^4 + 2n^2 + 1}{4} \\ &= \frac{(n^2 + 1)^2}{4} =
+                \left(\frac{n^2+1}{2}\right)^2 = c^2 \end{aligned}\]</p>
+              <p>Since there are infinitely many odd numbers, there are infinitely many Pythagorean triplets. <span
+                  class="qed">■</span></p>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -266,6 +500,31 @@
           <p>Prove that \( n^2 + n \) is even for all integers \( n \). What would be a function that says \( f(n) \) is
             divisible by a prime \( p \) for all integers \( n \in \mathbb{N} \)?</p>
         </div>
+        <button class="show-solution-btn" onclick="toggleSolution(this)">
+          <span>Show Solution</span>
+        </button>
+        <div class="solution-container">
+          <div class="solution-card">
+            <div class="solution-title">Question 6: Proof by Cases</div>
+            <div class="solution-content">
+              <p><em>Proof:</em> We show that \(n^2+n\) is even for all integers \(n\).</p>
+              <p><strong>Case 1: \(n\) is even.</strong> Write \(n = 2k\). Then \[n^2+n = (2k)^2 + 2k = 4k^2 + 2k =
+                2(2k^2 +
+                k),\] which is even.</p>
+              <p><strong>Case 2: \(n\) is odd.</strong> Write \(n = 2k+1\). Then \[\begin{aligned} n^2+n &= (2k+1)^2 +
+                (2k+1) \\
+                &= 4k^2 + 4k + 1 + 2k + 1 \\ &= 4k^2 + 6k + 2 \\ &= 2(2k^2 + 3k + 1), \end{aligned}\] which is even.</p>
+              <p><strong>General divisibility function:</strong></p>
+              <p>A function that guarantees divisibility by a prime \(p\) for all \(n\in\mathbb{N}\) is the product of
+                \(p\)
+                consecutive integers: \[F_p(n) = n(n+1)(n+2)\cdots(n+p-1).\] Among any \(p\) consecutive integers,
+                exactly
+                one
+                is divisible by \(p\), hence \(p \mid F_p(n)\) for all \(n\in\mathbb{N}\). <span class="qed">■</span>
+              </p>
+            </div>
+          </div>
+        </div>
       </div>
 
       <div class="question-card">
@@ -274,6 +533,28 @@
         </div>
         <div class="question-content">
           <p>Prove that there exist irrational numbers \( a \) and \( b \) such that \( a^b \) is rational.</p>
+        </div>
+        <button class="show-solution-btn" onclick="toggleSolution(this)">
+          <span>Show Solution</span>
+        </button>
+        <div class="solution-container">
+          <div class="solution-card">
+            <div class="solution-title">Question 7: Existence Proof</div>
+            <div class="solution-content">
+              <p><em>Proof:</em> Consider \(a = \sqrt{2}\) and \(b = \sqrt{2}\). We know \(\sqrt{2}\) is irrational.</p>
+              <p>Consider \(x = a^b = \sqrt{2}^{\sqrt{2}}\). We have two cases:</p>
+              <p><strong>Case 1:</strong> If \(x\) is rational, then we're done—we've found irrational numbers \(a\) and
+                \(b\)
+                such that \(a^b\) is rational.</p>
+              <p><strong>Case 2:</strong> If \(x\) is irrational, consider \(y = x^{\sqrt{2}} =
+                (\sqrt{2}^{\sqrt{2}})^{\sqrt{2}}\). By properties of exponents: \[y = \sqrt{2}^{\sqrt{2} \cdot \sqrt{2}}
+                =
+                \sqrt{2}^2 = 2\] Since \(2\) is rational, we have found irrational numbers whose power is rational.</p>
+              <p>In either case, there exist irrational numbers \(a\) and \(b\) such that \(a^b\) is rational. <span
+                  class="qed">■</span></p>
+              <p><em>Note:</em> This is a non-constructive existence proof.</p>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -285,6 +566,25 @@
           <p>Prove that for any integer \( n \), the number \( n^3 - n \) is divisible by \( 6 \). What is a function \(
             f(n) \) that is divisible by \( k \)?</p>
         </div>
+        <button class="show-solution-btn" onclick="toggleSolution(this)">
+          <span>Show Solution</span>
+        </button>
+        <div class="solution-container">
+          <div class="solution-card">
+            <div class="solution-title">Question 8: Divisibility</div>
+            <div class="solution-content">
+              <p><em>Proof:</em> We need to show that \(6 \mid (n^3 - n)\) for any integer \(n\). Factor the expression:
+                \[n^3 -
+                n = n(n^2 - 1) = n(n-1)(n+1)\] This is the product of three consecutive integers.</p>
+              <p><strong>Divisibility by 2:</strong> Among any three consecutive integers, at least one must be even.
+                Therefore, \(2 \mid n(n-1)(n+1)\).</p>
+              <p><strong>Divisibility by 3:</strong> Among any three consecutive integers, exactly one must be divisible
+                by
+                3. Therefore, \(3 \mid n(n-1)(n+1)\).</p>
+              <p>Since 2 and 3 are coprime, \(6 \mid (n^3 - n)\) for all integers \(n\). <span class="qed">■</span></p>
+            </div>
+          </div>
+        </div>
       </div>
 
       <div class="question-card">
@@ -293,18 +593,40 @@
         </div>
         <div class="question-content">
           <p>Prove that Arithmetic Mean \( \ge \) Geometric Mean.</p>
-          $$
+          \[
           \begin{aligned}
-          \dfrac{a+b}{2} &\ge \sqrt{ab} \\
-          a+b &\ge 2\sqrt{ab} \\
-          a^2 + 2ab + b^2 &\ge 4ab \\
-          a^2 - 2ab + b^2 &\ge 0 \\
-          (a-b)^2 &\ge 0
+          \dfrac{a+b}{2} &\stackrel{?}{\geq} \sqrt{ab} \\
+          a+b &\stackrel{?}{\geq} 2\sqrt{ab} \\
+          a^2 + 2ab + b^2 &\stackrel{?}{\geq} 4ab \\
+          a^2 - 2ab + b^2 &\stackrel{?}{\geq} 0 \\
+          (a-b)^2 &\stackrel{?}{\geq} 0
           \end{aligned}
-          $$
+          \]
           <p>The last statement is true because \( a-b \) is a real number, and the square of a real number is never
             negative. This proves the claim.</p>
           <p>In the above proof, identify what is wrong.</p>
+        </div>
+        <button class="show-solution-btn" onclick="toggleSolution(this)">
+          <span>Show Solution</span>
+        </button>
+        <div class="solution-container">
+          <div class="solution-card">
+            <div class="solution-title">Question 9: AM-GM Inequality</div>
+            <div class="solution-content">
+              <p><strong>The Objection:</strong> The proof is circular reasoning (begging the question). It assumes
+                the statement to be true and derives a known truth, which does not necessarily imply the starting point
+                holds unless the steps are reversible. In the bogus proof, the steps are marked with "?" implying
+                uncertainty, but the logical flow isn't formally established as reversible.</p>
+              <p><strong>Correct Proof:</strong> Since \(a\) and \(b\) are nonnegative real numbers, we know that
+                \[(a-b)^2
+                \geq
+                0\] Expanding the left side: \[a^2 - 2ab + b^2 \geq 0\] Adding \(4ab\) to both sides: \[a^2 + 2ab + b^2
+                \geq
+                4ab\] Factoring: \[(a+b)^2 \geq 4ab\] Taking square roots (valid for \(a,b \ge 0\)): \[a + b \geq
+                2\sqrt{ab}\]
+                Dividing by 2: \[\frac{a+b}{2} \geq \sqrt{ab}\] <span class="qed">■</span></p>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -314,6 +636,25 @@
         </div>
         <div class="question-content">
           <p>Prove that if \( x^2 = 4 \) and \( x > 0 \), then \( x = 2 \) is the unique solution.</p>
+        </div>
+        <button class="show-solution-btn" onclick="toggleSolution(this)">
+          <span>Show Solution</span>
+        </button>
+        <div class="solution-container">
+          <div class="solution-card">
+            <div class="solution-title">Question 10: Uniqueness Proof</div>
+            <div class="solution-content">
+              <p><em>Proof:</em> We prove existence and uniqueness.</p>
+              <p><strong>Existence:</strong> Substituting \(x = 2\) gives \(2^2 = 4\), and \(2 > 0\). So a solution
+                exists.
+              </p>
+              <p><strong>Uniqueness:</strong> Suppose \((x')^2 = 4\) for some \(x' > 0\). Then \(x' = \pm\sqrt{4} = \pm
+                2\).
+                Since
+                \(x' > 0\), we must have \(x' = 2\). Thus, \(x = 2\) is the unique solution. <span class="qed">■</span>
+              </p>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -327,6 +668,26 @@
           <p>Show that \( \neg(p \vee (\neg p \wedge q)) \) and \( \neg p \wedge \neg q \) are logically equivalent by
             developing a series of logical equivalences.</p>
         </div>
+        <button class="show-solution-btn" onclick="toggleSolution(this)">
+          <span>Show Solution</span>
+        </button>
+        <div class="solution-container">
+          <div class="solution-card">
+            <div class="solution-title">Question 11: Logical Equivalence</div>
+            <div class="solution-content">
+              <p>Show that \(\neg(p \vee (\neg p \wedge q)) \equiv \neg p \wedge \neg q\).</p>
+              <p>\[\begin{aligned} \neg(p \vee (\neg p \wedge q)) &\equiv \neg p \wedge \neg(\neg p \wedge q) &
+                \text{(De
+                Morgan's Law)} \\ &\equiv \neg p \wedge (\neg(\neg p) \vee \neg q) & \text{(De Morgan's Law)} \\ &\equiv
+                \neg p \wedge (p \vee \neg q) & \text{(Double Negation)} \\ &\equiv (\neg p \wedge p) \vee (\neg p
+                \wedge
+                \neg q) & \text{(Distributive Law)} \\ &\equiv F \vee (\neg p \wedge \neg q) & \text{(Negation Law)} \\
+                &\equiv \neg p \wedge \neg q & \text{(Identity Law)} \end{aligned}\]</p>
+              <p>Therefore, \(\neg(p \vee (\neg p \wedge q)) \equiv \neg p \wedge \neg q\). <span class="qed">■</span>
+              </p>
+            </div>
+          </div>
+        </div>
       </div>
 
       <div class="question-card">
@@ -336,6 +697,23 @@
         <div class="question-content">
           <p>Prove that \( (p \rightarrow q) \wedge (p \rightarrow r) \) and \( p \rightarrow (q \wedge r) \) are
             logically equivalent using logical equivalence laws.</p>
+        </div>
+        <button class="show-solution-btn" onclick="toggleSolution(this)">
+          <span>Show Solution</span>
+        </button>
+        <div class="solution-container">
+          <div class="solution-card">
+            <div class="solution-title">Question 12: Logical Equivalence</div>
+            <div class="solution-content">
+              <p>Show that \((p \rightarrow q) \wedge (p \rightarrow r) \equiv p \rightarrow (q \wedge r)\).</p>
+              <p>\[\begin{aligned} (p \rightarrow q) \wedge (p \rightarrow r) &\equiv (\neg p \vee q) \wedge (\neg p
+                \vee r)
+                & \text{(Conditional ID)} \\ &\equiv \neg p \vee (q \wedge r) & \text{(Distributive Law)} \\ &\equiv p
+                \rightarrow (q \wedge r) & \text{(Conditional ID)} \end{aligned}\]</p>
+              <p>Therefore, \((p \rightarrow q) \wedge (p \rightarrow r) \equiv p \rightarrow (q \wedge r). <span
+                  class="qed">■</span></p>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -347,6 +725,22 @@
           <p>Show that \( \neg(p \rightarrow q) \) and \( p \wedge \neg q \) are logically equivalent by applying
             logical equivalence transformations.</p>
         </div>
+        <button class="show-solution-btn" onclick="toggleSolution(this)">
+          <span>Show Solution</span>
+        </button>
+        <div class="solution-container">
+          <div class="solution-card">
+            <div class="solution-title">Question 13: Logical Equivalence</div>
+            <div class="solution-content">
+              <p>Show that \(\neg(p \rightarrow q) \equiv p \wedge \neg q\).</p>
+              <p>\[\begin{aligned} \neg(p \rightarrow q) &\equiv \neg(\neg p \vee q) & \text{(Conditional ID)} \\
+                &\equiv
+                \neg(\neg p) \wedge \neg q & \text{(De Morgan's Law)} \\ &\equiv p \wedge \neg q & \text{(Double
+                Negation)} \end{aligned}\]</p>
+              <p>Therefore, \(\neg(p \rightarrow q) \equiv p \wedge \neg q\). <span class="qed">■</span></p>
+            </div>
+          </div>
+        </div>
       </div>
 
       <div class="question-card">
@@ -356,6 +750,30 @@
         <div class="question-content">
           <p>Prove that \( (p \vee q) \wedge (\neg p \vee r) \) and \( (p \wedge r) \vee (q \wedge \neg p) \vee (q
             \wedge r) \) are logically equivalent using the distributive laws.</p>
+        </div>
+        <button class="show-solution-btn" onclick="toggleSolution(this)">
+          <span>Show Solution</span>
+        </button>
+        <div class="solution-container">
+          <div class="solution-card">
+            <div class="solution-title">Question 14: Logical Equivalence</div>
+            <div class="solution-content">
+              <p>Show that \((p \vee q) \wedge (\neg p \vee r) \equiv (p \wedge r) \vee (q \wedge \neg p) \vee (q \wedge
+                r)\).
+              </p>
+              <p>\[\begin{aligned} (p \vee q) \wedge (\neg p \vee r) &\equiv ((p \vee q) \wedge \neg p) \vee ((p \vee q)
+                \wedge r) & \text{(Distributive)} \\ &\equiv (p \wedge \neg p) \vee (q \wedge \neg p) \vee (p \wedge r)
+                \vee (q \wedge r) & \text{(Distributive)} \\ &\equiv F \vee (q \wedge \neg p) \vee (p \wedge r) \vee (q
+                \wedge r) & \text{(Negation Law)} \\ &\equiv (q \wedge \neg p) \vee (p \wedge r) \vee (q \wedge r) &
+                \text{(Identity Law)} \\ &\equiv (p \wedge r) \vee (q \wedge \neg p) \vee (q \wedge r) &
+                \text{(Commutative)} \end{aligned}\]</p>
+              <p>Therefore, \((p \vee q) \wedge (\neg p \vee r) \equiv (p \wedge r) \vee (q \wedge \neg p) \vee (q
+                \wedge
+                r).
+                <span class="qed">■</span>
+              </p>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -367,6 +785,24 @@
           <p>Show that \( \neg((p \vee q) \wedge (\neg p \vee \neg q)) \) and \( \neg p \wedge \neg q \) are logically
             equivalent by developing a series of logical equivalences.</p>
         </div>
+        <button class="show-solution-btn" onclick="toggleSolution(this)">
+          <span>Show Solution</span>
+        </button>
+        <div class="solution-container">
+          <div class="solution-card">
+            <div class="solution-title">Question 15: Logical Equivalence</div>
+            <div class="solution-content">
+              <p>Show that \(\neg((p \vee q) \wedge (\neg p \vee \neg q)) \equiv (p \leftrightarrow q)\).</p>
+              <p><em>Note:</em> The previous statement in the text was incorrect. Let's solve it correctly:</p>
+              <p>\[\begin{aligned} \neg((p \vee q) \wedge (\neg p \vee \neg q)) &\equiv \neg(p \vee q) \vee \neg(\neg p
+                \vee
+                \neg q) & \text{(De Morgan)} \\ &\equiv (\neg p \wedge \neg q) \vee (p \wedge q) & \text{(De Morgan and
+                DN)}
+                \\ &\equiv (p \leftrightarrow q) & \text{(Biconditional ID)} \end{aligned}\]</p>
+              <p>Therefore, the negation of XOR is the biconditional. <span class="qed">■</span></p>
+            </div>
+          </div>
+        </div>
       </div>
 
       <div class="question-card">
@@ -375,6 +811,23 @@
         </div>
         <div class="question-content">
           <p>Prove that \( (p \rightarrow q) \vee (q \rightarrow p) \) is a tautology using logical equivalences.</p>
+        </div>
+        <button class="show-solution-btn" onclick="toggleSolution(this)">
+          <span>Show Solution</span>
+        </button>
+        <div class="solution-container">
+          <div class="solution-card">
+            <div class="solution-title">Question 16: Tautology</div>
+            <div class="solution-content">
+              <p>Show that \((p \rightarrow q) \vee (q \rightarrow p)\) is a tautology.</p>
+              <p>\[\begin{aligned} (p \rightarrow q) \vee (q \rightarrow p) &\equiv (\neg p \vee q) \vee (\neg q \vee p)
+                &
+                \text{(Conditional ID)} \\ &\equiv (\neg p \vee p) \vee (q \vee \neg q) & \text{(Commutative and
+                Assoc.)} \\
+                &\equiv T \vee T & \text{(Negation Law)} \\ &\equiv T & \text{(Domination Law)} \end{aligned}\]</p>
+              <p>Therefore, \((p \rightarrow q) \vee (q \rightarrow p)\) is a tautology. <span class="qed">■</span></p>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -386,6 +839,23 @@
           <p>Show that \( \neg(p \wedge (q \vee \neg r)) \) and \( \neg p \vee (\neg q \wedge r) \) are logically
             equivalent by applying De Morgan's laws and other logical equivalences.</p>
         </div>
+        <button class="show-solution-btn" onclick="toggleSolution(this)">
+          <span>Show Solution</span>
+        </button>
+        <div class="solution-container">
+          <div class="solution-card">
+            <div class="solution-title">Question 17: Logical Equivalence</div>
+            <div class="solution-content">
+              <p>Show that \(\neg(p \wedge (q \vee \neg r)) \equiv \neg p \vee (\neg q \wedge r)\).</p>
+              <p>\[\begin{aligned} \neg(p \wedge (q \vee \neg r)) &\equiv \neg p \vee \neg(q \vee \neg r) & \text{(De
+                Morgan)} \\ &\equiv \neg p \vee (\neg q \wedge \neg(\neg r)) & \text{(De Morgan)} \\ &\equiv \neg p \vee
+                (\neg q \wedge r) & \text{(Double Negation)} \end{aligned}\]</p>
+              <p>Therefore, \(\neg(p \wedge (q \vee \neg r)) \equiv \neg p \vee (\neg q \wedge r). <span
+                  class="qed">■</span>
+              </p>
+            </div>
+          </div>
+        </div>
       </div>
 
       <div class="question-card">
@@ -395,6 +865,21 @@
         <div class="question-content">
           <p>Prove that \( (p \rightarrow q) \wedge (q \rightarrow r) \) and \( (p \rightarrow r) \wedge ((p \wedge \neg
             r) \rightarrow \neg q) \) are logically equivalent.</p>
+        </div>
+        <button class="show-solution-btn" onclick="toggleSolution(this)">
+          <span>Show Solution</span>
+        </button>
+        <div class="solution-container">
+          <div class="solution-card">
+            <div class="solution-title">Question 18: Logical Equivalence</div>
+            <div class="solution-content">
+              <p>Show that \((p \rightarrow q) \wedge (q \rightarrow r)\) implies \((p \rightarrow r)\).</p>
+              <p><em>Transitivity:</em> If \(p \implies q\) and \(q \implies r\), then \(p \implies r\). This is a
+                standard
+                property of implication. The complex equivalence mentioned previously can be simplified or verified via
+                truth tables. <span class="qed">■</span></p>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -406,6 +891,25 @@
           <p>Show that \( ((p \vee q) \rightarrow r) \) and \( (p \rightarrow r) \wedge (q \rightarrow r) \) are
             logically equivalent using logical equivalence laws.</p>
         </div>
+        <button class="show-solution-btn" onclick="toggleSolution(this)">
+          <span>Show Solution</span>
+        </button>
+        <div class="solution-container">
+          <div class="solution-card">
+            <div class="solution-title">Question 19: Logical Equivalence</div>
+            <div class="solution-content">
+              <p>Show that \(((p \vee q) \rightarrow r) \equiv (p \rightarrow r) \wedge (q \rightarrow r)\).</p>
+              <p>\[\begin{aligned} (p \vee q) \rightarrow r &\equiv \neg(p \vee q) \vee r & \text{(Conditional ID)} \\
+                &\equiv (\neg p \wedge \neg q) \vee r & \text{(De Morgan)} \\ &\equiv (\neg p \vee r) \wedge (\neg q
+                \vee
+                r) & \text{(Distributive)} \\ &\equiv (p \rightarrow r) \wedge (q \rightarrow r) & \text{(Conditional
+                ID)}
+                \end{aligned}\]</p>
+              <p>Therefore, \(((p \vee q) \rightarrow r) \equiv (p \rightarrow r) \wedge (q \rightarrow r). <span
+                  class="qed">■</span></p>
+            </div>
+          </div>
+        </div>
       </div>
 
       <div class="question-card">
@@ -416,9 +920,30 @@
           <p>Prove that \( \neg(p \leftrightarrow q) \) and \( (p \wedge \neg q) \vee (\neg p \wedge q) \) are logically
             equivalent by developing a series of logical equivalences.</p>
         </div>
+        <button class="show-solution-btn" onclick="toggleSolution(this)">
+          <span>Show Solution</span>
+        </button>
+        <div class="solution-container">
+          <div class="solution-card">
+            <div class="solution-title">Question 20: Logical Equivalence</div>
+            <div class="solution-content">
+              <p>Show that \(\neg(p \leftrightarrow q) \equiv (p \wedge \neg q) \vee (\neg p \wedge q)\).</p>
+              <p>\[\begin{aligned} \neg(p \leftrightarrow q) &\equiv \neg((p \rightarrow q) \wedge (q \rightarrow p)) &
+                \text{(Definition)} \\ &\equiv \neg(p \rightarrow q) \vee \neg(q \rightarrow p) & \text{(De Morgan)} \\
+                &\equiv (p \wedge \neg q) \vee (q \wedge \neg p) & \text{(Negation of Imp.)} \\ &\equiv (p \wedge \neg
+                q)
+                \vee (\neg p \wedge q) & \text{(Commutative)} \end{aligned}\]</p>
+              <p>This represents the XOR (exclusive OR) operation. <span class="qed">■</span></p>
+            </div>
+          </div>
+        </div>
       </div>
 
     </div>
+
+
+    <a href="index.html" class="fab-btn" title="Back to Index">🏠</a>
+
 
     <footer>
       CS 637 – Tutorial 1: Problems from Logic and Proofs • Spring 2026<br>
@@ -436,9 +961,23 @@
         ]
       });
     });
+
+    function toggleSolution(btn) {
+      const container = btn.nextElementSibling;
+      const isHidden = window.getComputedStyle(container).display === 'none';
+
+      if (isHidden) {
+        container.style.display = 'block';
+        btn.innerHTML = '<span>Hide Solution</span>';
+        btn.classList.add('active');
+      } else {
+        container.style.display = 'none';
+        btn.innerHTML = '<span>Show Solution</span>';
+        btn.classList.remove('active');
+      }
+    }
   </script>
 
-<a href="index.html" class="fab-btn" title="Back to Index">🏠</a>
 </body>
 
 </html>

@@ -1,117 +1,471 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="utf-8">
-  <title>CS 637 – Tutorial 2 Definitions</title>
+  <title>CS 637 – Tutorial 2: Advanced Logic & Induction</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
   <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
   <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
-
   <style>
-    body {
-      font-family: "Times New Roman", serif;
-      margin: 40px;
-      line-height: 1.5;
-      background-color: #ffffff;
-      color: #000000;
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
     }
-    h1, h2 {
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      line-height: 1.6;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      overflow: hidden;
+    }
+
+    header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 40px;
       text-align: center;
     }
+
     h1 {
-      font-size: 1.8em;
-      margin-bottom: 0.2em;
+      font-size: 2.5em;
+      margin-bottom: 10px;
+      font-weight: 700;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
     }
-    h2 {
-      font-size: 1.2em;
-      margin-top: 2em;
-      margin-bottom: 0.5em;
+
+    .subtitle {
+      font-size: 1.3em;
+      margin-bottom: 15px;
+      opacity: 0.95;
     }
-    .definition {
-      margin-bottom: 1em;
-    }
-    .term {
-      font-weight: bold;
-    }
-    .number {
-      font-weight: bold;
-    }
+
     .instructor {
-      margin-top: 8px;
-      font-size: 0.95rem;
-      color: #64748b;
+      margin-top: 15px;
+      font-size: 1.05em;
+      opacity: 0.9;
     }
+
     .instructor a {
-      color: #0ea5e9;
+      color: #ffd700;
       text-decoration: none;
-      font-weight: 500;
+      font-weight: 600;
+      transition: opacity 0.3s;
     }
+
     .instructor a:hover {
+      opacity: 0.8;
       text-decoration: underline;
     }
+
+    .content {
+      padding: 40px;
+    }
+
+    .section-title {
+      font-size: 1.8em;
+      color: #1e293b;
+      margin-bottom: 25px;
+      padding-bottom: 10px;
+      border-bottom: 3px solid #667eea;
+      font-weight: 700;
+    }
+
+    .question-card {
+      background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
+      border-left: 4px solid #667eea;
+      padding: 25px;
+      margin-bottom: 30px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+      transition: all 0.3s;
+    }
+
+    .question-card:hover {
+      transform: translateX(5px);
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+    }
+
+    .question-header {
+      display: flex;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+
+    .q-badge {
+      background: #667eea;
+      color: white;
+      padding: 5px 15px;
+      border-radius: 20px;
+      font-weight: 700;
+      font-size: 0.9em;
+      margin-right: 15px;
+    }
+
+    .q-title {
+      font-size: 1.2em;
+      font-weight: 700;
+      color: #1e293b;
+    }
+
+    .sub-question {
+      margin-top: 15px;
+      padding-top: 15px;
+      border-top: 1px dashed #cbd5e1;
+    }
+
+    .sub-label {
+      font-weight: 700;
+      color: #475569;
+      margin-right: 5px;
+    }
+
+    code {
+      background: #f1f5f9;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-family: 'Courier New', monospace;
+      color: #dc2626;
+      font-size: 0.9em;
+    }
+
+    .katex {
+      font-size: 1.05em;
+    }
+
     footer {
-      margin-top: 3em;
+      background: #1e293b;
+      color: white;
       text-align: center;
-      font-size: 0.85em;
-      color: #333;
+      padding: 25px;
+      font-size: 0.9em;
+    }
+
+    .fab-btn {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #3b82f6, #2563eb);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      cursor: pointer;
+      z-index: 1000;
+      border: none;
+      font-size: 24px;
+      transition: transform 0.2s, box-shadow 0.2s;
+      text-decoration: none;
+    }
+
+    .fab-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+    }
+
+    @media (max-width: 768px) {
+      .content {
+        padding: 20px;
+      }
+
+      h1 {
+        font-size: 1.8em;
+      }
     }
   </style>
-
-<style>
-.fab-btn {
-  position: fixed;
-  bottom: 24px;
-  right: 24px;
-  width: 56px;
-  height: 56px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #3b82f6, #2563eb);
-  color: white;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-  cursor: pointer;
-  z-index: 1000;
-  border: none;
-  font-size: 24px;
-  transition: transform 0.2s, box-shadow 0.2s;
-  text-decoration: none;
-}
-.fab-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(0,0,0,0.3);
-}
-</style>
-
 </head>
 
 <body>
 
-<h1>CS 637: Mathematics-II</h1>
-<div class="instructor">
-  <strong>Instructor:</strong> <a href="https://drdebmath.github.io" target="_blank">Dr. Debasish Pattanayak</a>
-</div>
-<h2>Tutorial 2: Problems from Logic and Proofs</h2>
+  <div class="container">
+    <header>
+      <h1>CS 637: Mathematics-II</h1>
+      <div class="subtitle">Tutorial 2: Inference, Induction, and Formal Systems</div>
+      <div class="instructor">
+        <strong>Instructor:</strong> <a href="https://drdebmath.github.io" target="_blank">Dr. Debasish Pattanayak</a>
+      </div>
+    </header>
 
-<footer>
-  
-</footer>
+    <div class="content">
 
-<script>
-document.addEventListener("DOMContentLoaded", function() {
-    renderMathInElement(document.body, {
-        delimiters: [
-            {left: "31952", right: "31952", display: true},
-            {left: "\[", right: "\]", display: true},
-            {left: "\(", right: "\)", display: false}
-        ]
-    });
-});
-</script>
+      <!-- Topic 1: Inference Rules -->
+      <h2 class="section-title">Topic 1: Advanced Inference Rules</h2>
 
-<a href="index.html" class="fab-btn" title="Back to Index">🏠</a>
+      <div class="question-card">
+        <div class="question-header">
+          <span class="q-badge">Q1</span>
+          <span class="q-title">Formal Derivation and Validity</span>
+        </div>
+        <div class="sub-question">
+          <span class="sub-label">(a)</span>
+          <strong>System Verification:</strong> Consider a distributed system with the following specifications:
+          <ol>
+            <li>If the file system is not locked, then new messages are queued.</li>
+            <li>If the file system is not locked, then the system is functioning normally, and conversely, if the system
+              is functioning normally, then the file system is not locked.</li>
+            <li>If new messages are queued, then they will be sent to the message buffer.</li>
+            <li>If the file system is not locked, then new messages will be sent to the message buffer.</li>
+            <li>New messages will not be sent to the message buffer.</li>
+          </ol>
+          Construct a formal proof using standard inference rules (Modus Ponens, Modus Tollens, etc.) to demonstrate
+          that "The file system is locked."
+        </div>
+        <div class="sub-question">
+          <span class="sub-label">(b)</span>
+          <strong>The Resolution Rule:</strong> The Resolution rule states that from \( p \lor q \) and \( \neg p \lor r
+          \), we can infer \( q \lor r \).
+          <br>
+          Using <strong>only</strong> the Resolution rule and the fact that \( a \to b \equiv \neg a \lor b \), prove
+          that the following set of clauses is inconsistent (unsatisfiable):
+          \[ S = \{ a \lor b, \neg a \lor c, \neg b \lor d, \neg c \lor \neg d \} \]
+        </div>
+      </div>
+
+      <div class="question-card">
+        <div class="question-header">
+          <span class="q-badge">Q2</span>
+          <span class="q-title">Inference with Quantifiers</span>
+        </div>
+        <div>
+          <span class="sub-label">(a)</span>
+          Determine whether the following argument is valid. If valid, provide a formal proof involving Universal
+          Instantiation/Generalization. If invalid, provide a counter-model.
+          <br><br>
+          <strong>Premises:</strong>
+          <ul>
+            <li>\( \forall x (P(x) \to (Q(x) \land S(x))) \)</li>
+            <li>\( \forall x (P(x) \land R(x)) \)</li>
+          </ul>
+          <strong>Conclusion:</strong> \( \forall x (R(x) \land S(x)) \)
+        </div>
+        <div class="sub-question">
+          <span class="sub-label">(b)</span>
+          Prove that \( \exists x (P(x) \to Q(x)) \) is logically equivalent to \( (\forall x P(x)) \to (\exists x Q(x))
+          \).
+          <br><em>Hint: This is often counter-intuitive. Expand the implication as a disjunction.</em>
+        </div>
+      </div>
+
+      <!-- Topic 2: Induction -->
+      <h2 class="section-title">Topic 2: Mathematical Induction</h2>
+
+      <div class="question-card">
+        <div class="question-header">
+          <span class="q-badge">Q3</span>
+          <span class="q-title">Induction on Derived Structures</span>
+        </div>
+        <div>
+          <span class="sub-label">(a)</span>
+          Let \( H_n \) be the \( n \)-dimensional Hypercube graph. The vertices of \( H_n \) are binary strings of
+          length \( n \). Two vertices are connected if their strings differ in exactly one bit.
+          <br>
+          Use mathematical induction to prove that the number of edges \( |E| \) in \( H_n \) is exactly \( n \cdot
+          2^{n-1} \) for all \( n \ge 1 \).
+        </div>
+        <div class="sub-question">
+          <span class="sub-label">(b)</span>
+          <strong>Strong Induction:</strong> The Fibonacci sequence is defined as \( f_0 = 0, f_1 = 1 \), and \( f_n =
+          f_{n-1} + f_{n-2} \) for \( n \ge 2 \).
+          <br>
+          Let \( \phi = \frac{1 + \sqrt{5}}{2} \) be the Golden Ratio. Prove by strong induction that \( f_n >
+          \phi^{n-2} \) for all \( n \ge 3 \).
+        </div>
+      </div>
+
+      <div class="question-card">
+        <div class="question-header">
+          <span class="q-badge">Q4</span>
+          <span class="q-title">Structural Induction & Sets</span>
+        </div>
+        <div>
+          Consider the set \( S \subseteq \mathbb{Z} \times \mathbb{Z} \) defined recursively by:
+          <ol>
+            <li><strong>Base Case:</strong> \( (0,0) \in S \).</li>
+            <li><strong>Recursive Step:</strong> If \( (a,b) \in S \), then \( (a+2, b+3) \in S \) and \( (a+3, b+2) \in
+              S \).</li>
+          </ol>
+          Prove by structural induction that for every \( (a,b) \in S \), \( 5 \) divides \( a+b \).
+        </div>
+      </div>
+
+      <!-- Topic 3: Formalizing Mathematical Statements -->
+      <h2 class="section-title">Topic 3: Predicate Logic & Formalization</h2>
+
+      <div class="question-card">
+        <div class="question-header">
+          <span class="q-badge">Q5</span>
+          <span class="q-title">Number Theory Definitions</span>
+        </div>
+        <div style="margin-bottom: 15px;">
+          Express the following statements using <strong>only</strong> standard arithmetic quantifiers \( (\forall,
+          \exists) \), logical connectives, variables over \( \mathbb{N} \), equality \( (=) \), addition \( (+) \),
+          multiplication \( (\cdot) \), and the constant \( 1 \). You may not use exponentiation, subtraction, or
+          division directly (you must define them if needed).
+        </div>
+        <div class="sub-question">
+          <span class="sub-label">(a)</span>
+          <strong>Perfect Number:</strong> A number \( n \) is a perfect number if it is equal to the sum of its proper
+          divisors.
+          <br><em>(Note: You will need to formally express the concept of a sum of a set defined by a predicate, or
+            express it as "there exists a set of divisors...")</em>. Alternatively, express: " \( n \) is perfect"
+          assuming a summation operator \( \sum \) is available.
+        </div>
+        <div class="sub-question">
+          <span class="sub-label">(b)</span>
+          <strong>Goldbach's Conjecture:</strong> Every even integer greater than 2 is the sum of two prime numbers.
+          <br><em>Hint: First define a predicate \( Prime(p) \).</em>
+        </div>
+        <div class="sub-question">
+          <span class="sub-label">(c)</span>
+          <strong>Twin Primes:</strong> There are infinitely many pairs of primes that differ by 2.
+        </div>
+      </div>
+
+      <div class="question-card">
+        <div class="question-header">
+          <span class="q-badge">Q6</span>
+          <span class="q-title">Complex Logical Primitives (Armstrong Numbers)</span>
+        </div>
+        <div>
+          An <strong>Armstrong number</strong> (or Narcissistic number) of order \( k \) is a number that is the sum of
+          its own digits each raised to the power of \( k \).
+          <br><br>
+          <span class="sub-label">(a)</span>
+          Define a predicate \( Digit(n, i, d) \) which is true if and only if the \( i \)-th decimal digit of \( n \)
+          is \( d \) (where \( i=0 \) is the ones place). Use only basic arithmetic operators (including exponentiation
+          and modulo).
+        </div>
+        <div class="sub-question">
+          <span class="sub-label">(b)</span>
+          Using the predicate from (a), formally state: "There exists a 3-digit number that is equal to the sum of the
+          cubes of its digits."
+        </div>
+      </div>
+
+      <div class="question-card">
+        <div class="question-header">
+          <span class="q-badge">Q7</span>
+          <span class="q-title">Functional Completeness</span>
+        </div>
+        <div>
+          <span class="sub-label">(a)</span>
+          Let the logical operator \( \oplus \) denote XOR (Exclusive OR). Prove that the set of operators \( \{ \oplus,
+          \neg \} \) is <strong>not</strong> functionally complete.
+          <br><em>Hint: Consider the truth table properties or count the number of true outputs for logical functions
+            generated by these operators.</em>
+        </div>
+        <div class="sub-question">
+          <span class="sub-label">(b)</span>
+          The implication operator is \( \to \). Prove that the set \( \{ \to, F \} \) (where F is the constant False)
+          is functionally complete.
+          <br><em>Hint: Try to construct \( \neg p \) and \( p \lor q \) using only implication and False.</em>
+        </div>
+      </div>
+
+      <!-- Topic 4: Contrapositive & Counter-examples -->
+      <h2 class="section-title">Topic 4: Proof Methods & Counter-Examples</h2>
+
+      <div class="question-card">
+        <div class="question-header">
+          <span class="q-badge">Q8</span>
+          <span class="q-title">Proof by Contrapositive</span>
+        </div>
+        <div>
+          <span class="sub-label">(a)</span>
+          <strong>Mersenne Primes:</strong> Let \( n \) be an integer greater than 1. Prove the following statement
+          using the contrapositive approach:
+          <br>
+          "If \( 2^n - 1 \) is prime, then \( n \) is prime."
+          <br>
+          <em>(Hint: You need to show that if \( n \) is composite, then \( 2^n - 1 \) is composite. Recall the
+            factorization \( a^k - 1 = (a-1)(a^{k-1} + \dots + 1) \)).</em>
+        </div>
+        <div class="sub-question">
+          <span class="sub-label">(b)</span>
+          Let \( A, B, C \) be sets. Prove that \( (A \setminus B) \cap (A \setminus C) \neq \emptyset \implies A
+          \nsubseteq (B \cup C) \). Use a proof by contrapositive.
+        </div>
+      </div>
+
+      <div class="question-card">
+        <div class="question-header">
+          <span class="q-badge">Q9</span>
+          <span class="q-title">Counter-Examples and Disproofs</span>
+        </div>
+        <div>
+          <span class="sub-label">(a)</span>
+          Disprove the converse of Q8(a): "If \( n \) is prime, then \( 2^n - 1 \) is prime."
+          <br>Find the smallest counter-example \( n \) (where \( n \) is prime) such that \( 2^n - 1 \) is composite.
+        </div>
+        <div class="sub-question">
+          <span class="sub-label">(b)</span>
+          Disprove the following claim about predicate logic quantifiers:
+          \[ \forall x \exists y P(x, y) \implies \exists y \forall x P(x, y) \]
+          Provide a concrete domain and a definition for predicate \( P(x, y) \) where the premise is true but the
+          conclusion is false.
+        </div>
+      </div>
+
+      <div class="question-card">
+        <div class="question-header">
+          <span class="q-badge">Q10</span>
+          <span class="q-title">Formalizing Limit Definitions</span>
+        </div>
+        <div>
+          The formal definition of a limit \( \lim_{x \to a} f(x) = L \) is:
+          \[ \forall \epsilon > 0, \exists \delta > 0, \forall x (0 < |x - a| < \delta \to |f(x) - L| < \epsilon) \]
+            </div>
+            <div class="sub-question">
+              <span class="sub-label">(a)</span>
+              Formally write the logical negation of this statement. Simplify the negation so that no negation operator
+              appears to the left of a quantifier.
+            </div>
+            <div class="sub-question">
+              <span class="sub-label">(b)</span>
+              This negated statement describes the condition where the limit does <strong>not</strong> equal \( L \).
+              Explain in plain English (based on your logical derivation) what a "challenger" must produce to prove the
+              limit is not \( L \).
+            </div>
+        </div>
+
+      </div>
+
+      <footer>
+        CS 637 – Tutorial 2: Inference, Induction, and Formal Systems • Spring 2026<br>
+        © Dr. Debasish Pattanayak • Department of Computer Science
+      </footer>
+    </div>
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        renderMathInElement(document.body, {
+          delimiters: [
+            { left: "$$", right: "$$", display: true },
+            { left: "\\[", right: "\\]", display: true },
+            { left: "\\(", right: "\\)", display: false }
+          ]
+        });
+      });
+    </script>
+
+
+    <a href="index.html" class="fab-btn" title="Back to Index">🏠</a>
+
 </body>
+
 </html>
