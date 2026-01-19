@@ -1,117 +1,1654 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-  <meta charset="utf-8">
-  <title>CS 637 – Lecture 4 Definitions</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="utf-8">
+    <title>CS 637 – Lecture 4: Formal Languages & Automata</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
-  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
-  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+            min-height: 100vh;
+            padding: 20px;
+        }
 
-  <style>
-    body {
-      font-family: "Times New Roman", serif;
-      margin: 40px;
-      line-height: 1.5;
-      background-color: #ffffff;
-      color: #000000;
-    }
-    h1, h2 {
-      text-align: center;
-    }
-    h1 {
-      font-size: 1.8em;
-      margin-bottom: 0.2em;
-    }
-    h2 {
-      font-size: 1.2em;
-      margin-top: 2em;
-      margin-bottom: 0.5em;
-    }
-    .definition {
-      margin-bottom: 1em;
-    }
-    .term {
-      font-weight: bold;
-    }
-    .number {
-      font-weight: bold;
-    }
-    .instructor {
-      margin-top: 8px;
-      font-size: 0.95rem;
-      color: #64748b;
-    }
-    .instructor a {
-      color: #0ea5e9;
-      text-decoration: none;
-      font-weight: 500;
-    }
-    .instructor a:hover {
-      text-decoration: underline;
-    }
-    footer {
-      margin-top: 3em;
-      text-align: center;
-      font-size: 0.85em;
-      color: #333;
-    }
-  </style>
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
 
-<style>
-.fab-btn {
-  position: fixed;
-  bottom: 24px;
-  right: 24px;
-  width: 56px;
-  height: 56px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #3b82f6, #2563eb);
-  color: white;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-  cursor: pointer;
-  z-index: 1000;
-  border: none;
-  font-size: 24px;
-  transition: transform 0.2s, box-shadow 0.2s;
-  text-decoration: none;
-}
-.fab-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(0,0,0,0.3);
-}
-</style>
+        header {
+            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
 
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            font-weight: 700;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .subtitle {
+            font-size: 1.3em;
+            margin-bottom: 15px;
+            opacity: 0.95;
+        }
+
+        .instructor {
+            margin-top: 15px;
+            font-size: 1.05em;
+            opacity: 0.9;
+        }
+
+        .instructor a {
+            color: #ffd700;
+            text-decoration: none;
+            font-weight: 600;
+            transition: opacity 0.3s;
+        }
+
+        .instructor a:hover {
+            opacity: 0.8;
+            text-decoration: underline;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .nav-tabs {
+            display: flex;
+            border-bottom: 2px solid #e2e8f0;
+            margin-bottom: 30px;
+            gap: 5px;
+            overflow-x: auto;
+        }
+
+        .tab-btn {
+            padding: 12px 20px;
+            background: none;
+            border: none;
+            font-size: 1em;
+            cursor: pointer;
+            color: #64748b;
+            font-weight: 600;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+            white-space: nowrap;
+        }
+
+        .tab-btn:hover {
+            color: #302b63;
+            background: #f8fafc;
+        }
+
+        .tab-btn.active {
+            color: #302b63;
+            border-bottom-color: #302b63;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.4s;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .section-title {
+            font-size: 1.8em;
+            color: #1e293b;
+            margin-bottom: 25px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #302b63;
+            font-weight: 700;
+        }
+
+        .subsection-title {
+            font-size: 1.4em;
+            color: #334155;
+            margin: 30px 0 15px 0;
+            font-weight: 600;
+        }
+
+        .definition-card {
+            background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
+            border-left: 4px solid #302b63;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s;
+        }
+
+        .definition-card:hover {
+            transform: translateX(5px);
+            box-shadow: 0 4px 12px rgba(48, 43, 99, 0.2);
+        }
+
+        .def-number {
+            display: inline-block;
+            background: #302b63;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 0.9em;
+            margin-right: 10px;
+        }
+
+        .def-term {
+            font-weight: 700;
+            color: #1e293b;
+            font-size: 1.15em;
+            display: inline-block;
+            margin-bottom: 8px;
+        }
+
+        .def-content {
+            color: #475569;
+            margin-top: 8px;
+            line-height: 1.7;
+        }
+
+        .def-content ul,
+        .def-content ol {
+            margin-top: 10px;
+            margin-left: 0;
+            padding-left: 25px;
+            list-style-position: outside;
+        }
+
+        .def-content li {
+            margin: 6px 0;
+        }
+
+        .example-card {
+            background: linear-gradient(135deg, #fef3c7 0%, #fef9c3 100%);
+            border-left: 4px solid #f59e0b;
+            padding: 18px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+
+        .example-number {
+            display: inline-block;
+            background: #f59e0b;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 0.9em;
+            margin-right: 10px;
+        }
+
+        .example-content {
+            color: #78350f;
+            margin-top: 8px;
+            font-weight: 500;
+        }
+
+        .example-content ul,
+        .example-content ol {
+            margin-top: 10px;
+            padding-left: 25px;
+        }
+
+        .theorem-card {
+            background: linear-gradient(135deg, #dfe9f3 0%, #ffffff 100%);
+            border-left: 4px solid #3b82f6;
+            padding: 18px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+
+        .theorem-number {
+            display: inline-block;
+            background: #3b82f6;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 0.9em;
+            margin-right: 10px;
+        }
+
+        .note-card {
+            background: linear-gradient(135deg, #f0fdf4 0%, #ffffff 100%);
+            border-left: 4px solid #10b981;
+            padding: 18px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+
+        .note-label {
+            display: inline-block;
+            background: #10b981;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 0.9em;
+            margin-right: 10px;
+        }
+
+        .warning-card {
+            background: linear-gradient(135deg, #fef2f2 0%, #ffffff 100%);
+            border-left: 4px solid #ef4444;
+            padding: 18px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+
+        .warning-label {
+            display: inline-block;
+            background: #ef4444;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 0.9em;
+            margin-right: 10px;
+        }
+
+        .search-box {
+            width: 100%;
+            padding: 15px 20px;
+            font-size: 1em;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            margin-bottom: 25px;
+            transition: all 0.3s;
+        }
+
+        .search-box:focus {
+            outline: none;
+            border-color: #302b63;
+            box-shadow: 0 0 0 3px rgba(48, 43, 99, 0.1);
+        }
+
+        .info-box {
+            background: linear-gradient(135deg, #e0e7ff 0%, #f3f4f6 100%);
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 4px solid #6366f1;
+            margin-bottom: 20px;
+        }
+
+        .info-box h3 {
+            color: #1e293b;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+
+        .info-box p {
+            color: #475569;
+            font-size: 0.95em;
+        }
+
+        .exercise-card {
+            background: linear-gradient(135deg, #f5f3ff 0%, #ffffff 100%);
+            border-left: 4px solid #8b5cf6;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s;
+        }
+
+        .exercise-card:hover {
+            transform: translateX(5px);
+            box-shadow: 0 4px 12px rgba(139, 92, 246, 0.2);
+        }
+
+        .exercise-number {
+            display: inline-block;
+            background: #8b5cf6;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 0.9em;
+            margin-right: 10px;
+        }
+
+        .exercise-label {
+            font-weight: 700;
+            color: #1e293b;
+            font-size: 1.15em;
+            display: inline-block;
+            margin-bottom: 8px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+
+        th,
+        td {
+            padding: 12px;
+            text-align: center;
+            border: 1px solid #e2e8f0;
+        }
+
+        th {
+            background: #302b63;
+            color: white;
+            font-weight: 600;
+        }
+
+        tr:nth-child(even) {
+            background: #f8fafc;
+        }
+
+        footer {
+            background: #1e293b;
+            color: white;
+            text-align: center;
+            padding: 25px;
+            font-size: 0.9em;
+        }
+
+        .fab-btn {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #302b63, #24243e);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            cursor: pointer;
+            z-index: 1000;
+            border: none;
+            font-size: 24px;
+            transition: transform 0.2s, box-shadow 0.2s;
+            text-decoration: none;
+        }
+
+        .fab-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+        }
+
+        .hierarchy-box {
+            background: #f8fafc;
+            padding: 25px;
+            border-radius: 12px;
+            border: 2px dashed #cbd5e1;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .hierarchy-level {
+            padding: 15px 30px;
+            margin: 10px auto;
+            border-radius: 8px;
+            font-weight: 600;
+            max-width: 80%;
+        }
+
+        .level-tm {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            color: white;
+        }
+
+        .level-cfl {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            color: white;
+        }
+
+        .level-regular {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+        }
+
+        .level-finite {
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+            color: white;
+        }
+
+        .arrow-down {
+            font-size: 1.5em;
+            color: #64748b;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 1.8em;
+            }
+
+            .subtitle {
+                font-size: 1.1em;
+            }
+
+            .content {
+                padding: 25px;
+            }
+
+            .nav-tabs {
+                flex-wrap: wrap;
+            }
+
+            .tab-btn {
+                padding: 10px 15px;
+                font-size: 0.9em;
+            }
+        }
+    </style>
 </head>
 
 <body>
+    <div class="container">
+        <header>
+            <h1>CS 637: Mathematics-II</h1>
+            <div class="subtitle">Lecture 4: What is a Language?</div>
+            <div class="instructor">
+                <strong>Instructor:</strong> <a href="https://drdebmath.github.io" target="_blank">Dr. Debasish
+                    Pattanayak</a>
+            </div>
+        </header>
 
-<h1>CS 637: Mathematics-II</h1>
-<div class="instructor">
-  <strong>Instructor:</strong> <a href="https://drdebmath.github.io" target="_blank">Dr. Debasish Pattanayak</a>
-</div>
-<h2>Lecture 4 – Soundness, Completeness, and Reduction-Based Reasoning</h2>
+        <div class="content">
+            <div class="nav-tabs">
+                <button class="tab-btn active" onclick="switchTab('strings')">Strings & Alphabets</button>
+                <button class="tab-btn" onclick="switchTab('regular')">Regular Languages</button>
+                <button class="tab-btn" onclick="switchTab('dfa')">Finite Automata (DFA)</button>
+                <button class="tab-btn" onclick="switchTab('nfa')">Non-deterministic (NFA)</button>
+                <button class="tab-btn" onclick="switchTab('cfl')">Context-Free Languages</button>
+                <button class="tab-btn" onclick="switchTab('turing')">Intro to Turing Machines</button>
+            </div>
 
-<footer>
-  
-</footer>
+            <input type="text" class="search-box" id="searchBox"
+                placeholder="🔍 Search definitions, examples, theorems..." onkeyup="searchDefinitions()">
 
-<script>
-document.addEventListener("DOMContentLoaded", function() {
-    renderMathInElement(document.body, {
-        delimiters: [
-            {left: "31952", right: "31952", display: true},
-            {left: "\[", right: "\]", display: true},
-            {left: "\(", right: "\)", display: false}
-        ]
-    });
-});
-</script>
+            <!-- TAB 1: Strings & Alphabets -->
+            <div id="strings" class="tab-content active">
+                <h2 class="section-title">Strings and Alphabets</h2>
 
-<a href="index.html" class="fab-btn" title="Back to Index">🏠</a>
+                <h3 class="subsection-title">Fundamental Definitions</h3>
+
+                <div class="definition-card">
+                    <div><span class="def-number">Def 1</span><span class="def-term">Alphabet (Σ)</span></div>
+                    <div class="def-content">A finite, non-empty set of symbols. Also called a vocabulary. Each element
+                        is called a <strong>symbol</strong> or <strong>letter</strong>.</div>
+                </div>
+
+                <div class="definition-card">
+                    <div><span class="def-number">Def 2</span><span class="def-term">String (Word)</span></div>
+                    <div class="def-content">A finite sequence of symbols from an alphabet Σ. The length of a string \(
+                        w \), denoted \( |w| \), is the number of symbols in it.</div>
+                </div>
+
+                <div class="definition-card">
+                    <div><span class="def-number">Def 3</span><span class="def-term">Empty String (ε)</span></div>
+                    <div class="def-content">The unique string of length zero, containing no symbols. We have \(
+                        |\varepsilon| = 0 \). Also denoted as \( \lambda \) in some texts.</div>
+                </div>
+
+                <div class="definition-card">
+                    <div><span class="def-number">Def 4</span><span class="def-term">Kleene Star (Σ*)</span></div>
+                    <div class="def-content">The set of all strings over alphabet Σ, including the empty string ε.
+                        Formally: \( \Sigma^* = \bigcup_{i=0}^{\infty} \Sigma^i \) where \( \Sigma^0 = \{\varepsilon\}
+                        \) and \( \Sigma^i \) is the set of all strings of length \( i \).</div>
+                </div>
+
+                <div class="definition-card">
+                    <div><span class="def-number">Def 5</span><span class="def-term">Kleene Plus (Σ⁺)</span></div>
+                    <div class="def-content">The set of all non-empty strings over Σ: \( \Sigma^+ = \Sigma^* \setminus
+                        \{\varepsilon\} = \bigcup_{i=1}^{\infty} \Sigma^i \)</div>
+                </div>
+
+                <div class="definition-card">
+                    <div><span class="def-number">Def 6</span><span class="def-term">Concatenation</span></div>
+                    <div class="def-content">If \( u = a_1a_2...a_m \) and \( v = b_1b_2...b_n \), then \( uv =
+                        a_1a_2...a_m b_1b_2...b_n \). Properties: \( |uv| = |u| + |v| \), \( \varepsilon w =
+                        w\varepsilon = w \) for all \( w \).</div>
+                </div>
+
+                <div class="definition-card">
+                    <div><span class="def-number">Def 7</span><span class="def-term">Language</span></div>
+                    <div class="def-content">A set of strings over an alphabet Σ. Formally, a language \( L \) is any
+                        subset of \( \Sigma^* \), i.e., \( L \subseteq \Sigma^* \). A language can be finite or
+                        infinite.</div>
+                </div>
+
+                <h3 class="subsection-title">String Indexing and Notation</h3>
+
+                <div class="definition-card">
+                    <div><span class="def-number">Def 8</span><span class="def-term">String Indexing w[i]</span></div>
+                    <div class="def-content">For a string \( w = a_1 a_2 \cdots a_n \) of length \( n \), we define:
+                        <ul>
+                            <li>\( w[i] = a_i \) — the \( i \)-th symbol of \( w \), where \( 1 \leq i \leq n \)</li>
+                            <li>Convention: indices are typically <strong>1-indexed</strong> (first symbol is \( w[1]
+                                \))</li>
+                            <li>Some texts use 0-indexing where first symbol is \( w[0] \)</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="definition-card">
+                    <div><span class="def-number">Def 9</span><span class="def-term">Substring Notation w[i..j]</span>
+                    </div>
+                    <div class="def-content">For a string \( w = a_1 a_2 \cdots a_n \):
+                        <ul>
+                            <li>\( w[i..j] = a_i a_{i+1} \cdots a_j \) for \( 1 \leq i \leq j \leq n \)</li>
+                            <li>\( w[1..i] \) = prefix of \( w \) of length \( i \)</li>
+                            <li>\( w[i..n] \) = suffix of \( w \) starting at position \( i \)</li>
+                            <li>If \( i > j \), then \( w[i..j] = \varepsilon \) (empty string)</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="definition-card">
+                    <div><span class="def-number">Def 10</span><span class="def-term">Substring</span></div>
+                    <div class="def-content">A string \( v \) is a <strong>substring</strong> of \( w \) if \( w = xvy
+                        \) for some strings \( x, y \in \Sigma^* \).
+                        <ul>
+                            <li>A substring consists of <strong>contiguous</strong> symbols from \( w \)</li>
+                            <li>The empty string \( \varepsilon \) is a substring of every string</li>
+                            <li>Every string is a substring of itself</li>
+                            <li>Number of substrings of \( w \) with length \( |w| = n \): at most \( \frac{n(n+1)}{2} +
+                                1 \)</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="definition-card">
+                    <div><span class="def-number">Def 11</span><span class="def-term">Subsequence</span></div>
+                    <div class="def-content">A string \( v = b_1 b_2 \cdots b_k \) is a <strong>subsequence</strong> of
+                        \( w = a_1 a_2 \cdots a_n \) if there exist indices \( 1 \leq i_1 < i_2 < \cdots < i_k \leq n \)
+                            such that \( b_j=a_{i_j} \) for all \( j \). <ul>
+                            <li>Subsequences need <strong>not</strong> be contiguous (can skip symbols)</li>
+                            <li>Every substring is a subsequence, but not vice versa</li>
+                            <li>Total number of subsequences of a string of length \( n \): \( 2^n \)</li>
+                            </ul>
+                    </div>
+                </div>
+
+                <div class="definition-card">
+                    <div><span class="def-number">Def 12</span><span class="def-term">Prefix</span></div>
+                    <div class="def-content">A string \( u \) is a <strong>prefix</strong> of \( w \) if \( w = uv \)
+                        for some string \( v \in \Sigma^* \).
+                        <ul>
+                            <li>Equivalently, \( u = w[1..k] \) for some \( 0 \leq k \leq |w| \)</li>
+                            <li>\( \varepsilon \) is a prefix of every string (the <strong>empty prefix</strong>)</li>
+                            <li>\( w \) is a prefix of itself (the <strong>trivial prefix</strong>)</li>
+                            <li>A prefix \( u \) is <strong>proper</strong> if \( u \neq w \)</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="definition-card">
+                    <div><span class="def-number">Def 13</span><span class="def-term">Suffix</span></div>
+                    <div class="def-content">A string \( v \) is a <strong>suffix</strong> of \( w \) if \( w = uv \)
+                        for some string \( u \in \Sigma^* \).
+                        <ul>
+                            <li>Equivalently, \( v = w[k..|w|] \) for some \( 1 \leq k \leq |w|+1 \)</li>
+                            <li>\( \varepsilon \) is a suffix of every string</li>
+                            <li>A suffix is <strong>proper</strong> if it is not equal to \( w \)</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="definition-card">
+                    <div><span class="def-number">Def 14</span><span class="def-term">Reverse (wᴿ)</span></div>
+                    <div class="def-content">The <strong>reverse</strong> of a string \( w = a_1 a_2 \cdots a_n \) is:
+                        \[ w^R = a_n a_{n-1} \cdots a_2 a_1 \]
+                        <ul>
+                            <li>\( \varepsilon^R = \varepsilon \)</li>
+                            <li>\( (uv)^R = v^R u^R \)</li>
+                            <li>\( (w^R)^R = w \)</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <h3 class="subsection-title">Recursive Definition of Strings</h3>
+
+                <div class="definition-card">
+                    <div><span class="def-number">Def 15</span><span class="def-term">Recursive Definition of Σ*</span>
+                    </div>
+                    <div class="def-content">The set \( \Sigma^* \) can be defined recursively:
+                        <ul>
+                            <li><strong>Base Case:</strong> \( \varepsilon \in \Sigma^* \)</li>
+                            <li><strong>Recursive Case:</strong> If \( w \in \Sigma^* \) and \( a \in \Sigma \), then \(
+                                wa \in \Sigma^* \)</li>
+                            <li><strong>Closure:</strong> Nothing else is in \( \Sigma^* \)</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="definition-card">
+                    <div><span class="def-number">Def 16</span><span class="def-term">Recursive Definition of String
+                            Length</span></div>
+                    <div class="def-content">The length function \( |w| \) is defined recursively:
+                        <ul>
+                            <li><strong>Base Case:</strong> \( |\varepsilon| = 0 \)</li>
+                            <li><strong>Recursive Case:</strong> \( |wa| = |w| + 1 \) for \( w \in \Sigma^*, a \in
+                                \Sigma \)</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="definition-card">
+                    <div><span class="def-number">Def 17</span><span class="def-term">Recursive Definition of
+                            Concatenation</span></div>
+                    <div class="def-content">Concatenation of strings \( u \) and \( v \) is defined recursively:
+                        <ul>
+                            <li><strong>Base Case:</strong> \( u \cdot \varepsilon = u \)</li>
+                            <li><strong>Recursive Case:</strong> \( u \cdot (va) = (u \cdot v)a \) for \( a \in \Sigma
+                                \)</li>
+                        </ul>
+                        This builds \( uv \) by appending symbols of \( v \) one at a time to \( u \).
+                    </div>
+                </div>
+
+                <div class="definition-card">
+                    <div><span class="def-number">Def 18</span><span class="def-term">Recursive Definition of
+                            Reverse</span></div>
+                    <div class="def-content">The reverse \( w^R \) is defined recursively:
+                        <ul>
+                            <li><strong>Base Case:</strong> \( \varepsilon^R = \varepsilon \)</li>
+                            <li><strong>Recursive Case:</strong> \( (wa)^R = a(w^R) \) for \( w \in \Sigma^*, a \in
+                                \Sigma \)</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <h3 class="subsection-title">Examples: Indexing, Substrings, and Subsequences</h3>
+
+                <div class="example-card">
+                    <div><span class="example-number">Ex 1</span><strong>String Indexing</strong></div>
+                    <div class="example-content">
+                        Let \( w = \text{abcde} \) (length 5). Then:
+                        <ul>
+                            <li>\( w[1] = a \), \( w[2] = b \), \( w[3] = c \), \( w[4] = d \), \( w[5] = e \)</li>
+                            <li>\( w[1..3] = \text{abc} \) (first 3 characters)</li>
+                            <li>\( w[2..4] = \text{bcd} \) (characters 2 through 4)</li>
+                            <li>\( w[3..5] = \text{cde} \) (last 3 characters)</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="example-card">
+                    <div><span class="example-number">Ex 2</span><strong>Prefix Examples</strong></div>
+                    <div class="example-content">
+                        For \( w = \text{compute} \):
+                        <ul>
+                            <li>All prefixes: \( \varepsilon \), c, co, com, comp, compu, comput, compute</li>
+                            <li>Proper prefixes: \( \varepsilon \), c, co, com, comp, compu, comput</li>
+                            <li>\( w[1..4] = \text{comp} \) is a prefix</li>
+                            <li>A string of length \( n \) has exactly \( n+1 \) prefixes</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="example-card">
+                    <div><span class="example-number">Ex 3</span><strong>Suffix Examples</strong></div>
+                    <div class="example-content">
+                        For \( w = \text{string} \):
+                        <ul>
+                            <li>All suffixes: string, tring, ring, ing, ng, g, \( \varepsilon \)</li>
+                            <li>\( w[4..6] = \text{ing} \) is a suffix</li>
+                            <li>Note: "tri" is NOT a suffix (not at the end)</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="example-card">
+                    <div><span class="example-number">Ex 4</span><strong>Substring vs Subsequence</strong></div>
+                    <div class="example-content">
+                        For \( w = \text{algorithm} \):
+                        <ul>
+                            <li><strong>Substrings:</strong> "algo", "rith", "gor", "hm" ✓ (contiguous)</li>
+                            <li><strong>NOT substrings:</strong> "arm", "lot" ✗ (not contiguous in \( w \))</li>
+                            <li><strong>Subsequences:</strong> "arm" ✓ (a...r......m), "aim" ✓ (a......i..m)</li>
+                            <li>"ago" is a subsequence: \( \underline{a}l\underline{g}\underline{o}rithm \)</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="example-card">
+                    <div><span class="example-number">Ex 5</span><strong>Counting Subsequences</strong></div>
+                    <div class="example-content">
+                        For \( w = \text{abc} \) (length 3):
+                        <ul>
+                            <li>All \( 2^3 = 8 \) subsequences: \( \varepsilon \), a, b, c, ab, ac, bc, abc</li>
+                            <li>Each subsequence corresponds to a subset of positions</li>
+                            <li>Note: "ba" is NOT a subsequence (order must be preserved)</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="example-card">
+                    <div><span class="example-number">Ex 6</span><strong>Reverse Examples</strong></div>
+                    <div class="example-content">
+                        <ul>
+                            <li>\( (\text{hello})^R = \text{olleh} \)</li>
+                            <li>\( (\text{abba})^R = \text{abba} \) — a palindrome!</li>
+                            <li>\( (abc \cdot def)^R = (def)^R \cdot (abc)^R = fed \cdot cba = fedcba \)</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="example-card">
+                    <div><span class="example-number">Ex 7</span><strong>Recursive Length Computation</strong></div>
+                    <div class="example-content">
+                        Compute \( |\text{cat}| \) recursively:
+                        <ul>
+                            <li>\( |\text{cat}| = |\text{ca}| + 1 \) (since cat = ca·t)</li>
+                            <li>\( |\text{ca}| = |\text{c}| + 1 \)</li>
+                            <li>\( |\text{c}| = |\varepsilon| + 1 = 0 + 1 = 1 \)</li>
+                            <li>Therefore: \( |\text{c}| = 1 \), \( |\text{ca}| = 2 \), \( |\text{cat}| = 3 \) ✓</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="example-card">
+                    <div><span class="example-number">Ex 8</span><strong>Recursive Reverse Computation</strong></div>
+                    <div class="example-content">
+                        Compute \( (\text{abc})^R \) recursively:
+                        <ul>
+                            <li>\( (\text{abc})^R = c \cdot (\text{ab})^R \)</li>
+                            <li>\( (\text{ab})^R = b \cdot (\text{a})^R \)</li>
+                            <li>\( (\text{a})^R = a \cdot (\varepsilon)^R = a \cdot \varepsilon = a \)</li>
+                            <li>Therefore: \( (\text{ab})^R = ba \), \( (\text{abc})^R = cba \) ✓</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="note-card">
+                    <span class="note-label">Key Insight</span>
+                    <strong>Why Recursive Definitions Matter:</strong>
+                    <ul>
+                        <li>They provide a foundation for <strong>inductive proofs</strong> about strings</li>
+                        <li>They show how complex strings are built from simpler ones</li>
+                        <li>They directly translate to <strong>recursive algorithms</strong></li>
+                    </ul>
+                </div>
+
+                <h3 class="subsection-title">More Examples of Strings</h3>
+
+                <div class="example-card">
+                    <div><span class="example-number">Ex 9</span><strong>Binary Alphabet</strong></div>
+                    <div class="example-content">
+                        Let \( \Sigma = \{0, 1\} \). Then:
+                        <ul>
+                            <li>\( \varepsilon \) is a string (the empty string)</li>
+                            <li>\( 0, 1, 00, 01, 10, 11, 000, ... \) are all strings in \( \Sigma^* \)</li>
+                            <li>\( |0110| = 4 \), \( |1| = 1 \)</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="example-card">
+                    <div><span class="example-number">Ex 10</span><strong>DNA Alphabet</strong></div>
+                    <div class="example-content">
+                        \( \Sigma = \{A, C, G, T\} \) (Adenine, Cytosine, Guanine, Thymine)
+                        <ul>
+                            <li>ACGT, GATTACA, AAAA are valid strings</li>
+                            <li>A DNA sequence like "ATCGATCG" has length 8</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="example-card">
+                    <div><span class="example-number">Ex 11</span><strong>Concatenation Examples</strong></div>
+                    <div class="example-content">
+                        With \( u = \text{ab} \) and \( v = \text{cd} \):
+                        <ul>
+                            <li>\( uv = \text{abcd} \), \( vu = \text{cdab} \)</li>
+                            <li>\( u\varepsilon = \varepsilon u = \text{ab} \)</li>
+                            <li>\( u^3 = uuu = \text{ababab} \)</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="example-card">
+                    <div><span class="example-number">Ex 12</span><strong>Language Examples</strong></div>
+                    <div class="example-content">
+                        Over \( \Sigma = \{a, b\} \):
+                        <ul>
+                            <li>\( L_1 = \{a, aa, aaa\} \) — finite language with 3 strings</li>
+                            <li>\( L_2 = \{a^n : n \geq 0\} = \{\varepsilon, a, aa, aaa, ...\} \) — infinite language
+                            </li>
+                            <li>\( L_3 = \emptyset \) — empty language (contains no strings)</li>
+                            <li>\( L_4 = \{\varepsilon\} \) — language containing only empty string</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="note-card">
+                    <span class="note-label">Important</span>
+                    <strong>Distinguish carefully:</strong>
+                    <ul>
+                        <li>\( \emptyset \neq \{\varepsilon\} \): The empty set has no elements; \( \{\varepsilon\} \)
+                            has one element (the empty string)</li>
+                        <li>\( |\emptyset| = 0 \) but \( |\{\varepsilon\}| = 1 \)</li>
+                    </ul>
+                </div>
+
+                <h3 class="subsection-title">Exercises</h3>
+
+                <div class="exercise-card">
+                    <div><span class="exercise-number">Exercise 1</span><span class="exercise-label">Properties of
+                            Reversal</span></div>
+                    <div class="def-content">
+                        The reversal \( w^R \) of a string \( w \) is defined recursively as follows:
+                        \[ w^R := \begin{cases} \varepsilon & \text{if } w = \varepsilon \\ x^R \cdot a & \text{if } w =
+                        a \cdot x \text{ (where } a \in \Sigma, x \in \Sigma^*\text{)} \end{cases} \]
+
+                        Prove the following properties for all strings \( w, x \in \Sigma^* \) and every symbol \( a \in
+                        \Sigma \):
+                        <ol type="a" style="margin-top: 15px;">
+                            <li><strong>Double Reversal:</strong> Prove that \( (w^R)^R = w \).</li>
+                            <li><strong>Length Invariance:</strong> Prove that \( |w^R| = |w| \).</li>
+                            <li><strong>Reversal of Concatenation:</strong> Prove that \( (w \cdot x)^R = x^R \cdot w^R
+                                \).</li>
+                            <li><strong>Symbol Counting:</strong> Prove that \( \#(a, w^R) = \#(a, w) \), where \( \#(a,
+                                s) \) denotes the number of occurrences of symbol \( a \) in string \( s \).</li>
+                        </ol>
+
+                        <div class="info-box" style="margin-top: 15px; margin-bottom: 0;">
+                            <p><strong>Hint:</strong> Use mathematical induction on the length of the string \( w \).
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 2: Regular Languages -->
+            <div id="regular" class="tab-content">
+                <h2 class="section-title">Regular Languages</h2>
+
+                <h3 class="subsection-title">Defining Regular Languages</h3>
+
+                <div class="definition-card">
+                    <div><span class="def-number">Def 19</span><span class="def-term">Regular Language</span></div>
+                    <div class="def-content">A language is <strong>regular</strong> if it can be recognized by a finite
+                        automaton (DFA or NFA), or equivalently, if it can be described by a regular expression.</div>
+                </div>
+
+                <div class="definition-card">
+                    <div><span class="def-number">Def 20</span><span class="def-term">Regular Expression</span></div>
+                    <div class="def-content">
+                        A compact notation for describing regular languages. Defined recursively:
+                        <ul>
+                            <li>\( \emptyset \) is a regex (denotes empty language)</li>
+                            <li>\( \varepsilon \) is a regex (denotes \( \{\varepsilon\} \))</li>
+                            <li>For any \( a \in \Sigma \), \( a \) is a regex (denotes \( \{a\} \))</li>
+                            <li>If \( R, S \) are regexes: \( (R+S) \), \( (RS) \), and \( (R^*) \) are regexes</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="note-card">
+                    <span class="note-label">Notation and Precedence</span>
+                    <div class="def-content">
+                        Regular languages are normally described using a compact notation called <strong>regular
+                            expressions</strong>, which omit braces around one-string sets, use \( + \) to represent
+                        union instead of \( \cup \), and juxtapose subexpressions to represent concatenation instead of
+                        using an explicit operator \( \cdot \).
+                        <br><br>
+                        By convention, in the absence of parentheses, the operators have the following precedence:
+                        <ol>
+                            <li>The <strong>Kleene star (*)</strong> operator (highest precedence)</li>
+                            <li>The <strong>(implicit) concatenation</strong> operator</li>
+                            <li>The <strong>union (+)</strong> operator (lowest precedence)</li>
+                        </ol>
+                    </div>
+                </div>
+
+                <div class="definition-card">
+                    <div><span class="def-number">Def 21</span><span class="def-term">Building Regular Languages</span>
+                    </div>
+                    <div class="def-content">
+                        The set of <strong>regular languages</strong> over an alphabet \( \Sigma \) is defined
+                        inductively:
+                        <ol style="margin-top: 10px;">
+                            <li><strong>Base Cases:</strong>
+                                <ul>
+                                    <li>The empty language \( \emptyset \) is regular.</li>
+                                    <li>The language containing only the empty string \( \{ \varepsilon \} \) is
+                                        regular.
+                                    </li>
+                                    <li>For each \( a \in \Sigma \), the singleton language \( \{ a \} \) is regular.
+                                    </li>
+                                </ul>
+                            </li>
+                            <li style="margin-top: 10px;"><strong>Inductive Step:</strong> If \( L_1 \) and \( L_2 \)
+                                are
+                                regular languages, then so are:
+                                <ul>
+                                    <li>\( L_1 \cup L_2 \) (Union)</li>
+                                    <li>\( L_1 \cdot L_2 \) (Concatenation)</li>
+                                    <li>\( L_1^* \) (Kleene Star)</li>
+                                </ul>
+                            </li>
+                        </ol>
+                    </div>
+                </div>
+                <div class="example-card">
+                    <div><span class="example-number">Ex 13</span><strong>Building a Language Step-by-Step</strong>
+                    </div>
+                    <div class="example-content">
+                        To build the language \( L = \{0, 11\} \) over \( \Sigma = \{0, 1\} \):
+                        <ol style="margin-top: 10px;">
+                            <li><strong>Base cases:</strong> \( \{0\} \) and \( \{1\} \) are regular languages.</li>
+                            <li><strong>Concatenation:</strong> Since \( \{1\} \) is regular, \( \{1\} \cdot \{1\} =
+                                \{11\} \)
+                                is regular.</li>
+                            <li><strong>Union:</strong> Since \( \{0\} \) and \( \{11\} \) are regular, \( \{0\}
+                                \cup \{11\}
+                                = \{0, 11\} \) is regular.</li>
+                        </ol>
+                        Thus, \( L \) is built from the basic building blocks using regular operations.
+                    </div>
+                </div>
+
+                <div class="definition-card">
+                    <div><span class="def-number">Def 22</span><span class="def-term">Operations on Regular
+                            Languages</span></div>
+                    <div class="def-content">
+                        <ul>
+                            <li><strong>Union:</strong> \( L_1 \cup L_2 = \{w : w \in L_1 \text{ or } w \in L_2\} \)
+                            </li>
+                            <li><strong>Concatenation:</strong> \( L_1 L_2 = \{uv : u \in L_1, v \in L_2\} \)</li>
+                            <li><strong>Kleene Star:</strong> \( L^* = \bigcup_{i=0}^{\infty} L^i \) where \( L^0 =
+                                \{\varepsilon\} \)</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="definition-card">
+                    <div><span class="def-number">Def 23</span><span class="def-term">Closure Properties</span>
+                    </div>
+                    <div class="def-content">
+                        Regular languages are closed under: union, intersection, complement, concatenation, Kleene
+                        star,
+                        reversal, and homomorphism.
+                    </div>
+                </div>
+
+                <h3 class="subsection-title">Regular Expression Examples</h3>
+
+                <div class="example-card">
+                    <div><span class="example-number">Ex 14</span><strong>Basic Regular Expressions</strong></div>
+                    <div class="example-content">
+                        Over \( \Sigma = \{0, 1\} \):
+                        <ul>
+                            <li>\( 0^* \) = all strings of zeros: \( \{\varepsilon, 0, 00, 000, ...\} \)</li>
+                            <li>\( (0+1)^* \) = all binary strings = \( \Sigma^* \)</li>
+                            <li>\( 0^*1^* \) = zeros followed by ones: \( \{\varepsilon, 0, 1, 00, 01, 11, 001,
+                                ...\} \)
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="example-card">
+                    <div><span class="example-number">Ex 15</span><strong>Pattern Matching</strong></div>
+                    <div class="example-content">
+                        Strings ending in 01: \( (0+1)^*01 \)
+                        <br>Examples: 01, 001, 101, 0101, 1101, ...
+                    </div>
+                </div>
+
+                <div class="example-card">
+                    <div><span class="example-number">Ex 16</span><strong>Even Length Strings</strong></div>
+                    <div class="example-content">
+                        All strings of even length: \( ((0+1)(0+1))^* \)
+                        <br>Examples: \( \varepsilon \), 00, 01, 10, 11, 0000, 0101, ...
+                    </div>
+                </div>
+
+                <div class="example-card">
+                    <div><span class="example-number">Ex 17</span><strong>Contains Substring</strong></div>
+                    <div class="example-content">
+                        All strings containing "010" as substring: \( (0+1)^*010(0+1)^* \)
+                        <br>Examples: 010, 0010, 0101, 11010111, ...
+                    </div>
+                </div>
+
+                <div class="theorem-card">
+                    <div><span class="theorem-number">Theorem</span><strong>Kleene's Theorem</strong></div>
+                    <div class="def-content">
+                        A language is regular if and only if it can be described by a regular expression.
+                        Equivalently,
+                        a language is regular iff it is accepted by some DFA (or NFA).
+                    </div>
+                </div>
+
+                <h3 class="subsection-title">Exercises</h3>
+
+                <div class="exercise-card">
+                    <div><span class="exercise-number">Exercise 2</span><span class="exercise-label">Divisibility by
+                            5</span></div>
+                    <div class="def-content">
+                        Construct a regular expression for the language \( L = \{ w \in \{0, 1\}^* : \text{value}(w)
+                        \text{ is divisible by 5} \} \).
+                        <br><br>
+                        <strong>Note:</strong> Strings are interpreted as binary numbers (e.g., "101" is 5).
+                        <div class="info-box" style="margin-top: 15px; margin-bottom: 0;">
+                            <p><strong>Hint:</strong> Use the state elimination method on a 5-state DFA where each state
+                                represents a remainder modulo 5.</p>
+                        </div>
+                        <br>
+                        <strong>Smallest known Regex:</strong>
+                        \[ (0 + 1(10)^*(0 + 11)(01^*01 + 01^*00(10)^*(0 + 11))^*1)^* \]
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 3: DFA -->
+            <div id="dfa" class="tab-content">
+                <h2 class="section-title">Deterministic Finite Automata (DFA)</h2>
+
+                <h3 class="subsection-title">Formal Definition</h3>
+
+                <div class="definition-card">
+                    <div><span class="def-number">Def 24</span><span class="def-term">Deterministic Finite
+                            Automaton</span></div>
+                    <div class="def-content">
+                        A DFA is a 5-tuple \( M = (Q, \Sigma, \delta, q_0, F) \) where:
+                        <ul>
+                            <li>\( Q \) = finite set of states</li>
+                            <li>\( \Sigma \) = input alphabet</li>
+                            <li>\( \delta: Q \times \Sigma \to Q \) = transition function</li>
+                            <li>\( q_0 \in Q \) = start state</li>
+                            <li>\( F \subseteq Q \) = set of accept (final) states</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="definition-card">
+                    <div><span class="def-number">Def 25</span><span class="def-term">Extended Transition
+                            Function</span></div>
+                    <div class="def-content">
+                        \( \hat{\delta}: Q \times \Sigma^* \to Q \) defined recursively:
+                        <ul>
+                            <li>\( \hat{\delta}(q, \varepsilon) = q \)</li>
+                            <li>\( \hat{\delta}(q, wa) = \delta(\hat{\delta}(q, w), a) \) for \( w \in \Sigma^*, a
+                                \in
+                                \Sigma \)</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="definition-card">
+                    <div><span class="def-number">Def 26</span><span class="def-term">Language Accepted by
+                            DFA</span>
+                    </div>
+                    <div class="def-content">
+                        The language of a DFA \( M \) is: \( L(M) = \{w \in \Sigma^* : \hat{\delta}(q_0, w) \in F\}
+                        \)
+                        <br>A string is <strong>accepted</strong> if processing it from \( q_0 \) ends in an accept
+                        state.
+                    </div>
+                </div>
+
+                <div class="definition-card">
+                    <div><span class="def-number">Def 27</span><span class="def-term">Dead State (Trap State)</span>
+                    </div>
+                    <div class="def-content">
+                        A non-accepting state \( q_d \) from which no accepting state is reachable. All transitions
+                        from
+                        \( q_d \) lead back to \( q_d \).
+                    </div>
+                </div>
+
+                <h3 class="subsection-title">DFA Examples</h3>
+
+                <div class="example-card">
+                    <div><span class="example-number">Ex 18</span><strong>Strings ending in 1</strong></div>
+                    <div class="example-content">
+                        \( L = \{w \in \{0,1\}^* : w \text{ ends with } 1\} \)
+                        <br>DFA: \( Q = \{q_0, q_1\}, \Sigma = \{0,1\}, q_0 = q_0, F = \{q_1\} \)
+                        <br>Transitions: \( \delta(q_0, 0) = q_0, \delta(q_0, 1) = q_1, \delta(q_1, 0) = q_0,
+                        \delta(q_1, 1) = q_1 \)
+                    </div>
+                </div>
+
+                <div class="example-card">
+                    <div><span class="example-number">Ex 19</span><strong>Even number of 0s</strong></div>
+                    <div class="example-content">
+                        \( L = \{w \in \{0,1\}^* : w \text{ has even number of 0s}\} \)
+                        <br>\( Q = \{q_{even}, q_{odd}\}, F = \{q_{even}\} \)
+                        <br>\( \delta(q_{even}, 0) = q_{odd}, \delta(q_{even}, 1) = q_{even} \)
+                        <br>\( \delta(q_{odd}, 0) = q_{even}, \delta(q_{odd}, 1) = q_{odd} \)
+                    </div>
+                </div>
+
+                <div class="example-card">
+                    <div><span class="example-number">Ex 20</span><strong>Divisibility by 3</strong></div>
+                    <div class="example-content">
+                        Binary numbers divisible by 3 (interpreting string as binary number).
+                        <br>\( Q = \{q_0, q_1, q_2\} \) representing remainder mod 3.
+                        <br>Accept state: \( F = \{q_0\} \) (remainder 0)
+                        <br>Key insight: if current remainder is \( r \), reading bit \( b \) gives remainder \( (2r
+                        +
+                        b) \mod 3 \)
+                    </div>
+                </div>
+
+                <div class="example-card">
+                    <div><span class="example-number">Ex 21</span><strong>Contains "01" as substring</strong></div>
+                    <div class="example-content">
+                        \( Q = \{q_0, q_1, q_2\} \) where:
+                        <ul>
+                            <li>\( q_0 \): haven't seen pattern yet</li>
+                            <li>\( q_1 \): just saw a 0</li>
+                            <li>\( q_2 \): have seen "01" (accept state, \( F = \{q_2\} \))</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="note-card">
+                    <span class="note-label">Key Property</span>
+                    <strong>Determinism:</strong> For every state and input symbol, there is exactly one next state.
+                    No
+                    ambiguity in computation.
+                </div>
+            </div>
+
+            <!-- TAB 4: NFA -->
+            <div id="nfa" class="tab-content">
+                <h2 class="section-title">Non-deterministic Finite Automata (NFA)</h2>
+
+                <h3 class="subsection-title">Formal Definition</h3>
+
+                <div class="definition-card">
+                    <div><span class="def-number">Def 28</span><span class="def-term">Non-deterministic Finite
+                            Automaton</span></div>
+                    <div class="def-content">
+                        An NFA is a 5-tuple \( N = (Q, \Sigma, \delta, q_0, F) \) where:
+                        <ul>
+                            <li>\( Q, \Sigma, q_0, F \) are as in DFA</li>
+                            <li>\( \delta: Q \times (\Sigma \cup \{\varepsilon\}) \to \mathcal{P}(Q) \) — transition
+                                function returns a <strong>set</strong> of states</li>
+                        </ul>
+                        Key differences: multiple transitions on same input, ε-transitions allowed, can have zero
+                        transitions.
+                    </div>
+                </div>
+
+                <div class="definition-card">
+                    <div><span class="def-number">Def 29</span><span class="def-term">ε-Closure</span></div>
+                    <div class="def-content">
+                        For a state \( q \), the ε-closure is the set of all states reachable from \( q \) via zero
+                        or
+                        more ε-transitions:
+                        <br>\( \varepsilon\text{-closure}(q) = \{p : p \text{ is reachable from } q \text{ using
+                        only }
+                        \varepsilon\text{-transitions}\} \)
+                    </div>
+                </div>
+
+                <div class="definition-card">
+                    <div><span class="def-number">Def 30</span><span class="def-term">NFA Acceptance</span></div>
+                    <div class="def-content">
+                        An NFA accepts a string \( w \) if <strong>there exists</strong> at least one computation
+                        path
+                        that ends in an accept state. The language \( L(N) \) is the set of all accepted strings.
+                    </div>
+                </div>
+
+                <div class="definition-card">
+                    <div><span class="def-number">Def 31</span><span class="def-term">ε-NFA</span></div>
+                    <div class="def-content">
+                        An NFA that can make transitions without consuming input symbols (ε-transitions). These
+                        allow
+                        "free" moves between states.
+                    </div>
+                </div>
+
+                <h3 class="subsection-title">NFA Examples</h3>
+
+                <div class="example-card">
+                    <div><span class="example-number">Ex 22</span><strong>Strings ending in 01</strong></div>
+                    <div class="example-content">
+                        NFA with 3 states is simpler than DFA:
+                        <ul>
+                            <li>\( q_0 \): loops on 0 and 1, transitions to \( q_1 \) on 0</li>
+                            <li>\( q_1 \): transitions to \( q_2 \) on 1</li>
+                            <li>\( q_2 \): accept state</li>
+                        </ul>
+                        Non-determinism: from \( q_0 \), on input 0, can go to \( q_0 \) or \( q_1 \).
+                    </div>
+                </div>
+
+                <div class="example-card">
+                    <div><span class="example-number">Ex 23</span><strong>Contains "web" or "ebay"</strong></div>
+                    <div class="example-content">
+                        NFA can "guess" which pattern to look for:
+                        <ul>
+                            <li>Start state branches (non-deterministically) to search for "web" or "ebay"</li>
+                            <li>Each branch matches its pattern sequentially</li>
+                            <li>Either branch reaching accept means the string is accepted</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="example-card">
+                    <div><span class="example-number">Ex 24</span><strong>ε-NFA Example</strong></div>
+                    <div class="example-content">
+                        Language: strings that are either all 0s or all 1s.
+                        <br>Use ε-transitions from start to branch to "0-only" path or "1-only" path.
+                        <br>Regex: \( 0^* + 1^* \)
+                    </div>
+                </div>
+
+                <div class="example-card">
+                    <div><span class="example-number">Ex 25</span><strong>Third symbol from end is 1</strong></div>
+                    <div class="example-content">
+                        \( L = \{w \in \{0,1\}^* : |w| \geq 3 \text{ and 3rd from end is 1}\} \)
+                        <br>NFA: 4 states, non-deterministically guess when to start counting last 3 symbols.
+                        <br>Much simpler than equivalent DFA (which needs 8 states)!
+                    </div>
+                </div>
+
+                <div class="theorem-card">
+                    <div><span class="theorem-number">Theorem</span><strong>Subset Construction</strong></div>
+                    <div class="def-content">
+                        For every NFA \( N \), there exists an equivalent DFA \( D \) with \( L(D) = L(N) \). The
+                        DFA
+                        may have up to \( 2^{|Q|} \) states (exponential blowup in worst case).
+                    </div>
+                </div>
+
+                <div class="note-card">
+                    <span class="note-label">Key Insight</span>
+                    NFAs and DFAs recognize exactly the same class of languages (regular languages), but NFAs can be
+                    exponentially more succinct.
+                </div>
+            </div>
+
+            <!-- TAB 5: Context-Free Languages -->
+            <div id="cfl" class="tab-content">
+                <h2 class="section-title">Context-Free Languages</h2>
+
+                <h3 class="subsection-title">Beyond Regular Languages</h3>
+
+                <div class="warning-card">
+                    <span class="warning-label">Limitation</span>
+                    <strong>Regular languages cannot count!</strong> Languages like \( \{a^n b^n : n \geq 0\} \)
+                    (equal
+                    a's and b's), balanced parentheses, and palindromes are NOT regular.
+                </div>
+
+                <div class="definition-card">
+                    <div><span class="def-number">Def 32</span><span class="def-term">Context-Free Grammar
+                            (CFG)</span>
+                    </div>
+                    <div class="def-content">
+                        A CFG is a 4-tuple \( G = (V, \Sigma, R, S) \) where:
+                        <ul>
+                            <li>\( V \) = finite set of variables (non-terminals)</li>
+                            <li>\( \Sigma \) = finite set of terminals (alphabet)</li>
+                            <li>\( R \) = finite set of production rules of form \( A \to \alpha \) where \( A \in V
+                                \)
+                                and \( \alpha \in (V \cup \Sigma)^* \)</li>
+                            <li>\( S \in V \) = start variable</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="definition-card">
+                    <div><span class="def-number">Def 33</span><span class="def-term">Derivation</span></div>
+                    <div class="def-content">
+                        A <strong>derivation</strong> is a sequence of rule applications that transforms the start
+                        symbol into a string of terminals.
+                        <br>We write \( \alpha \Rightarrow \beta \) if \( \beta \) is obtained from \( \alpha \) by
+                        one
+                        rule application.
+                        <br>\( \alpha \Rightarrow^* \beta \) means zero or more steps.
+                    </div>
+                </div>
+
+                <div class="definition-card">
+                    <div><span class="def-number">Def 34</span><span class="def-term">Context-Free Language</span>
+                    </div>
+                    <div class="def-content">
+                        A language \( L \) is context-free if \( L = L(G) \) for some CFG \( G \), where:
+                        <br>\( L(G) = \{w \in \Sigma^* : S \Rightarrow^* w\} \)
+                    </div>
+                </div>
+
+                <div class="definition-card">
+                    <div><span class="def-number">Def 35</span><span class="def-term">Pushdown Automaton
+                            (PDA)</span>
+                    </div>
+                    <div class="def-content">
+                        A PDA is like an NFA but with an additional <strong>stack</strong> memory. It can push and
+                        pop
+                        symbols from the stack. PDAs recognize exactly the context-free languages.
+                    </div>
+                </div>
+
+                <h3 class="subsection-title">CFG Examples</h3>
+
+                <div class="example-card">
+                    <div><span class="example-number">Ex 26</span><strong>Equal a's and b's</strong></div>
+                    <div class="example-content">
+                        \( L = \{a^n b^n : n \geq 0\} \)
+                        <br>Grammar: \( S \to aSb \mid \varepsilon \)
+                        <br>Derivation of \( aabb \): \( S \Rightarrow aSb \Rightarrow aaSbb \Rightarrow aabb \)
+                    </div>
+                </div>
+
+                <div class="example-card">
+                    <div><span class="example-number">Ex 27</span><strong>Balanced Parentheses</strong></div>
+                    <div class="example-content">
+                        Grammar: \( S \to (S) \mid SS \mid \varepsilon \)
+                        <br>Examples: \( \varepsilon, (), (()), ()(), (())(), ... \)
+                        <br>Key: stack keeps track of unmatched opening parens.
+                    </div>
+                </div>
+
+                <div class="example-card">
+                    <div><span class="example-number">Ex 28</span><strong>Palindromes over {a,b}</strong></div>
+                    <div class="example-content">
+                        \( L = \{w : w = w^R\} \) where \( w^R \) is reverse of \( w \)
+                        <br>Grammar: \( S \to aSa \mid bSb \mid a \mid b \mid \varepsilon \)
+                        <br>Examples: \( \varepsilon, a, b, aa, bb, aba, bab, abba, ... \)
+                    </div>
+                </div>
+
+                <div class="example-card">
+                    <div><span class="example-number">Ex 29</span><strong>Arithmetic Expressions</strong></div>
+                    <div class="example-content">
+                        Grammar for expressions with +, ×, and parentheses:
+                        <br>\( E \to E + T \mid T \)
+                        <br>\( T \to T \times F \mid F \)
+                        <br>\( F \to (E) \mid \text{id} \)
+                        <br>This grammar encodes operator precedence!
+                    </div>
+                </div>
+
+                <div class="theorem-card">
+                    <div><span class="theorem-number">Theorem</span><strong>Pumping Lemma for CFLs</strong></div>
+                    <div class="def-content">
+                        If \( L \) is context-free, there exists \( p \) such that for any \( w \in L \) with \( |w|
+                        \geq p \), we can write \( w = uvxyz \) with: (1) \( |vxy| \leq p \), (2) \( |vy| > 0 \),
+                        (3) \(
+                        uv^i xy^i z \in L \) for all \( i \geq 0 \).
+                        <br>Used to prove languages are NOT context-free.
+                    </div>
+                </div>
+
+                <div class="note-card">
+                    <span class="note-label">Hierarchy</span>
+                    <strong>Regular ⊂ Context-Free:</strong> Every regular language is context-free (convert regex
+                    to
+                    CFG), but not vice versa.
+                </div>
+            </div>
+
+            <!-- TAB 6: Turing Machines Introduction -->
+            <div id="turing" class="tab-content">
+                <h2 class="section-title">Introduction to Turing Machines</h2>
+
+                <div class="hierarchy-box">
+                    <h3 style="margin-bottom: 20px; color: #334155;">The Chomsky Hierarchy</h3>
+                    <div class="hierarchy-level level-tm">Recursively Enumerable (Turing Machines)</div>
+                    <div class="arrow-down">⊃</div>
+                    <div class="hierarchy-level level-cfl">Context-Free Languages (PDAs, CFGs)</div>
+                    <div class="arrow-down">⊃</div>
+                    <div class="hierarchy-level level-regular">Regular Languages (DFA, NFA, Regex)</div>
+                    <div class="arrow-down">⊃</div>
+                    <div class="hierarchy-level level-finite">Finite Languages</div>
+                </div>
+
+                <h3 class="subsection-title">Motivation for Turing Machines</h3>
+
+                <div class="definition-card">
+                    <div><span class="def-number">Why TMs?</span><span class="def-term">Limitations of Finite
+                            Automata &
+                            PDAs</span></div>
+                    <div class="def-content">
+                        <ul>
+                            <li><strong>DFA/NFA:</strong> Finite memory, cannot count arbitrarily</li>
+                            <li><strong>PDA:</strong> Stack gives LIFO memory, but cannot match patterns like \(
+                                \{a^n
+                                b^n c^n\} \)</li>
+                            <li><strong>Need:</strong> A model with unlimited memory and full read/write access</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="definition-card">
+                    <div><span class="def-number">Def 36</span><span class="def-term">Turing Machine
+                            (Informal)</span>
+                    </div>
+                    <div class="def-content">
+                        A Turing Machine consists of:
+                        <ul>
+                            <li>An infinite tape divided into cells (memory)</li>
+                            <li>A read/write head that moves left or right</li>
+                            <li>A finite state control</li>
+                            <li>Transition rules based on current state and symbol under head</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="definition-card">
+                    <div><span class="def-number">Def 37</span><span class="def-term">Turing Machine (Formal)</span>
+                    </div>
+                    <div class="def-content">
+                        A TM is a 7-tuple \( M = (Q, \Sigma, \Gamma, \delta, q_0, q_{accept}, q_{reject}) \) where:
+                        <ul>
+                            <li>\( Q \) = finite set of states</li>
+                            <li>\( \Sigma \) = input alphabet (not containing blank ⊔)</li>
+                            <li>\( \Gamma \) = tape alphabet, \( \Sigma \cup \{⊔\} \subseteq \Gamma \)</li>
+                            <li>\( \delta: Q \times \Gamma \to Q \times \Gamma \times \{L, R\} \) = transition
+                                function
+                            </li>
+                            <li>\( q_0 \) = start state, \( q_{accept} \) = accept state, \( q_{reject} \) = reject
+                                state</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="definition-card">
+                    <div><span class="def-number">Def 38</span><span class="def-term">Configuration</span></div>
+                    <div class="def-content">
+                        A snapshot of computation: current state, tape contents, and head position. Written as \(
+                        uqv \)
+                        meaning state \( q \), head on first symbol of \( v \), tape contains \( uv \).
+                    </div>
+                </div>
+
+                <div class="definition-card">
+                    <div><span class="def-number">Def 39</span><span class="def-term">Decidable vs.
+                            Recognizable</span>
+                    </div>
+                    <div class="def-content">
+                        <ul>
+                            <li><strong>Decidable:</strong> TM always halts (accepts or rejects) on every input</li>
+                            <li><strong>Recognizable:</strong> TM accepts strings in language, but may loop forever
+                                on
+                                others</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <h3 class="subsection-title">Turing Machine Examples</h3>
+
+                <div class="example-card">
+                    <div><span class="example-number">Ex 30</span><strong>Language \( \{0^n 1^n : n \geq 0\}
+                            \)</strong>
+                    </div>
+                    <div class="example-content">
+                        Algorithm: Cross off matching 0s and 1s repeatedly.
+                        <ol>
+                            <li>Scan right, mark a 0 as X</li>
+                            <li>Continue right to find a 1, mark it as Y</li>
+                            <li>Return left to find next unmarked 0</li>
+                            <li>Repeat until all matched or mismatch found</li>
+                        </ol>
+                    </div>
+                </div>
+
+                <div class="example-card">
+                    <div><span class="example-number">Ex 31</span><strong>Language \( \{a^n b^n c^n : n \geq 0\}
+                            \)</strong></div>
+                    <div class="example-content">
+                        This is NOT context-free, but TM can recognize it:
+                        <ol>
+                            <li>Mark an 'a', scan to mark a 'b', scan to mark a 'c'</li>
+                            <li>Return to beginning, repeat</li>
+                            <li>Accept if all symbols marked simultaneously</li>
+                        </ol>
+                    </div>
+                </div>
+
+                <div class="example-card">
+                    <div><span class="example-number">Ex 32</span><strong>Binary Addition</strong></div>
+                    <div class="example-content">
+                        Input: two binary numbers separated by #.
+                        <br>TM can add them bit by bit, carrying as needed.
+                        <br>Uses tape for intermediate results.
+                    </div>
+                </div>
+
+                <div class="example-card">
+                    <div><span class="example-number">Ex 33</span><strong>Palindrome Checker</strong></div>
+                    <div class="example-content">
+                        For \( w = w^R \) over any alphabet:
+                        <ol>
+                            <li>Read and erase first symbol, remember it</li>
+                            <li>Move to end, compare with last symbol</li>
+                            <li>Erase if match, reject if mismatch</li>
+                            <li>Repeat until tape is empty (accept)</li>
+                        </ol>
+                    </div>
+                </div>
+
+                <div class="theorem-card">
+                    <div><span class="theorem-number">Thesis</span><strong>Church-Turing Thesis</strong></div>
+                    <div class="def-content">
+                        Any function that can be computed by an algorithm can be computed by a Turing Machine. TMs
+                        capture the intuitive notion of "effective computability."
+                    </div>
+                </div>
+
+                <div class="warning-card">
+                    <span class="warning-label">Undecidability</span>
+                    <strong>The Halting Problem:</strong> There is no TM that can decide, for all TM-input pairs,
+                    whether the TM will halt. This was Turing's profound negative answer to Hilbert's
+                    Entscheidungsproblem!
+                </div>
+
+                <div class="info-box">
+                    <h3>🎯 Summary: The Computational Hierarchy</h3>
+                    <p>
+                        <strong>Finite Automata:</strong> Recognize regular languages (no memory beyond states)<br>
+                        <strong>Pushdown Automata:</strong> Recognize CFLs (stack memory)<br>
+                        <strong>Turing Machines:</strong> Recognize recursively enumerable languages (unlimited tape
+                        memory)<br>
+                        <strong>Key Result:</strong> Some languages are not recognizable by ANY TM!
+                    </p>
+                </div>
+            </div>
+
+        </div>
+
+        <footer>
+            CS 637 – Lecture 4: What is a Language? • Models of Computation<br>
+            © 2026 Dr. Debasish Pattanayak • Department of Computer Science
+        </footer>
+    </div>
+
+    <a href="index.html" class="fab-btn" title="Back to Index">🏠</a>
+
+    <script>
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        function searchDefinitions() {
+            const query = document.getElementById('searchBox').value.toLowerCase();
+            const cards = document.querySelectorAll('.definition-card, .example-card, .theorem-card, .note-card, .warning-card, .info-box');
+
+            if (query.length === 0) {
+                cards.forEach(card => {
+                    card.style.display = 'block';
+                    card.style.opacity = '1';
+                });
+                return;
+            }
+
+            cards.forEach(card => {
+                const text = card.textContent.toLowerCase();
+                if (text.includes(query)) {
+                    card.style.display = 'block';
+                    card.style.opacity = '1';
+                } else {
+                    card.style.opacity = '0.3';
+                }
+            });
+        }
+
+        document.addEventListener("DOMContentLoaded", function () {
+            renderMathInElement(document.body, {
+                delimiters: [
+                    { left: "$$", right: "$$", display: true },
+                    { left: "\\[", right: "\\]", display: true },
+                    { left: "\\(", right: "\\)", display: false },
+                    { left: "$", right: "$", display: false }
+                ]
+            });
+        });
+    </script>
+
 </body>
+
 </html>

@@ -399,32 +399,33 @@
     }
   </style>
 
-<style>
-.fab-btn {
-  position: fixed;
-  bottom: 24px;
-  right: 24px;
-  width: 56px;
-  height: 56px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #3b82f6, #2563eb);
-  color: white;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-  cursor: pointer;
-  z-index: 1000;
-  border: none;
-  font-size: 24px;
-  transition: transform 0.2s, box-shadow 0.2s;
-  text-decoration: none;
-}
-.fab-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(0,0,0,0.3);
-}
-</style>
+  <style>
+    .fab-btn {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #3b82f6, #2563eb);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      cursor: pointer;
+      z-index: 1000;
+      border: none;
+      font-size: 24px;
+      transition: transform 0.2s, box-shadow 0.2s;
+      text-decoration: none;
+    }
+
+    .fab-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+    }
+  </style>
 
 </head>
 
@@ -433,7 +434,7 @@
   <div class="container">
     <header>
       <h1>CS 637: Mathematics-II</h1>
-      <div class="subtitle">Theory of Computation and Graph Theory</div>
+      <div class="subtitle">How to write a proof?</div>
       <div class="instructor">
         <strong>Instructor:</strong> <a href="https://drdebmath.github.io" target="_blank">Dr. Debasish Pattanayak</a>
       </div>
@@ -459,7 +460,8 @@
           <div class="definition-card">
             <div><span class="def-number">Def 1</span><span class="def-term">Inference Rules</span></div>
             <div class="def-content">
-              Rules that allow us to derive new statements from existing premises. Each rule preserves truth - if premises are true, conclusion must be true.
+              Rules that allow us to derive new statements from existing premises. Each rule preserves truth - if
+              premises are true, conclusion must be true.
               <br><br><strong>Common Rules:</strong>
               <ul>
                 <li><strong>Modus Ponens:</strong> \( p \to q, p \therefore q \)</li>
@@ -483,7 +485,8 @@
                 <li>"If they hold position, then reinforcements will arrive."</li>
               </ol>
               <strong>Propositional Encoding:</strong><br>
-              Let \( p \): "Visibility is good", \( q \): "Weather is bad", \( r \): "Unit advances", \( s \): "Hold position", \( t \): "Reinforcements arrive"
+              Let \( p \): "Visibility is good", \( q \): "Weather is bad", \( r \): "Unit advances", \( s \): "Hold
+              position", \( t \): "Reinforcements arrive"
               <br><br><strong>Formal Proof:</strong>
               <ol>
                 <li>\( \neg p \land q \) (Premise 1)</li>
@@ -510,7 +513,8 @@
                 <li>"If the battalion retreats, supplies will be safeguarded."</li>
               </ol>
               <strong>Propositional Encoding:</strong><br>
-              Let \( p \): "Communications are up", \( q \): "Enemy advancing", \( r \): "Commander orders attack", \( s \): "Battalion retreats", \( t \): "Supplies safeguarded"
+              Let \( p \): "Communications are up", \( q \): "Enemy advancing", \( r \): "Commander orders attack", \( s
+              \): "Battalion retreats", \( t \): "Supplies safeguarded"
               <br><br><strong>Formal Proof:</strong>
               <ol>
                 <li>\( \neg p \land q \) (Premise 1)</li>
@@ -546,14 +550,16 @@
           <div><span class="def-number">Def 2</span><span class="def-term">Mathematical Induction</span></div>
           <div class="def-content">
             A proof technique for showing that a statement \( P(n) \) is true for all natural numbers \( n \geq n_0 \).
-            <br><br><strong>Principle:</strong> If \( P(n_0) \) is true and \( P(k) \implies P(k+1) \) for all \( k \geq n_0 \), then \( P(n) \) is true for all \( n \geq n_0 \).
+            <br><br><strong>Principle:</strong> If \( P(n_0) \) is true and \( P(k) \implies P(k+1) \) for all \( k \geq
+            n_0 \), then \( P(n) \) is true for all \( n \geq n_0 \).
           </div>
         </div>
 
         <div class="theorem-card">
           <div><span class="theorem-number">Theorem 1</span><strong>Well-Ordering Principle</strong></div>
           <div class="def-content">
-            Every non-empty set of positive integers has a smallest element. This principle is equivalent to mathematical induction and forms its foundation.
+            Every non-empty set of positive integers has a smallest element. This principle is equivalent to
+            mathematical induction and forms its foundation.
           </div>
         </div>
 
@@ -562,7 +568,9 @@
         <div class="example-card">
           <div><span class="example-number">Ex 3</span><strong>Order Transmission in Battalion</strong></div>
           <div class="example-content">
-            <strong>Problem:</strong> A battalion consists of companies arranged in a line. Each company has a commander. If the first company's commander can communicate orders to their company, and each commander can relay orders to the next company's commander, then all companies will receive orders.
+            <strong>Problem:</strong> A battalion consists of companies arranged in a line. Each company has a
+            commander. If the first company's commander can communicate orders to their company, and each commander can
+            relay orders to the next company's commander, then all companies will receive orders.
             <br><br><strong>Formal Setup:</strong>
             <br><strong>Domain:</strong> Natural numbers representing company positions (1, 2, 3, ..., n)
             <br><strong>Predicate:</strong> \( R(k) \): "Company at position \( k \) receives orders"
@@ -602,8 +610,10 @@
         <div class="example-card">
           <div><span class="example-number">Ex 4</span><strong>Total Soldiers in Battalion</strong></div>
           <div class="example-content">
-            <strong>Context:</strong> Each company has exactly 50 soldiers. Prove the total number of soldiers in \( n \) companies.
-            <br><br><strong>Predicate:</strong> \( S(k) \): "The total number of soldiers in the first \( k \) companies equals \( 50k \)"
+            <strong>Context:</strong> Each company has exactly 50 soldiers. Prove the total number of soldiers in \( n
+            \) companies.
+            <br><br><strong>Predicate:</strong> \( S(k) \): "The total number of soldiers in the first \( k \) companies
+            equals \( 50k \)"
             <br><strong>Goal:</strong> Prove \( \forall n \in \mathbb{N}, S(n) \)
             <br><br><strong>Base Case (\( n = 1 \)):</strong>
             <br>Company 1 has 50 soldiers, so \( S(1) \) holds since \( 50 \times 1 = 50 \). ✓
@@ -621,13 +631,16 @@
 
         <div class="note-card">
           <span class="note-label">Induction Intuition</span>
-          <strong>Military Analogy:</strong> Like a chain of command where orders flow from commander to commander, induction shows how a property propagates through an infinite sequence. The base case is the "first commander" and the inductive step shows "each commander can pass orders to the next."
+          <strong>Military Analogy:</strong> Like a chain of command where orders flow from commander to commander,
+          induction shows how a property propagates through an infinite sequence. The base case is the "first commander"
+          and the inductive step shows "each commander can pass orders to the next."
         </div>
 
         <div class="warning-card">
           <span class="warning-label">Common Pitfall</span>
           <strong>Don't Assume the Conclusion!</strong>
-          <br>In the inductive step, you cannot use \( \forall n, R(n) \) to prove \( R(k+1) \). You must rely only on the inductive hypothesis \( R(k) \) and the general properties of the system.
+          <br>In the inductive step, you cannot use \( \forall n, R(n) \) to prove \( R(k+1) \). You must rely only on
+          the inductive hypothesis \( R(k) \) and the general properties of the system.
         </div>
       </div>
 
@@ -637,7 +650,8 @@
         <div class="definition-card">
           <div><span class="def-number">Def 3</span><span class="def-term">Predicate Logic</span></div>
           <div class="def-content">
-            Extends propositional logic by allowing statements about objects and their properties using quantifiers and predicates.
+            Extends propositional logic by allowing statements about objects and their properties using quantifiers and
+            predicates.
             <br><br><strong>Quantifiers:</strong>
             <ul>
               <li>\( \forall x \, P(x) \): "For all x, P(x) is true"</li>
@@ -652,158 +666,165 @@
         <div class="example-card">
           <div><span class="example-number">Ex 5</span><strong>Formalizing Mathematical Concepts</strong></div>
           <div class="example-content">
-            Express each predicate using only addition, multiplication, equality, and nonnegative integer constants (no exponentiation).
+            Express each predicate using only addition, multiplication, equality, and nonnegative integer constants (no
+            exponentiation).
             <br><br><strong>(a) m is a divisor of n:</strong>
             <br>\( \exists k \in \mathbb{N}, n = m \times k \)
             <br><em>Alternative:</em> \( \exists k \in \mathbb{N}, m \times k = n \)
             <br><br><strong>(b) n is a prime number:</strong>
-            <br>\( n > 1 \land \forall d \in \mathbb{N}, (d \neq 1 \land d \neq n) \to \neg(\exists k \in \mathbb{N}, n = d \times k) \)
-            <br><em>Simplified:</em> \( n > 1 \land \forall d(1 < d < n \to \neg(\exists k, n = d \times k)) \)
-            <br><br><strong>(c) n is a power of a prime:</strong>
-            <br>\( \exists p \in \mathbb{N}, p > 1 \land \forall d(1 < d < p \to \neg(\exists k, p = d \times k)) \land \exists e \in \mathbb{N}, e \geq 1 \land \exists m \in \mathbb{N}, m^e = n \)
+            <br>\( n > 1 \land \forall d \in \mathbb{N}, (d \neq 1 \land d \neq n) \to \neg(\exists k \in \mathbb{N}, n
+            = d \times k) \)
+            <br><em>Simplified:</em> \( n > 1 \land \forall d(1 < d < n \to \neg(\exists k, n=d \times k)) \) <br>
+              <br><strong>(c) n is a power of a prime:</strong>
+              <br>\( \exists p \in \mathbb{N}, p > 1 \land \forall d(1 < d < p \to \neg(\exists k, p=d \times k)) \land
+                \exists e \in \mathbb{N}, e \geq 1 \land \exists m \in \mathbb{N}, m^e=n \) </div>
+          </div>
+
+          <div class="note-card">
+            <span class="note-label">Prime Definition</span>
+            <strong>Prime Number:</strong> A number greater than 1 that has no divisors other than 1 and itself.
+            <br><br>The formalization ensures:
+            <ul style="margin-top: 8px;">
+              <li>\( n > 1 \): Excludes 0 and 1</li>
+              <li>No divisors between 2 and n-1</li>
+              <li>Uses existential quantification for the divisor relationship</li>
+            </ul>
+          </div>
+
+          <div class="info-box">
+            <h3>🔢 Domain Constraints</h3>
+            <p>The problem restricts us to basic arithmetic operations. This means we cannot use exponentiation
+              directly, but we can define powers through repeated multiplication or find alternative characterizations
+              that avoid powers entirely.</p>
+          </div>
+
+          <div class="theorem-card">
+            <div><span class="theorem-number">Theorem 3</span><strong>Fundamental Theorem of Arithmetic</strong></div>
+            <div class="def-content">
+              Every integer greater than 1 can be expressed uniquely as a product of prime powers.
+              <br><br>This theorem justifies why "power of a prime" is a well-defined concept in formal logic.
+            </div>
           </div>
         </div>
 
-        <div class="note-card">
-          <span class="note-label">Prime Definition</span>
-          <strong>Prime Number:</strong> A number greater than 1 that has no divisors other than 1 and itself.
-          <br><br>The formalization ensures:
-          <ul style="margin-top: 8px;">
-            <li>\( n > 1 \): Excludes 0 and 1</li>
-            <li>No divisors between 2 and n-1</li>
-            <li>Uses existential quantification for the divisor relationship</li>
-          </ul>
-        </div>
+        <div id="summary" class="tab-content">
+          <h2 class="section-title">Quick Reference</h2>
 
-        <div class="info-box">
-          <h3>🔢 Domain Constraints</h3>
-          <p>The problem restricts us to basic arithmetic operations. This means we cannot use exponentiation directly, but we can define powers through repeated multiplication or find alternative characterizations that avoid powers entirely.</p>
-        </div>
+          <div class="grid-2">
+            <div class="info-box">
+              <h3>📋 Inference Rules</h3>
+              <p>
+                • <strong>Modus Ponens:</strong> \( p \to q, p \therefore q \)<br>
+                • <strong>Modus Tollens:</strong> \( p \to q, \neg q \therefore \neg p \)<br>
+                • <strong>Hypothetical Syllogism:</strong> \( p \to q, q \to r \therefore p \to r \)<br>
+                • <strong>Simplification:</strong> \( p \land q \therefore p \)
+              </p>
+            </div>
 
-        <div class="theorem-card">
-          <div><span class="theorem-number">Theorem 3</span><strong>Fundamental Theorem of Arithmetic</strong></div>
-          <div class="def-content">
-            Every integer greater than 1 can be expressed uniquely as a product of prime powers.
-            <br><br>This theorem justifies why "power of a prime" is a well-defined concept in formal logic.
+            <div class="info-box">
+              <h3>🔄 Mathematical Induction</h3>
+              <p>
+                <strong>Steps:</strong><br>
+                1. Base case: Prove P(n₀)<br>
+                2. Inductive step: P(k) → P(k+1)<br>
+                3. Conclusion: ∀n ≥ n₀, P(n)
+              </p>
+            </div>
+
+            <div class="info-box">
+              <h3>🎯 Predicate Logic</h3>
+              <p>
+                <strong>Quantifiers:</strong><br>
+                • ∀x P(x): "For all x"<br>
+                • ∃x P(x): "There exists x"<br>
+                <strong>Domain:</strong> Nonnegative integers
+              </p>
+            </div>
+
+            <div class="info-box">
+              <h3>⚔️ Military Examples</h3>
+              <p>
+                <strong>Orders Flow:</strong> Base case + relay = all receive<br>
+                <strong>Chain of Command:</strong> Natural induction model<br>
+                <strong>Resource Counting:</strong> Additive properties
+              </p>
+            </div>
+          </div>
+
+          <div class="note-card" style="margin-top: 25px;">
+            <span class="note-label">Study Tips</span>
+            <strong>Mastery Checklist:</strong>
+            <ul style="margin-top: 10px; list-style-type: none; padding-left: 0;">
+              <li>✓ Can you construct formal proofs using inference rules?</li>
+              <li>✓ Do you understand how induction proves universal statements?</li>
+              <li>✓ Can you formalize natural language into predicate logic?</li>
+              <li>✓ Can you identify when military analogies apply to mathematical concepts?</li>
+            </ul>
+          </div>
+
+          <div class="theorem-card" style="margin-top: 20px;">
+            <div><span class="theorem-number">Theorem 4</span><strong>From Logic to Proof</strong></div>
+            <div class="def-content">
+              This lecture bridges propositional logic with predicate logic and proof techniques. Inference rules
+              provide the tools for constructing valid arguments, mathematical induction proves properties of infinite
+              sets, and predicate logic allows us to formalize complex mathematical concepts. Military examples provide
+              concrete intuition for abstract mathematical principles.
+            </div>
           </div>
         </div>
       </div>
 
-      <div id="summary" class="tab-content">
-        <h2 class="section-title">Quick Reference</h2>
-
-        <div class="grid-2">
-          <div class="info-box">
-            <h3>📋 Inference Rules</h3>
-            <p>
-              • <strong>Modus Ponens:</strong> \( p \to q, p \therefore q \)<br>
-              • <strong>Modus Tollens:</strong> \( p \to q, \neg q \therefore \neg p \)<br>
-              • <strong>Hypothetical Syllogism:</strong> \( p \to q, q \to r \therefore p \to r \)<br>
-              • <strong>Simplification:</strong> \( p \land q \therefore p \)
-            </p>
-          </div>
-
-          <div class="info-box">
-            <h3>🔄 Mathematical Induction</h3>
-            <p>
-              <strong>Steps:</strong><br>
-              1. Base case: Prove P(n₀)<br>
-              2. Inductive step: P(k) → P(k+1)<br>
-              3. Conclusion: ∀n ≥ n₀, P(n)
-            </p>
-          </div>
-
-          <div class="info-box">
-            <h3>🎯 Predicate Logic</h3>
-            <p>
-              <strong>Quantifiers:</strong><br>
-              • ∀x P(x): "For all x"<br>
-              • ∃x P(x): "There exists x"<br>
-              <strong>Domain:</strong> Nonnegative integers
-            </p>
-          </div>
-
-          <div class="info-box">
-            <h3>⚔️ Military Examples</h3>
-            <p>
-              <strong>Orders Flow:</strong> Base case + relay = all receive<br>
-              <strong>Chain of Command:</strong> Natural induction model<br>
-              <strong>Resource Counting:</strong> Additive properties
-            </p>
-          </div>
-        </div>
-
-        <div class="note-card" style="margin-top: 25px;">
-          <span class="note-label">Study Tips</span>
-          <strong>Mastery Checklist:</strong>
-          <ul style="margin-top: 10px; list-style-type: none; padding-left: 0;">
-            <li>✓ Can you construct formal proofs using inference rules?</li>
-            <li>✓ Do you understand how induction proves universal statements?</li>
-            <li>✓ Can you formalize natural language into predicate logic?</li>
-            <li>✓ Can you identify when military analogies apply to mathematical concepts?</li>
-          </ul>
-        </div>
-
-        <div class="theorem-card" style="margin-top: 20px;">
-          <div><span class="theorem-number">Theorem 4</span><strong>From Logic to Proof</strong></div>
-          <div class="def-content">
-            This lecture bridges propositional logic with predicate logic and proof techniques. Inference rules provide the tools for constructing valid arguments, mathematical induction proves properties of infinite sets, and predicate logic allows us to formalize complex mathematical concepts. Military examples provide concrete intuition for abstract mathematical principles.
-          </div>
-        </div>
-      </div>
+      <footer>
+        CS 637 – Lecture 3: Proof Systems and Formal Proof Techniques • Theory of Computation and Graph Theory<br>
+        © 2025 Dr. Debasish Pattanayak • Department of Computer Science
+      </footer>
     </div>
 
-    <footer>
-      CS 637 – Lecture 3: Proof Systems and Formal Proof Techniques • Theory of Computation and Graph Theory<br>
-      © 2025 Dr. Debasish Pattanayak • Department of Computer Science
-    </footer>
-  </div>
+    <script>
+      function switchTab(tabName) {
+        const tabs = document.querySelectorAll('.tab-content');
+        tabs.forEach(tab => tab.classList.remove('active'));
 
-  <script>
-    function switchTab(tabName) {
-      const tabs = document.querySelectorAll('.tab-content');
-      tabs.forEach(tab => tab.classList.remove('active'));
+        const btns = document.querySelectorAll('.tab-btn');
+        btns.forEach(btn => btn.classList.remove('active'));
 
-      const btns = document.querySelectorAll('.tab-btn');
-      btns.forEach(btn => btn.classList.remove('active'));
-
-      const target = document.getElementById(tabName);
-      if (target) {
-        target.classList.add('active');
-      }
-
-      const clickedBtn = Array.from(btns).find(btn => btn.getAttribute('onclick').includes(tabName));
-      if (clickedBtn) {
-        clickedBtn.classList.add('active');
-      }
-    }
-
-    function searchDefinitions() {
-      const input = document.getElementById('searchBox').value.toLowerCase();
-      const cards = document.querySelectorAll('.definition-card, .example-card, .theorem-card, .note-card, .warning-card');
-
-      cards.forEach(card => {
-        const text = card.textContent.toLowerCase();
-        if (text.includes(input)) {
-          card.style.display = 'block';
-        } else {
-          card.style.display = 'none';
+        const target = document.getElementById(tabName);
+        if (target) {
+          target.classList.add('active');
         }
-      });
-    }
 
-    document.addEventListener("DOMContentLoaded", function () {
-      renderMathInElement(document.body, {
-        delimiters: [
-          { left: "$", right: "$", display: true },
-          { left: "\\[", right: "\\]", display: true },
-          { left: "\\(", right: "\\)", display: false }
-        ]
-      });
-    });
-  </script>
+        const clickedBtn = Array.from(btns).find(btn => btn.getAttribute('onclick').includes(tabName));
+        if (clickedBtn) {
+          clickedBtn.classList.add('active');
+        }
+      }
 
-<a href="index.html" class="fab-btn" title="Back to Index">🏠</a>
+      function searchDefinitions() {
+        const input = document.getElementById('searchBox').value.toLowerCase();
+        const cards = document.querySelectorAll('.definition-card, .example-card, .theorem-card, .note-card, .warning-card');
+
+        cards.forEach(card => {
+          const text = card.textContent.toLowerCase();
+          if (text.includes(input)) {
+            card.style.display = 'block';
+          } else {
+            card.style.display = 'none';
+          }
+        });
+      }
+
+      document.addEventListener("DOMContentLoaded", function () {
+        renderMathInElement(document.body, {
+          delimiters: [
+            { left: "$", right: "$", display: true },
+            { left: "\\[", right: "\\]", display: true },
+            { left: "\\(", right: "\\)", display: false }
+          ]
+        });
+      });
+    </script>
+
+    <a href="index.html" class="fab-btn" title="Back to Index">🏠</a>
 </body>
 
 </html>
