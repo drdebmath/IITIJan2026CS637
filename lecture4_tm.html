@@ -1,0 +1,1508 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <title>CS 637 – Lecture 4: Deterministic Turing Machines</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      line-height: 1.6;
+      background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      overflow: hidden;
+    }
+
+    header {
+      background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
+      color: white;
+      padding: 40px;
+      text-align: center;
+    }
+
+    h1 {
+      font-size: 2.5em;
+      margin-bottom: 10px;
+      font-weight: 700;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+    }
+
+    .subtitle {
+      font-size: 1.3em;
+      margin-bottom: 15px;
+      opacity: 0.95;
+    }
+
+    .instructor {
+      margin-top: 15px;
+      font-size: 1.05em;
+      opacity: 0.9;
+    }
+
+    .instructor a {
+      color: #ffd700;
+      text-decoration: none;
+      font-weight: 600;
+      transition: opacity 0.3s;
+    }
+
+    .instructor a:hover {
+      opacity: 0.8;
+      text-decoration: underline;
+    }
+
+    .content {
+      padding: 40px;
+    }
+
+    .nav-tabs {
+      display: flex;
+      border-bottom: 2px solid #e2e8f0;
+      margin-bottom: 30px;
+      gap: 5px;
+      overflow-x: auto;
+    }
+
+    .tab-btn {
+      padding: 12px 20px;
+      background: none;
+      border: none;
+      font-size: 1em;
+      cursor: pointer;
+      color: #64748b;
+      font-weight: 600;
+      border-bottom: 3px solid transparent;
+      transition: all 0.3s;
+      white-space: nowrap;
+    }
+
+    .tab-btn:hover {
+      color: #1a2a6c;
+      background: #f8fafc;
+    }
+
+    .tab-btn.active {
+      color: #1a2a6c;
+      border-bottom-color: #1a2a6c;
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+      animation: fadeIn 0.4s;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .section-title {
+      font-size: 1.8em;
+      color: #1e293b;
+      margin-bottom: 25px;
+      padding-bottom: 10px;
+      border-bottom: 3px solid #1a2a6c;
+      font-weight: 700;
+    }
+
+    .subsection-title {
+      font-size: 1.4em;
+      color: #334155;
+      margin: 30px 0 15px 0;
+      font-weight: 600;
+    }
+
+    .definition-card {
+      background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
+      border-left: 4px solid #1a2a6c;
+      padding: 20px;
+      margin-bottom: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+      transition: all 0.3s;
+    }
+
+    .definition-card:hover {
+      transform: translateX(5px);
+      box-shadow: 0 4px 12px rgba(26, 42, 108, 0.2);
+    }
+
+    .def-number {
+      display: inline-block;
+      background: #1a2a6c;
+      color: white;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-weight: 700;
+      font-size: 0.9em;
+      margin-right: 10px;
+    }
+
+    .def-term {
+      font-weight: 700;
+      color: #1e293b;
+      font-size: 1.15em;
+      display: inline-block;
+      margin-bottom: 8px;
+    }
+
+    .def-content {
+      color: #475569;
+      margin-top: 8px;
+      line-height: 1.7;
+    }
+
+    .def-content ul,
+    .def-content ol {
+      margin-top: 10px;
+      margin-left: 0;
+      padding-left: 25px;
+      list-style-position: outside;
+    }
+
+    .def-content li {
+      margin: 6px 0;
+    }
+
+    .example-content ol,
+    .example-content ul {
+      margin-top: 10px;
+      margin-left: 0;
+      padding-left: 25px;
+      list-style-position: outside;
+    }
+
+    .example-content li {
+      margin: 6px 0;
+    }
+
+    .note-card ol,
+    .note-card ul {
+      margin-top: 10px;
+      margin-left: 0;
+      padding-left: 25px;
+      list-style-position: outside;
+    }
+
+    .example-card {
+      background: linear-gradient(135deg, #fef3c7 0%, #fef9c3 100%);
+      border-left: 4px solid #f59e0b;
+      padding: 18px;
+      margin-bottom: 15px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    }
+
+    .example-number {
+      display: inline-block;
+      background: #f59e0b;
+      color: white;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-weight: 700;
+      font-size: 0.9em;
+      margin-right: 10px;
+    }
+
+    .example-content {
+      color: #78350f;
+      margin-top: 8px;
+      font-weight: 500;
+    }
+
+    .theorem-card {
+      background: linear-gradient(135deg, #dfe9f3 0%, #ffffff 100%);
+      border-left: 4px solid #3b82f6;
+      padding: 18px;
+      margin-bottom: 15px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    }
+
+    .theorem-number {
+      display: inline-block;
+      background: #3b82f6;
+      color: white;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-weight: 700;
+      font-size: 0.9em;
+      margin-right: 10px;
+    }
+
+    .note-card {
+      background: linear-gradient(135deg, #f0fdf4 0%, #ffffff 100%);
+      border-left: 4px solid #10b981;
+      padding: 18px;
+      margin-bottom: 15px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    }
+
+    .note-label {
+      display: inline-block;
+      background: #10b981;
+      color: white;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-weight: 700;
+      font-size: 0.9em;
+      margin-right: 10px;
+    }
+
+    .search-box {
+      width: 100%;
+      padding: 15px 20px;
+      font-size: 1em;
+      border: 2px solid #e2e8f0;
+      border-radius: 8px;
+      margin-bottom: 25px;
+      transition: all 0.3s;
+    }
+
+    .search-box:focus {
+      outline: none;
+      border-color: #1a2a6c;
+      box-shadow: 0 0 0 3px rgba(26, 42, 108, 0.1);
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+      margin-top: 20px;
+    }
+
+    .info-box {
+      background: linear-gradient(135deg, #e0e7ff 0%, #f3f4f6 100%);
+      padding: 20px;
+      border-radius: 8px;
+      border-left: 4px solid #6366f1;
+    }
+
+    .info-box h3 {
+      color: #1e293b;
+      margin-bottom: 10px;
+      font-size: 1.1em;
+    }
+
+    footer {
+      background: #1e293b;
+      color: white;
+      text-align: center;
+      padding: 25px;
+      font-size: 0.9em;
+    }
+
+    .fab-btn {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #1a2a6c, #b21f1f);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      cursor: pointer;
+      z-index: 1000;
+      border: none;
+      font-size: 24px;
+      transition: transform 0.2s, box-shadow 0.2s;
+      text-decoration: none;
+    }
+
+    .fab-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+    }
+
+    /* Simulation Styles */
+    .sim-container {
+      background: #f8fafc;
+      padding: 25px;
+      border-radius: 12px;
+      border: 1px solid #cbd5e1;
+      text-align: center;
+      margin-bottom: 20px;
+      box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05);
+    }
+
+    .tape-window {
+      position: relative;
+      height: 100px;
+      background: white;
+      border-radius: 8px;
+      border: 2px solid #94a3b8;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+      margin-bottom: 20px;
+      box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .tape-content {
+      display: flex;
+      transition: transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    }
+
+    .cell {
+      width: 60px;
+      height: 60px;
+      border: 1px solid #cbd5e1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Courier New', monospace;
+      font-size: 1.8em;
+      font-weight: 700;
+      background: white;
+      margin: 0 2px;
+      border-radius: 4px;
+      color: #334155;
+      flex-shrink: 0;
+    }
+
+    .cell.active {
+      background: #e0f2fe;
+      border-color: #3b82f6;
+    }
+
+    .head-marker {
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      z-index: 10;
+    }
+
+    .head-arrow {
+      width: 0;
+      height: 0;
+      border-left: 12px solid transparent;
+      border-right: 12px solid transparent;
+      border-bottom: 20px solid #ef4444;
+    }
+
+    .head-label {
+      background: #ef4444;
+      color: white;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 0.85em;
+      font-weight: bold;
+      margin-top: -5px;
+      /* Pull into arrow slightly or adjust as needed setup */
+      box-shadow: 0 2px 4px rgba(239, 68, 68, 0.3);
+    }
+
+    .controls {
+      display: flex;
+      gap: 15px;
+      justify-content: center;
+      margin-bottom: 25px;
+      flex-wrap: wrap;
+    }
+
+    .control-grp {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      background: white;
+      padding: 5px 15px;
+      border-radius: 50px;
+      border: 1px solid #e2e8f0;
+    }
+
+    .btn {
+      padding: 10px 24px;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-size: 1em;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #3b82f6, #2563eb);
+      color: white;
+      box-shadow: 0 4px 6px rgba(37, 99, 235, 0.2);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 8px rgba(37, 99, 235, 0.3);
+    }
+
+    .btn-danger {
+      background: linear-gradient(135deg, #ef4444, #dc2626);
+      color: white;
+      box-shadow: 0 4px 6px rgba(220, 38, 38, 0.2);
+    }
+
+    .btn-danger:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 8px rgba(220, 38, 38, 0.3);
+    }
+
+    .btn:disabled {
+      background: #94a3b8;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+
+    .input-field {
+      padding: 8px 15px;
+      border: 2px solid #e2e8f0;
+      border-radius: 6px;
+      font-family: 'Courier New', monospace;
+      font-weight: bold;
+      font-size: 1.1em;
+      width: 150px;
+      text-align: center;
+    }
+
+    .status-panel {
+      background: #1e293b;
+      color: #33e680;
+      padding: 20px;
+      border-radius: 8px;
+      text-align: left;
+      font-family: 'Courier New', monospace;
+      height: 200px;
+      overflow-y: auto;
+      border: 1px solid #334155;
+      font-size: 0.95em;
+      line-height: 1.5;
+    }
+
+    .log-entry {
+      margin-bottom: 4px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      padding-bottom: 2px;
+    }
+
+    .log-state {
+      color: #f59e0b;
+      font-weight: bold;
+    }
+
+    .log-action {
+      color: #60a5fa;
+    }
+
+    /* Concept Animation Styles */
+    .concept-anim {
+      width: 100%;
+      max-width: 600px;
+      height: 200px;
+      background: white;
+      border-radius: 12px;
+      border: 4px solid #e2e8f0;
+      margin: 30px auto;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    }
+
+    .concept-anim::before {
+      content: "VISUALIZATION";
+      position: absolute;
+      top: 10px;
+      left: 15px;
+      font-size: 0.7em;
+      font-weight: bold;
+      color: #94a3b8;
+      letter-spacing: 1px;
+    }
+
+    .anim-tape {
+      display: flex;
+      position: absolute;
+      top: 60px;
+      left: 50%;
+      transform: translateX(-50%);
+      animation: tapeMove 4s infinite ease-in-out;
+    }
+
+    .anim-cell {
+      width: 50px;
+      height: 50px;
+      border: 2px solid #cbd5e1;
+      margin: 0 2px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: monospace;
+      font-weight: bold;
+      color: #475569;
+      font-size: 1.2em;
+      background: #f8fafc;
+      border-radius: 4px;
+    }
+
+    .anim-head {
+      position: absolute;
+      top: 120px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .anim-arrow {
+      width: 0;
+      height: 0;
+      border-left: 10px solid transparent;
+      border-right: 10px solid transparent;
+      border-bottom: 15px solid #1a2a6c;
+      margin-bottom: 5px;
+    }
+
+    .anim-state {
+      width: 40px;
+      height: 40px;
+      background: #1a2a6c;
+      border-radius: 50%;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      font-family: monospace;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+      animation: statePulse 4s infinite ease-in-out;
+    }
+
+    @keyframes tapeMove {
+
+      0%,
+      100% {
+        transform: translateX(-50%);
+      }
+
+      /* Center */
+      25% {
+        transform: translateX(calc(-50% - 54px));
+      }
+
+      /* Move Left 1 cell */
+      50% {
+        transform: translateX(calc(-50% + 54px));
+      }
+
+      /* Move Right 1 cell (from center) */
+      75% {
+        transform: translateX(-50%);
+      }
+    }
+
+    @keyframes statePulse {
+
+      0%,
+      100% {
+        transform: scale(1);
+        background: #1a2a6c;
+      }
+
+      25% {
+        transform: scale(1.1);
+        background: #b21f1f;
+      }
+
+      50% {
+        transform: scale(1.1);
+        background: #b21f1f;
+      }
+
+      75% {
+        transform: scale(1);
+        background: #1a2a6c;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <header>
+      <h1>CS 637: Mathematics-II</h1>
+      <div class="subtitle">Lecture 4: Deterministic Turing Machines</div>
+      <div class="instructor">
+        <strong>Instructor:</strong> <a href="https://drdebmath.github.io" target="_blank">Dr. Debasish Pattanayak</a>
+      </div>
+    </header>
+
+    <div class="content">
+      <div class="nav-tabs">
+        <button class="tab-btn active" onclick="switchTab('bridge')">From Logic to Computation</button>
+        <button class="tab-btn" onclick="switchTab('intro')">Intro & History</button>
+        <button class="tab-btn" onclick="switchTab('universality')">Universality</button>
+        <button class="tab-btn" onclick="switchTab('formalism')">Formal Definition</button>
+        <button class="tab-btn" onclick="switchTab('mechanism')">Tape & Mechanism</button>
+        <button class="tab-btn" onclick="switchTab('simulation')">Interactive Simulation</button>
+      </div>
+
+      <input type="text" class="search-box" id="searchBox" placeholder="🔍 Search concepts, definitions, history..."
+        onkeyup="searchDefinitions()">
+
+      <!-- NEW: Bridging Tab - Connects Logic/Proofs to Computation -->
+      <div id="bridge" class="tab-content active">
+        <h2 class="section-title">From Logic to Computation</h2>
+        <div class="searchable">
+          <div class="note-card">
+            <span class="note-label">Recap</span>
+            <strong>What We've Learned So Far (Lectures 2-3):</strong>
+            <ul style="margin-top: 10px;">
+              <li><strong>Propositional Logic:</strong> Formulas, truth tables, CNF/DNF normal forms</li>
+              <li><strong>Inference Rules:</strong> Modus Ponens, Modus Tollens, Hypothetical Syllogism</li>
+              <li><strong>The SAT Problem:</strong> Given a CNF formula, is there a satisfying assignment?</li>
+              <li><strong>Proof Techniques:</strong> Mathematical induction, formal step-by-step proofs</li>
+            </ul>
+          </div>
+
+          <h3 class="subsection-title">The Natural Next Question</h3>
+          <div class="definition-card">
+            <div><span class="def-number">Key Question</span><span class="def-term">Can We Automate Proofs?</span></div>
+            <div class="def-content">
+              In Lecture 3, we learned to construct formal proofs using inference rules like Modus Ponens:
+              <br><br>
+              \( p \to q, \quad p \quad \therefore \quad q \)
+              <br><br>
+              Each step is <strong>mechanical</strong>—we apply a fixed rule to derive new truths. This raises a
+              profound question:
+              <br><br>
+              <em>"Can we build a machine that automatically discovers proofs for any mathematical statement?"</em>
+            </div>
+          </div>
+
+          <div class="theorem-card">
+            <div><span class="theorem-number">Historical</span><strong>Hilbert's Entscheidungsproblem (1928)</strong>
+            </div>
+            <div class="def-content">
+              David Hilbert posed the <strong>Decision Problem</strong>: Is there an algorithm that, given any logical
+              formula in first-order logic, can determine whether it is <em>valid</em> (true in all interpretations)?
+              <br><br>
+              Think of it this way: Given a formula like \( \forall x (P(x) \to Q(x)) \), can a machine tell us if it's
+              always true?
+              <br><br>
+              <strong>This is exactly what Turing Machines were invented to answer!</strong>
+            </div>
+          </div>
+
+          <h3 class="subsection-title">From SAT to Computation</h3>
+          <div class="example-card">
+            <div><span class="example-number">Connection</span><strong>SAT as a Computational Problem</strong></div>
+            <div class="example-content">
+              Recall the <strong>SAT problem</strong> from Lecture 2: Given a CNF formula like:
+              <br><br>
+              \( (p \lor \neg q) \land (\neg p \lor r) \land (q \lor \neg r) \)
+              <br><br>
+              Is there an assignment of truth values that makes it true?
+              <br><br>
+              <strong>Observation:</strong> We can verify a solution mechanically (just substitute and evaluate), but
+              <em>finding</em> a solution seems harder. How hard? Turing Machines help us precisely answer this!
+            </div>
+          </div>
+
+          <div class="info-box">
+            <h3>🔗 The Bridge: Proofs → Algorithms → Computation</h3>
+            <p>
+              <strong>Lecture 2-3:</strong> We learned that proofs are sequences of logical steps.<br>
+              <strong>Key Insight:</strong> Each inference rule (Modus Ponens, etc.) is like an instruction.<br>
+              <strong>Natural Question:</strong> What if we had infinitely many instructions? What can be computed?<br>
+              <strong>Lecture 4:</strong> Turing Machines give us a precise definition of "algorithm" and "computable."
+            </p>
+          </div>
+
+          <h3 class="subsection-title">Why Turing Machines in a Mathematics Course?</h3>
+          <div class="definition-card">
+            <div><span class="def-number">Motivation</span><span class="def-term">The Limits of Mathematical
+                Reasoning</span></div>
+            <div class="def-content">
+              <ul>
+                <li><strong>Decidability:</strong> Which mathematical questions can be answered by algorithms?</li>
+                <li><strong>Computability:</strong> Which functions can be computed mechanically?</li>
+                <li><strong>Complexity:</strong> Even if solvable, how much time/space does a solution require?</li>
+              </ul>
+              <br>
+              Turing's answer to the Entscheidungsproblem was <strong>negative</strong>—not all logical truths can be
+              decided algorithmically! This fundamental result shapes modern computer science and mathematics.
+            </div>
+          </div>
+
+          <div class="note-card">
+            <span class="note-label">Preview</span>
+            <strong>What's Coming:</strong>
+            <p style="margin-top: 8px;">
+              In this lecture, we'll define Turing Machines formally and see how they capture the intuitive notion of
+              "mechanical computation." Later, we'll use TMs to prove that certain problems (like the Halting Problem)
+              are <strong>undecidable</strong>—no algorithm exists to solve them!
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div id="intro" class="tab-content">
+        <h2 class="section-title">Introduction to Mechanical Computation</h2>
+        <div class="searchable">
+          <div class="definition-card">
+            <div><span class="def-number">Concept</span><span class="def-term">The Idea of an Algorithm</span></div>
+            <div class="def-content">
+              Before the advent of physical computers, mathematicians sought to formalize the notion of "effective
+              calculability." What does it mean for a problem to be solvable by a step-by-step procedure?
+              <br><br>
+              <strong>Connection to Proofs:</strong> Just as we chain inference rules (Modus Ponens → Simplification →
+              Modus Tollens) to build proofs, an algorithm chains elementary operations to solve problems.
+            </div>
+          </div>
+
+          <h3 class="subsection-title">Alan Turing and the 1936 Paper</h3>
+          <div class="note-card">
+            <span class="note-label">History</span>
+            <strong>"On Computable Numbers, with an Application to the Entscheidungsproblem"</strong>
+            <p style="margin-top: 8px;">
+              In 1936, Alan Turing introduced the "Automatic Machine" (now called the Turing Machine). His goal was to
+              answer Hilbert's <em>Entscheidungsproblem</em> (the Decision Problem) that we discussed in the previous
+              tab.
+            </p>
+            <ul>
+              <li><strong>Physical Intuition:</strong> Turing modeled his machine on a human "computer" (a person
+                performing calculations) with a pencil, paper, and a set of instructions—much like following inference
+                rules!</li>
+              <li><strong>Simplicity:</strong> By reducing computation to the simplest possible steps (reading/writing a
+                symbol, moving a head), he provided a rigorous foundation for what "mechanical" means.</li>
+            </ul>
+          </div>
+
+          <div class="example-card">
+            <div><span class="example-number">Context</span><strong>Why Turing's Model?</strong></div>
+            <div class="example-content">
+              While other models existed (like Alonzo Church's Lambda Calculus), Turing's model was praised for its
+              intuitive "mechanical" nature. Just as we understand inference rules as concrete steps, each TM transition
+              is a concrete, unambiguous action.
+            </div>
+          </div>
+
+          <div class="theorem-card">
+            <div><span class="theorem-number">Key Result</span><strong>Turing's Answer to the
+                Entscheidungsproblem</strong></div>
+            <div class="def-content">
+              Turing proved that <strong>no algorithm exists</strong> that can decide the truth of all logical
+              statements. The Entscheidungsproblem is <em>undecidable</em>.
+              <br><br>
+              This negative result is actually liberating—it tells us exactly where the boundaries of mechanical
+              reasoning lie.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="universality" class="tab-content">
+        <h2 class="section-title">The Universality of Turing Machines</h2>
+        <div class="searchable">
+          <div class="theorem-card">
+            <div><span class="theorem-number">Thesis</span><strong>Church-Turing Thesis</strong></div>
+            <div class="def-content">
+              The informal notion of "algorithm" or "effective procedure" is exactly captured by the formal definition
+              of a Turing Machine.
+              <br><br>
+              <em>Note: This is a thesis, not a mathematical theorem, because it connects an informal concept to a
+                formal one. To date, no model of computation has been found that is more powerful than a Turing
+                Machine.</em>
+            </div>
+          </div>
+
+          <div class="definition-card">
+            <div><span class="def-number">Def 1</span><span class="def-term">Universal Turing Machine (UTM)</span></div>
+            <div class="def-content">
+              A single Turing Machine \( U \) that can simulate *any* other Turing Machine \( M \) on an input \( w \),
+              provided it is given a description of \( M \). This is the theoretical blueprint for the general-purpose
+              computer.
+            </div>
+          </div>
+
+          <div class="info-box" style="margin-top: 20px;">
+            <h3>🚀 Why Universal?</h3>
+            <p>
+              Before UTMs, machines were built for specific tasks. Turing's insight was that <strong>data and
+                instructions are the same thing</strong>. If you can encode a machine's behavior as symbols on a tape,
+              then another machine can read those symbols and act accordingly.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div id="formalism" class="tab-content">
+        <h2 class="section-title">Formal Definition of a DTM</h2>
+        <div class="searchable">
+          <div class="definition-card">
+            <div><span class="def-number">Def 2</span><span class="def-term">7-tuple Definition</span></div>
+            <div class="def-content">
+              A Deterministic Turing Machine (DTM) is a 7-tuple \( M = (Q, \Sigma, \Gamma, \delta, q_0, B, F) \):
+              <ul>
+                <li><strong>\( Q \):</strong> A finite set of states.</li>
+                <li><strong>\( \Sigma \):</strong> A finite set of input symbols (subset of \( \Gamma \setminus \{B\}
+                  \)).</li>
+                <li><strong>\( \Gamma \):</strong> A finite set of tape symbols.</li>
+                <li><strong>\( \delta \):</strong> The transition function: \( Q \times \Gamma \to Q \times \Gamma
+                  \times \{L, R\} \).</li>
+                <li><strong>\( q_0 \):</strong> The initial state (\( q_0 \in Q \)).</li>
+                <li><strong>\( B \):</strong> The blank symbol (\( B \in \Gamma \), but \( B \notin \Sigma \)).</li>
+                <li><strong>\( F \):</strong> The set of final or accepting states (\( F \subseteq Q \)).</li>
+              </ul>
+            </div>
+          </div>
+
+          <h3 class="subsection-title">Understanding the Transition Function</h3>
+          <div class="example-card">
+            <div><span class="example-number">Ex</span><strong>$\delta(q, a) = (p, b, D)$</strong></div>
+            <div class="example-content">
+              If the machine is in state \( q \) and the head reads symbol \( a \):
+              <ol>
+                <li>Change state to \( p \).</li>
+                <li>Write symbol \( b \) on the current cell (replacing \( a \)).</li>
+                <li>Move the head in direction \( D \) (\( L \) for Left, \( R \) for Right).</li>
+              </ol>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="mechanism" class="tab-content">
+        <h2 class="section-title">The Tape and Head Mechanism</h2>
+        <div class="searchable">
+          <div class="info-box">
+            <h3>📏 The Infinite Tape</h3>
+            <p>
+              The tape is divided into cells, each capable of holding one symbol from \( \Gamma \). It is infinite in
+              both directions (or semi-infinite in some models). Initially, the tape contains the input string followed
+              by infinite "Blank" ($B$) symbols.
+            </p>
+          </div>
+
+          <div class="definition-card" style="margin-top: 20px;">
+            <div><span class="def-number">Def 3</span><span class="def-term">Read/Write Head</span></div>
+            <div class="def-content">
+              The head points to a single cell on the tape. At each step:
+              <ul>
+                <li>It **reads** the symbol at the current cell.</li>
+                <li>It **writes** a new symbol (can be the same).</li>
+                <li>It **moves** one cell to the left or right.</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="concept-anim">
+            <div class="anim-tape">
+              <div class="anim-cell">0</div>
+              <div class="anim-cell">1</div>
+              <div class="anim-cell">1</div>
+              <div class="anim-cell">0</div>
+              <div class="anim-cell">B</div>
+              <div class="anim-cell">0</div>
+              <div class="anim-cell">1</div>
+            </div>
+            <div class="anim-head">
+              <div class="anim-arrow"></div>
+              <div class="anim-state">q1</div>
+            </div>
+          </div>
+
+          <div class="note-card">
+            <span class="note-label">Mechanism</span>
+            <strong>The Deterministic Attribute:</strong>
+            <p style="margin-top: 8px;">
+              For any given state and symbol, there is <strong>at most one</strong> transition possible. This means the
+              path of computation is a single line, never branching.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div id="simulation" class="tab-content">
+        <h2 class="section-title">Interactive TM Simulation</h2>
+
+        <!-- Formal Definition Section -->
+        <div class="definition-card">
+          <div><span class="def-number">Formal</span><span class="def-term">TM for $L = \{0^n 1^n \mid n \geq
+              0\}$</span></div>
+          <div class="def-content">
+            <strong>7-Tuple Definition:</strong> $M = (Q, \Sigma, \Gamma, \delta, q_0, B, F)$
+            <ul style="margin-top: 10px;">
+              <li><strong>$Q$</strong> = $\{q_0, q_1, q_2, q_3, q_{\text{accept}}, q_{\text{reject}}\}$ — Set of states
+              </li>
+              <li><strong>$\Sigma$</strong> = $\{0, 1\}$ — Input alphabet</li>
+              <li><strong>$\Gamma$</strong> = $\{0, 1, X, Y, B\}$ — Tape alphabet ($X$, $Y$ are markers, $B$ is blank)
+              </li>
+              <li><strong>$\delta$</strong> = Transition function (defined below)</li>
+              <li><strong>$q_0$</strong> = Initial state</li>
+              <li><strong>$B$</strong> = Blank symbol</li>
+              <li><strong>$F$</strong> = $\{q_{\text{accept}}\}$ — Accepting states</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Algorithm Explanation -->
+        <div class="note-card">
+          <span class="note-label">Algorithm</span>
+          <strong>High-Level Strategy:</strong>
+          <p style="margin-top: 8px;">
+            The TM repeatedly "crosses off" matching pairs of $0$s and $1$s:
+          </p>
+          <ol style="margin-top: 10px; margin-left: 20px;">
+            <li><strong>Find leftmost unmarked $0$</strong> → Mark it with $X$</li>
+            <li><strong>Scan right</strong> past all $0$s and $Y$s to find the leftmost unmarked $1$</li>
+            <li><strong>Mark the $1$</strong> with $Y$</li>
+            <li><strong>Scan left</strong> back to the $X$ just placed, then move right to find next unmarked $0$</li>
+            <li><strong>Repeat</strong> until all $0$s are marked as $X$s</li>
+            <li><strong>Verify</strong> that only $Y$s remain (no leftover $1$s) → Accept</li>
+          </ol>
+        </div>
+
+        <!-- State Descriptions -->
+        <h3 class="subsection-title">State Descriptions</h3>
+        <div class="grid-2">
+          <div class="info-box">
+            <h3>$q_0$ — Start/Scan for 0</h3>
+            <p>Look for leftmost unmarked $0$. If found, mark it $X$ and go to $q_1$. If we see $Y$, skip right to check
+              for completion.</p>
+          </div>
+          <div class="info-box">
+            <h3>$q_1$ — Scan Right for 1</h3>
+            <p>Move right, skipping $0$s and $Y$s. When we find a $1$, mark it $Y$ and switch to $q_2$.</p>
+          </div>
+          <div class="info-box">
+            <h3>$q_2$ — Return Left</h3>
+            <p>Move left, skipping $0$s and $Y$s. When we hit $X$, move right and return to $q_0$.</p>
+          </div>
+          <div class="info-box">
+            <h3>$q_3$ — Verify Completion</h3>
+            <p>All $0$s are marked. Scan right to ensure only $Y$s and blanks remain. If so, accept.</p>
+          </div>
+        </div>
+
+        <!-- Complete Transition Table -->
+        <h3 class="subsection-title">Complete Transition Function $\delta$</h3>
+        <div class="theorem-card">
+          <div><span class="theorem-number">Table</span><strong>All Transition Rules</strong></div>
+          <div class="def-content">
+            <p style="margin-bottom: 10px;">Format: $\delta(\text{state}, \text{read}) = (\text{new state},
+              \text{write}, \text{move})$</p>
+            <table style="width: 100%; margin-top: 10px;">
+              <thead>
+                <tr>
+                  <th>Current State</th>
+                  <th>Read Symbol</th>
+                  <th>Write Symbol</th>
+                  <th>Move</th>
+                  <th>Next State</th>
+                  <th>Explanation</th>
+                </tr>
+              </thead>
+              <tbody>
+                <!-- q0 transitions -->
+                <tr style="background: #e0f2fe;">
+                  <td><strong>$q_0$</strong></td>
+                  <td>$0$</td>
+                  <td>$X$</td>
+                  <td>R</td>
+                  <td>$q_1$</td>
+                  <td>Mark leftmost 0, start searching for matching 1</td>
+                </tr>
+                <tr style="background: #e0f2fe;">
+                  <td><strong>$q_0$</strong></td>
+                  <td>$Y$</td>
+                  <td>$Y$</td>
+                  <td>R</td>
+                  <td>$q_3$</td>
+                  <td>No more 0s; verify all 1s are marked</td>
+                </tr>
+                <tr style="background: #e0f2fe;">
+                  <td><strong>$q_0$</strong></td>
+                  <td>$B$</td>
+                  <td>$B$</td>
+                  <td>R</td>
+                  <td>$q_{\text{accept}}$</td>
+                  <td>Empty input $\varepsilon$ is valid ($0^0 1^0$)</td>
+                </tr>
+                <!-- q1 transitions -->
+                <tr style="background: #fef3c7;">
+                  <td><strong>$q_1$</strong></td>
+                  <td>$0$</td>
+                  <td>$0$</td>
+                  <td>R</td>
+                  <td>$q_1$</td>
+                  <td>Skip over remaining 0s</td>
+                </tr>
+                <tr style="background: #fef3c7;">
+                  <td><strong>$q_1$</strong></td>
+                  <td>$Y$</td>
+                  <td>$Y$</td>
+                  <td>R</td>
+                  <td>$q_1$</td>
+                  <td>Skip over previously marked 1s</td>
+                </tr>
+                <tr style="background: #fef3c7;">
+                  <td><strong>$q_1$</strong></td>
+                  <td>$X$</td>
+                  <td>$X$</td>
+                  <td>R</td>
+                  <td>$q_1$</td>
+                  <td>Skip over marked 0s</td>
+                </tr>
+                <tr style="background: #fef3c7;">
+                  <td><strong>$q_1$</strong></td>
+                  <td>$1$</td>
+                  <td>$Y$</td>
+                  <td>L</td>
+                  <td>$q_2$</td>
+                  <td>Found matching 1; mark it Y, go back</td>
+                </tr>
+                <tr style="background: #fef3c7;">
+                  <td><strong>$q_1$</strong></td>
+                  <td>$B$</td>
+                  <td>$B$</td>
+                  <td>L</td>
+                  <td>$q_{\text{reject}}$</td>
+                  <td>Ran out of 1s before matching all 0s</td>
+                </tr>
+                <!-- q2 transitions -->
+                <tr style="background: #f0fdf4;">
+                  <td><strong>$q_2$</strong></td>
+                  <td>$0$</td>
+                  <td>$0$</td>
+                  <td>L</td>
+                  <td>$q_2$</td>
+                  <td>Move left past 0s</td>
+                </tr>
+                <tr style="background: #f0fdf4;">
+                  <td><strong>$q_2$</strong></td>
+                  <td>$Y$</td>
+                  <td>$Y$</td>
+                  <td>L</td>
+                  <td>$q_2$</td>
+                  <td>Move left past marked 1s</td>
+                </tr>
+                <tr style="background: #f0fdf4;">
+                  <td><strong>$q_2$</strong></td>
+                  <td>$X$</td>
+                  <td>$X$</td>
+                  <td>R</td>
+                  <td>$q_0$</td>
+                  <td>Reached last marked 0; restart from next cell</td>
+                </tr>
+                <!-- q3 transitions -->
+                <tr style="background: #fce7f3;">
+                  <td><strong>$q_3$</strong></td>
+                  <td>$Y$</td>
+                  <td>$Y$</td>
+                  <td>R</td>
+                  <td>$q_3$</td>
+                  <td>Skip past marked 1s</td>
+                </tr>
+                <tr style="background: #fce7f3;">
+                  <td><strong>$q_3$</strong></td>
+                  <td>$B$</td>
+                  <td>$B$</td>
+                  <td>R</td>
+                  <td>$q_{\text{accept}}$</td>
+                  <td>All 1s matched; accept!</td>
+                </tr>
+                <tr style="background: #fce7f3;">
+                  <td><strong>$q_3$</strong></td>
+                  <td>$0$</td>
+                  <td>$0$</td>
+                  <td>R</td>
+                  <td>$q_{\text{reject}}$</td>
+                  <td>Leftover 0s (shouldn't happen in valid path)</td>
+                </tr>
+                <tr style="background: #fce7f3;">
+                  <td><strong>$q_3$</strong></td>
+                  <td>$1$</td>
+                  <td>$1$</td>
+                  <td>R</td>
+                  <td>$q_{\text{reject}}$</td>
+                  <td>Leftover 1s; more 1s than 0s</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Example Trace -->
+        <h3 class="subsection-title">Example Computation Trace</h3>
+        <div class="example-card">
+          <div><span class="example-number">Trace</span><strong>Input: "0011"</strong></div>
+          <div class="example-content">
+            <p>Configuration format: <code>tape content</code> with underline showing head position, state in
+              parentheses</p>
+            <ol style="margin-top: 10px; padding-left: 30px; font-family: 'Courier New', monospace; font-size: 0.95em;">
+              <li>$(q_0)$ <u>0</u>011B → Write X, move R → $X$<u>0</u>11B</li>
+              <li>$(q_1)$ X<u>0</u>11B → Skip 0, move R → X0<u>1</u>1B</li>
+              <li>$(q_1)$ X0<u>1</u>1B → Write Y, move L → X<u>0</u>Y1B</li>
+              <li>$(q_2)$ X<u>0</u>Y1B → Skip 0, move L → <u>X</u>0Y1B</li>
+              <li>$(q_2)$ <u>X</u>0Y1B → Found X, move R → X<u>0</u>Y1B</li>
+              <li>$(q_0)$ X<u>0</u>Y1B → Write X, move R → XX<u>Y</u>1B</li>
+              <li>$(q_1)$ XX<u>Y</u>1B → Skip Y, move R → XXY<u>1</u>B</li>
+              <li>$(q_1)$ XXY<u>1</u>B → Write Y, move L → XX<u>Y</u>YB</li>
+              <li>$(q_2)$ XX<u>Y</u>YB → Skip Y, move L → X<u>X</u>YYB</li>
+              <li>$(q_2)$ X<u>X</u>YYB → Found X, move R → XX<u>Y</u>YB</li>
+              <li>$(q_0)$ XX<u>Y</u>YB → No more 0s, enter $q_3$ → XX<u>Y</u>YB</li>
+              <li>$(q_3)$ XXY<u>Y</u>B → Skip Y, move R → XXYY<u>B</u></li>
+              <li>$(q_3)$ XXYY<u>B</u> → Blank reached → <strong>ACCEPT!</strong></li>
+            </ol>
+          </div>
+        </div>
+
+        <!-- Interactive Simulation -->
+        <h3 class="subsection-title">Try It Yourself</h3>
+        <div class="info-box" style="margin-bottom: 25px;">
+          <h3>🎯 Test the TM</h3>
+          <p>Enter a string of 0s and 1s below. Valid strings in $L$ include: "", "01", "0011", "000111", etc.</p>
+          <p><strong>Try an invalid string</strong> like "0111" or "0010" to see rejection!</p>
+        </div>
+
+        <div class="sim-container">
+          <div class="tape-window">
+            <div class="head-marker">
+              <div class="head-label">HEAD</div>
+              <div class="head-arrow"></div>
+            </div>
+            <div class="tape-content" id="tapeContent">
+              <!-- Cells generated by JS -->
+            </div>
+          </div>
+
+          <div class="controls">
+            <div class="control-grp">
+              <label style="font-weight:600; color:#475569;">Input Tape:</label>
+              <input type="text" id="inputString" class="input-field" value="0011" placeholder="e.g. 0011">
+            </div>
+            <button class="btn btn-primary" onclick="initAndRun()" id="runBtn">
+              <span>▶ Run</span>
+            </button>
+            <button class="btn btn-danger" onclick="resetSim()" id="resetBtn">
+              <span>↺ Reset</span>
+            </button>
+            <div class="control-grp">
+              <label style="font-weight:600; color:#475569;">Speed:</label>
+              <input type="range" id="speedRange" min="100" max="1000" step="100" value="500" onchange="updateSpeed()">
+            </div>
+          </div>
+
+          <div class="status-panel" id="statusPanel">
+            <div style="color: #94a3b8; font-style: italic;">Ready to start...</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <footer>
+      CS 637 – Lecture 4: Deterministic Turing Machines and Universal Computation<br>
+      © 2025 Dr. Debasish Pattanayak • Department of Computer Science
+    </footer>
+  </div>
+
+  <a href="index.html" class="fab-btn" title="Back to Index">🏠</a>
+
+  <script>
+    function switchTab(tabName) {
+      const tabs = document.querySelectorAll('.tab-content');
+      tabs.forEach(tab => tab.classList.remove('active'));
+
+      const btns = document.querySelectorAll('.tab-btn');
+      btns.forEach(btn => btn.classList.remove('active'));
+
+      const target = document.getElementById(tabName);
+      if (target) {
+        target.classList.add('active');
+      }
+
+      const clickedBtn = Array.from(btns).find(btn => btn.getAttribute('onclick').includes(tabName));
+      if (clickedBtn) {
+        clickedBtn.classList.add('active');
+      }
+    }
+
+    function searchDefinitions() {
+      const input = document.getElementById('searchBox').value.toLowerCase();
+      const cards = document.querySelectorAll('.definition-card, .example-card, .theorem-card, .note-card, .info-box');
+
+      cards.forEach(card => {
+        const text = card.textContent.toLowerCase();
+        if (text.includes(input)) {
+          card.style.display = 'block';
+        } else {
+          card.style.display = 'none';
+        }
+      });
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+      renderMathInElement(document.body, {
+        delimiters: [
+          { left: "$$", right: "$$", display: true },
+          { left: "\\[", right: "\\]", display: true },
+          { left: "$", right: "$", display: false },
+          { left: "\\(", right: "\\)", display: false }
+        ]
+      });
+    });
+
+    // --- Turing Machine Simulation Logic ---
+    let tape = [];
+    let head = 0;
+    let state = 'q0';
+    let isRunning = false;
+    let speed = 500;
+
+    // TM Transitions for L = {0^n 1^n}
+    // Logic: 
+    // q0: Start. If 0 -> replace X, move R, goto q1. If Y -> skip, goto q3 (check finish). If empty -> accept.
+    // q1: Skip 0s and Ys right. If 1 -> replace Y, move L, goto q2.
+    // q2: Skip 0s and Ys left. If X -> move R, goto q0.
+    // q3: Check if only Ys remain. If Y -> skip R. If B -> Accept. If 0/1 -> Reject.
+    const transitions = {
+      'q0': {
+        '0': { write: 'X', move: 'R', next: 'q1' },
+        'Y': { write: 'Y', move: 'R', next: 'q3' }, // checking for completion
+        'B': { write: 'B', move: 'R', next: 'qAccept' } // empty input is valid 0^0 1^0
+      },
+      'q1': {
+        '0': { write: '0', move: 'R', next: 'q1' },
+        'Y': { write: 'Y', move: 'R', next: 'q1' },
+        '1': { write: 'Y', move: 'L', next: 'q2' },
+        'B': { write: 'B', move: 'L', next: 'qReject' }, // Ran out of 1s
+        'X': { write: 'X', move: 'R', next: 'q1' }
+      },
+      'q2': {
+        '0': { write: '0', move: 'L', next: 'q2' },
+        'Y': { write: 'Y', move: 'L', next: 'q2' },
+        'X': { write: 'X', move: 'R', next: 'q0' } // Back at start of unprocessed part
+      },
+      'q3': {
+        'Y': { write: 'Y', move: 'R', next: 'q3' },
+        'B': { write: 'B', move: 'R', next: 'qAccept' },
+        '0': { write: '0', move: 'R', next: 'qReject' }, // Leftover 0s
+        '1': { write: '1', move: 'R', next: 'qReject' }  // Leftover 1s
+      }
+    };
+
+    function updateSpeed() {
+      speed = 1100 - document.getElementById('speedRange').value; // Invert so higher value = faster (lower ms)
+    }
+
+    function resetSim() {
+      isRunning = false;
+      document.getElementById('runBtn').disabled = false;
+      document.getElementById('inputString').disabled = false;
+      document.getElementById('statusPanel').innerHTML = '<div style="color: #94a3b8; font-style: italic;">Ready to start...</div>';
+      head = 0;
+      state = 'q0';
+      renderTape(document.getElementById('inputString').value);
+    }
+
+    function renderTape(inputStr) {
+      tape = inputStr.split('');
+      // Pad tape
+      const displayTape = [...tape];
+      while (displayTape.length < 15) displayTape.push('B');
+
+      const container = document.getElementById('tapeContent');
+      container.innerHTML = '';
+
+      // We render more cells than needed for visual padding
+      for (let i = -2; i < displayTape.length + 2; i++) {
+        const cell = document.createElement('div');
+        cell.className = 'cell';
+        if (i < 0 || i >= displayTape.length) {
+          cell.textContent = 'B';
+          cell.style.opacity = 0.5;
+        } else {
+          cell.textContent = displayTape[i];
+          cell.id = `cell-${i}`;
+        }
+        container.appendChild(cell);
+      }
+      updateHeadVisual();
+    }
+
+    function log(msg, type = 'info') {
+      const panel = document.getElementById('statusPanel');
+      const entry = document.createElement('div');
+      entry.className = 'log-entry';
+      entry.innerHTML = msg;
+      panel.prepend(entry); // Newest on top
+    }
+
+    function updateHeadVisual() {
+      const cellSize = 64; // width (60) + margin (2*2) = 64px
+      const tapeWindow = document.querySelector('.tape-window');
+      const windowWidth = tapeWindow.offsetWidth;
+
+      // Offset to align center of cell[head] with center of window
+      const offset = (windowWidth / 2) - (head * cellSize) - (cellSize / 2);
+
+      document.getElementById('tapeContent').style.transform = `translateX(${offset}px)`;
+
+      // Highlight active cell
+      document.querySelectorAll('.cell').forEach(c => c.classList.remove('active'));
+      const active = document.getElementById(`cell-${head}`);
+      if (active) active.classList.add('active');
+    }
+
+    async function initAndRun() {
+      if (isRunning) return;
+      isRunning = true;
+      document.getElementById('runBtn').disabled = true;
+      document.getElementById('inputString').disabled = true;
+
+      const input = document.getElementById('inputString').value;
+      if (!input.match(/^[01]*$/)) {
+        log('<span style="color:red">Error: Input must only contain 0s and 1s</span>');
+        isRunning = false;
+        document.getElementById('runBtn').disabled = false;
+        return;
+      }
+
+      renderTape(input);
+
+      // Ensure tape has enough buffer blank space for logic
+      // Our 'tape' array is the logic model. Expand it if needed.
+      if (tape.length === 0) tape = ['B'];
+
+      // Add trailing Blanks for logic safety
+      tape.push('B', 'B', 'B', 'B');
+
+      log(`Starting simulation with input: ${input}`);
+
+      await new Promise(r => setTimeout(r, 500));
+
+      while (isRunning) {
+        // Check limits
+        if (head < 0) {
+          log('<span style="color:red">CRASH: Moved off left end of tape!</span>');
+          isRunning = false;
+          break;
+        }
+        if (head >= tape.length) {
+          tape.push('B');
+          renderTapeVisualUpdateOnly(); // Update DOM for new cell
+        }
+
+        const currentSym = tape[head] || 'B';
+
+        // Check acceptance/rejection
+        if (state === 'qAccept') {
+          log('<span style="color:#4ade80; font-size:1.2em">✓ ACCEPTED</span>');
+          isRunning = false;
+          break;
+        }
+        if (state === 'qReject') {
+          log('<span style="color:#f87171; font-size:1.2em">✗ REJECTED</span>');
+          isRunning = false;
+          break;
+        }
+
+        // Log current step
+        log(`<span class="log-state">[${state}]</span> Read: <strong>${currentSym}</strong>`);
+
+        // Find transition
+        const stateTrans = transitions[state];
+        let action = null;
+
+        // Explicit rule or default (if not defined, explicit reject usually, but our logic handles some)
+        if (stateTrans && stateTrans[currentSym]) {
+          action = stateTrans[currentSym];
+        } else {
+          // Implicit Reject
+          log(`<span style="color:#f87171">No transition for (${state}, ${currentSym}) -> REJECT</span>`);
+          state = 'qReject';
+          continue; // Loop will catch reject state next iter
+        }
+
+        // Apply Action
+        tape[head] = action.write;
+        // Update Visual specific cell
+        const cellDom = document.getElementById(`cell-${head}`);
+        if (cellDom) cellDom.textContent = action.write;
+
+        log(`<span class="log-action">➔ Write: ${action.write}, Move: ${action.move}, Next: ${action.next}</span>`);
+
+        state = action.next;
+        if (action.move === 'R') head++;
+        else head--;
+
+        updateHeadVisual();
+        await new Promise(r => setTimeout(r, speed));
+      }
+      document.getElementById('runBtn').disabled = false;
+      document.getElementById('inputString').disabled = false;
+    }
+
+    function renderTapeVisualUpdateOnly() {
+      // Simple re-render helper if tape grows
+      // logic reuse of renderTape but using current global 'tape' content
+      const container = document.getElementById('tapeContent');
+      // Just append if needed? Easier to rebuild for safety
+      // But we want to keep animation smooth.
+      // For simple demo, random access logic is fine.
+      // If we grew `tape`, we need a DOM element for it.
+      const lastIdx = tape.length - 1;
+      if (!document.getElementById(`cell-${lastIdx}`)) {
+        const cell = document.createElement('div');
+        cell.className = 'cell';
+        cell.textContent = tape[lastIdx];
+        cell.id = `cell-${lastIdx}`;
+        container.appendChild(cell);
+      }
+    }
+  </script>
+</body>
+
+</html>
