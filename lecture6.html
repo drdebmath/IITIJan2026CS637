@@ -1,117 +1,996 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="utf-8">
-  <title>CS 637 – Lecture 6 Definitions</title>
+  <title>CS 637 – Lecture 6: What is Turing Computable?</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+  <!-- Math Rendering -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
   <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
   <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
 
   <style>
-    body {
-      font-family: "Times New Roman", serif;
-      margin: 40px;
-      line-height: 1.5;
-      background-color: #ffffff;
-      color: #000000;
+    :root {
+      --primary: #1a2a6c;
+      --secondary: #b21f1f;
+      --accent: #fdbb2d;
+      --accent-hover: #f59e0b;
+      --success: #10b981;
+      --danger: #ef4444;
+      --warning: #f59e0b;
+      --bg-light: #f8fafc;
+      --text-dark: #1e293b;
     }
-    h1, h2 {
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      line-height: 1.6;
+      background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      overflow: hidden;
+    }
+
+    /* Header */
+    header {
+      background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
+      color: white;
+      padding: 40px;
       text-align: center;
     }
+
     h1 {
-      font-size: 1.8em;
-      margin-bottom: 0.2em;
+      font-size: 2.5em;
+      margin-bottom: 10px;
+      font-weight: 700;
     }
-    h2 {
-      font-size: 1.2em;
-      margin-top: 2em;
-      margin-bottom: 0.5em;
+
+    .subtitle {
+      font-size: 1.3em;
+      margin-bottom: 15px;
+      opacity: 0.95;
     }
-    .definition {
-      margin-bottom: 1em;
-    }
-    .term {
-      font-weight: bold;
-    }
-    .number {
-      font-weight: bold;
-    }
+
     .instructor {
-      margin-top: 8px;
-      font-size: 0.95rem;
-      color: #64748b;
+      margin-top: 15px;
+      font-size: 1.05em;
+      opacity: 0.9;
     }
+
     .instructor a {
-      color: #0ea5e9;
+      color: #ffd700;
       text-decoration: none;
-      font-weight: 500;
+      font-weight: 600;
+      transition: opacity 0.3s;
     }
+
     .instructor a:hover {
+      opacity: 0.8;
       text-decoration: underline;
     }
+
+    /* Navigation */
+    .nav-wrapper {
+      background: #fff;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      border-bottom: 2px solid #e2e8f0;
+    }
+
+    .nav-tabs {
+      display: flex;
+      gap: 5px;
+      overflow-x: auto;
+      padding: 0 20px;
+      scrollbar-width: thin;
+    }
+
+    .tab-btn {
+      padding: 12px 20px;
+      background: none;
+      border: none;
+      font-size: 1em;
+      cursor: pointer;
+      color: #64748b;
+      font-weight: 600;
+      border-bottom: 3px solid transparent;
+      transition: all 0.3s;
+      white-space: nowrap;
+    }
+
+    .tab-btn:hover {
+      color: var(--primary);
+      background: #f8fafc;
+    }
+
+    .tab-btn.active {
+      color: var(--primary);
+      border-bottom-color: var(--primary);
+    }
+
+    /* Content Area */
+    .content {
+      padding: 40px;
+      min-height: 600px;
+    }
+
+    .tab-content {
+      display: none;
+      animation: fadeIn 0.4s;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Typography & Components */
+    .section-title {
+      font-size: 1.8em;
+      color: var(--text-dark);
+      margin-bottom: 25px;
+      padding-bottom: 10px;
+      border-bottom: 3px solid var(--secondary);
+    }
+
+    .definition-card {
+      background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
+      border-left: 4px solid var(--primary);
+      padding: 20px;
+      margin-bottom: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+      transition: all 0.3s;
+    }
+
+    .definition-card:hover {
+      transform: translateX(5px);
+      box-shadow: 0 4px 12px rgba(26, 42, 108, 0.2);
+    }
+
+    .def-number {
+      display: inline-block;
+      background: var(--primary);
+      color: white;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-weight: 700;
+      font-size: 0.9em;
+      margin-right: 10px;
+    }
+
+    .def-term {
+      font-weight: 700;
+      color: var(--text-dark);
+      font-size: 1.15em;
+    }
+
+    .theorem-card {
+      background: linear-gradient(135deg, #dfe9f3 0%, #ffffff 100%);
+      border-left: 4px solid #3b82f6;
+      padding: 18px;
+      border-radius: 8px;
+      margin-bottom: 15px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+      transition: all 0.3s;
+    }
+
+    .theorem-card:hover {
+      transform: translateX(5px);
+      box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
+    }
+
+    .example-card {
+      background: linear-gradient(135deg, #fef3c7 0%, #fef9c3 100%);
+      border-left: 4px solid var(--warning);
+      padding: 18px;
+      border-radius: 8px;
+      margin-bottom: 15px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+      transition: all 0.3s;
+    }
+
+    .example-card:hover {
+      transform: translateX(5px);
+      box-shadow: 0 4px 12px rgba(245, 158, 11, 0.2);
+    }
+
+    .svg-container {
+      display: flex;
+      justify-content: center;
+      margin: 30px 0;
+      padding: 20px;
+      background: white;
+      border-radius: 12px;
+      border: 1px solid #e2e8f0;
+      overflow-x: auto;
+      box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05);
+    }
+
+    .note-card {
+      background: linear-gradient(135deg, #f0fdf4 0%, #ffffff 100%);
+      border-left: 4px solid var(--success);
+      padding: 18px;
+      margin-bottom: 15px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    }
+
+    .note-label {
+      display: inline-block;
+      background: var(--success);
+      color: white;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-weight: 700;
+      font-size: 0.9em;
+      margin-right: 10px;
+    }
+
+    /* Simulation Styles */
+    .simulation-box {
+      background: #f8fafc;
+      border: 1px solid #cbd5e1;
+      border-radius: 12px;
+      padding: 25px;
+      margin: 20px 0;
+      box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05);
+    }
+
+    .tape-visual {
+      display: flex;
+      gap: 4px;
+      justify-content: center;
+      margin: 20px 0;
+      overflow-x: auto;
+      padding-bottom: 10px;
+    }
+
+    .tape-cell {
+      width: 50px;
+      height: 50px;
+      border: 2px solid #94a3b8;
+      background: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Courier New', monospace;
+      font-size: 1.3em;
+      font-weight: bold;
+      position: relative;
+      border-radius: 4px;
+      transition: all 0.3s;
+    }
+
+    .tape-cell.active-head {
+      border-color: #3b82f6;
+      background: #e0f2fe;
+      box-shadow: 0 0 0 2px #3b82f6;
+      z-index: 10;
+    }
+
+    .tape-cell.active-head::after {
+      content: '▲';
+      position: absolute;
+      bottom: -22px;
+      color: #ef4444;
+      font-size: 14px;
+    }
+
+    .control-panel {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    .btn {
+      padding: 10px 24px;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      color: white;
+      transition: all 0.2s;
+      font-size: 0.95em;
+    }
+
+    .btn:active {
+      transform: scale(0.96);
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #1a2a6c, #b21f1f);
+      box-shadow: 0 4px 6px rgba(26, 42, 108, 0.2);
+    }
+
+    .btn-accent {
+      background: linear-gradient(135deg, #3b82f6, #2563eb);
+      box-shadow: 0 4px 6px rgba(59, 130, 246, 0.2);
+    }
+
+    .btn-reset {
+      background: linear-gradient(135deg, #ef4444, #dc2626);
+      box-shadow: 0 4px 6px rgba(220, 38, 38, 0.2);
+    }
+
+    .log-console {
+      background: #1e293b;
+      color: #33e680;
+      padding: 20px;
+      border-radius: 8px;
+      font-family: 'Courier New', monospace;
+      height: 180px;
+      overflow-y: auto;
+      margin-top: 15px;
+      font-size: 0.9em;
+      border: 1px solid #334155;
+    }
+
+    /* Search & Footer */
+    .search-box {
+      width: 100%;
+      padding: 15px 20px;
+      font-size: 1em;
+      border: 2px solid #e2e8f0;
+      border-radius: 8px;
+      margin-bottom: 25px;
+      transition: all 0.3s;
+    }
+
+    .search-box:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(26, 42, 108, 0.1);
+    }
+
     footer {
-      margin-top: 3em;
+      background: var(--primary);
+      color: white;
       text-align: center;
-      font-size: 0.85em;
-      color: #333;
+      padding: 25px;
+    }
+
+    /* Responsive Grid for comparisons */
+    .grid-box {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+      margin: 20px 0;
+    }
+
+    .comp-card {
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 20px;
+      background: #f8fafc;
+      transition: transform 0.2s;
+    }
+
+    .comp-card:hover {
+      transform: translateY(-5px);
+      border-color: var(--primary);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    .fab-btn {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #1a2a6c, #b21f1f);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      cursor: pointer;
+      z-index: 1000;
+      border: none;
+      font-size: 24px;
+      transition: transform 0.2s, box-shadow 0.2s;
+      text-decoration: none;
+    }
+
+    .fab-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
     }
   </style>
-
-<style>
-.fab-btn {
-  position: fixed;
-  bottom: 24px;
-  right: 24px;
-  width: 56px;
-  height: 56px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #3b82f6, #2563eb);
-  color: white;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-  cursor: pointer;
-  z-index: 1000;
-  border: none;
-  font-size: 24px;
-  transition: transform 0.2s, box-shadow 0.2s;
-  text-decoration: none;
-}
-.fab-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(0,0,0,0.3);
-}
-</style>
-
 </head>
 
 <body>
+  <div class="container">
+    <header>
+      <h1>CS 637: Mathematics-II</h1>
+      <div class="subtitle">Lecture 6: What is Turing Computable?</div>
+      <div class="instructor">
+        <strong>Instructor:</strong> <a href="https://drdebmath.github.io/">Dr. Debasish Pattanayak</a>
+      </div>
+    </header>
 
-<h1>CS 637: Mathematics-II</h1>
-<div class="instructor">
-  <strong>Instructor:</strong> <a href="https://drdebmath.github.io" target="_blank">Dr. Debasish Pattanayak</a>
-</div>
-<h2>Lecture 6 – Nondeterministic and Multitape Turing Machines</h2>
+    <div class="nav-wrapper">
+      <div class="nav-tabs">
+        <button class="tab-btn active" onclick="switchTab('hierarchy')">Hierarchy</button>
+        <button class="tab-btn" onclick="switchTab('multitape')">Multitape TMs</button>
+        <button class="tab-btn" onclick="switchTab('equivalences')">Equivalence Proofs</button>
+        <button class="tab-btn" onclick="switchTab('binary-addition')">Binary Adder (Sim)</button>
+        <button class="tab-btn" onclick="switchTab('halting')">Halting vs Acceptance</button>
+        <button class="tab-btn" onclick="switchTab('variations')">Other Variations</button>
+        <button class="tab-btn" onclick="switchTab('universal')">Universal TM</button>
+        <button class="tab-btn" onclick="switchTab('church-turing')">Church-Turing Thesis</button>
+        <button class="tab-btn" onclick="switchTab('nondeterminism')">Nondeterministic TMs</button>
+      </div>
+    </div>
 
-<footer>
-  
-</footer>
+    <div class="content">
+      <input type="text" class="search-box" id="searchBox" placeholder="🔍 Search definitions, theorems, or examples..."
+        onkeyup="searchContent()">
 
-<script>
-document.addEventListener("DOMContentLoaded", function() {
-    renderMathInElement(document.body, {
+      <!-- 1. Language Hierarchy -->
+      <div id="hierarchy" class="tab-content active">
+        <h2 class="section-title">The Hierarchy of Computational Power</h2>
+        <p>Not all computational models are created equal. As we relax restrictions on memory and access, the class of
+          languages recognized grows larger.</p>
+
+        <div class="svg-container" style="background: #f1f5f9; border: 2px dashed #cbd5e1;">
+          <svg width="400" height="300" viewBox="0 0 400 300">
+            <!-- Recursive/TM -->
+            <ellipse cx="200" cy="150" rx="190" ry="140" fill="#dbeafe" stroke="#2563eb" stroke-width="2" />
+            <text x="200" y="30" text-anchor="middle" fill="#1e40af" font-weight="bold">Turing Recognizable (RE)</text>
+
+            <!-- Decidable -->
+            <ellipse cx="200" cy="170" rx="160" ry="110" fill="#bfdbfe" stroke="#1d4ed8" stroke-width="2"
+              stroke-dasharray="5,5" />
+            <text x="200" y="80" text-anchor="middle" fill="#1e40af" font-size="14">Decidable (Recursive)</text>
+
+            <!-- CFL/PDA -->
+            <ellipse cx="200" cy="200" rx="120" ry="70" fill="#fef3c7" stroke="#d97706" stroke-width="2" />
+            <text x="200" y="150" text-anchor="middle" fill="#92400e" font-weight="bold">Context-Free (PDA)</text>
+
+            <!-- Regular/DFA -->
+            <ellipse cx="200" cy="220" rx="60" ry="30" fill="#d1fae5" stroke="#059669" stroke-width="2" />
+            <text x="200" y="225" text-anchor="middle" fill="#065f46" font-weight="bold">Regular (DFA)</text>
+          </svg>
+        </div>
+
+        <div class="grid-box">
+          <div class="comp-card">
+            <h4 style="color: #059669;">Regular (DFA/NFA)</h4>
+            <p><strong>Memory:</strong> Finite states only.</p>
+            <p><strong>Example:</strong> \( L = \{ w \in \{0,1\}^* \mid w \text{ has even 0s} \} \)</p>
+            <p><strong>Limit:</strong> Cannot count arbitrarily high.</p>
+          </div>
+          <div class="comp-card">
+            <h4 style="color: #d97706;">Context-Free (PDA)</h4>
+            <p><strong>Memory:</strong> Infinite Stack (LIFO).</p>
+            <p><strong>Example:</strong> \( L = \{ 0^n 1^n \mid n \ge 0 \} \)</p>
+            <p><strong>Limit:</strong> Can only compare two dependent parts.</p>
+          </div>
+          <div class="comp-card">
+            <h4 style="color: #2563eb;">Turing Machine</h4>
+            <p><strong>Memory:</strong> Infinite Tape (Random Access).</p>
+            <p><strong>Example:</strong> \( L = \{ 0^n 1^n 0^n \mid n \ge 0 \} \)</p>
+            <p><strong>Power:</strong> Can solve anything algorithmically solvable.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- 1. Language Hierarchy -->
+
+      <!-- 3. Multitape -->
+      <div id="multitape" class="tab-content">
+        <h2 class="section-title">Multitape Turing Machines</h2>
+        <div class="definition-card">
+          <div class="def-content">
+            A Multitape TM has \(k\) tapes, each with an independent head.
+            \[ \delta: Q \times \Gamma^k \to Q \times \Gamma^k \times \{L, R, S\}^k \]
+            This allows specific operations (like copying strings) to be done in \(O(n)\) time, whereas a single tape
+            might take \(O(n^2)\).
+          </div>
+        </div>
+
+        <div class="example-card">
+          <strong>Example:</strong> Checking if a string is a palindrome \(w = w^R\).
+          <br>
+          <ol style="margin-left: 20px; margin-top: 10px;">
+            <li><strong>Single Tape:</strong> Zig-zag back and forth matching first and last chars. \(O(n^2)\).</li>
+            <li><strong>2-Tape:</strong> Copy input to Tape 2. Move Tape 1 head to start, Tape 2 head to end. Move heads
+              towards each other comparing symbols. \(O(n)\).</li>
+          </ol>
+        </div>
+      </div>
+
+      <!-- 4. Equivalences -->
+      <div id="equivalences" class="tab-content">
+        <h2 class="section-title">Equivalence Proofs</h2>
+        <p>To show two models are equivalent, we must show that they can <strong>simulate</strong> each other.</p>
+
+        <h3 class="subsection-title">1. Multitape \(\equiv\) Single Tape</h3>
+        <p>We can flatten \(k\) tapes onto a single tape by using delimiters (\#) and marking virtual head positions
+          with dotted symbols.</p>
+
+        <div class="svg-container">
+          <svg width="600" height="150" viewBox="0 0 600 150">
+            <text x="10" y="30" font-weight="bold">Logical View (2 Tapes):</text>
+            <text x="30" y="60" font-family="monospace">Tape 1: [a][b][c]...</text>
+            <text x="30" y="80" font-family="monospace">Tape 2: [1][0][1]...</text>
+
+            <line x1="250" y1="20" x2="250" y2="130" stroke="#cbd5e1" />
+
+            <text x="270" y="30" font-weight="bold">Physical View (1 Tape):</text>
+            <rect x="270" y="50" width="300" height="40" fill="white" stroke="#334155" />
+            <text x="280" y="75" font-family="monospace" font-size="20"># a b c # 1 0 1 #</text>
+            <!-- Head Markers -->
+            <circle cx="308" cy="45" r="4" fill="#ef4444" />
+            <text x="308" y="35" text-anchor="middle" font-size="10" fill="#ef4444">Head 1</text>
+            <circle cx="405" cy="45" r="4" fill="#ef4444" />
+            <text x="405" y="35" text-anchor="middle" font-size="10" fill="#ef4444">Head 2</text>
+          </svg>
+        </div>
+
+        <h3 class="subsection-title">2. Doubly-Infinite Tape \(\equiv\) Semi-Infinite Tape</h3>
+        <p>A standard TM has a left boundary. A doubly-infinite TM does not. We simulate the doubly-infinite one by
+          "folding" it at the origin.</p>
+        <div class="definition-card">
+          <strong>The Fold Trick:</strong>
+          Map position \(i\) of the infinite tape to the semi-infinite tape:
+          <ul>
+            <li>If \(i \ge 0\), map to \(2i\) (Even cells).</li>
+            <li>If \(i < 0\), map to \(2(-i) - 1\) (Odd cells).</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- 5. Binary Addition Simulation -->
+      <div id="binary-addition" class="tab-content">
+        <h2 class="section-title">Interactive Simulation: Binary Adder</h2>
+        <p>This 3-Tape machine adds two binary numbers. Input is placed on Tape 1 (e.g., "101+11").</p>
+
+        <div class="simulation-box">
+          <div class="control-panel" style="justify-content: flex-start; margin-bottom: 20px;">
+            <label>Input Equation: <input type="text" id="binInput" value="1011+110"
+                style="padding: 5px; font-family: monospace;"></label>
+          </div>
+
+          <div id="tapes-container">
+            <!-- Tapes rendered by JS -->
+          </div>
+
+          <div class="control-panel">
+            <button class="btn btn-primary" onclick="simInit()">Initialize</button>
+            <button class="btn btn-accent" onclick="simStep()">Step</button>
+            <button class="btn btn-primary" onclick="simRun()">Run All</button>
+            <button class="btn btn-reset" onclick="simReset()">Reset</button>
+          </div>
+
+          <div id="simLog" class="log-console">Logs will appear here...</div>
+        </div>
+
+        <div class="algorithm-steps" style="background: white; padding: 20px; border-radius: 8px;">
+          <strong>Algorithm:</strong>
+          <ol>
+            <li>Scan Tape 1 to copy the first number to Tape 2 (reversed) and second number to Tape 3 (reversed).</li>
+            <li>Reset heads on Tape 2 and 3.</li>
+            <li>Perform addition bit-by-bit from left to right (since numbers are reversed), writing sum to Tape 1.</li>
+            <li>Handle carry.</li>
+            <li>(In a real TM, we would reverse Tape 1 again to get final result, simplified here).</li>
+          </ol>
+        </div>
+      </div>
+
+      <!-- 6. Halting & Acceptance -->
+      <div id="halting" class="tab-content">
+        <h2 class="section-title">Halting vs. Acceptance</h2>
+        <p>This distinction is the foundation of Computability Theory.</p>
+
+        <div class="grid-box">
+          <div class="comp-card" style="border-top: 4px solid #10b981;">
+            <h4>Turing-Recognizable (RE)</h4>
+            <p>A language \(L\) is RE if there exists a TM \(M\) such that:</p>
+            <ul>
+              <li>If \(w \in L\), \(M\) halts and <strong>accepts</strong>.</li>
+              <li>If \(w \notin L\), \(M\) either <strong>rejects</strong> or <strong>loops forever</strong>.</li>
+            </ul>
+          </div>
+          <div class="comp-card" style="border-top: 4px solid #3b82f6;">
+            <h4>Turing-Decidable (Recursive)</h4>
+            <p>A language \(L\) is Decidable if there exists a TM \(M\) such that:</p>
+            <ul>
+              <li>If \(w \in L\), \(M\) halts and <strong>accepts</strong>.</li>
+              <li>If \(w \notin L\), \(M\) halts and <strong>rejects</strong>.</li>
+            </ul>
+            <p><em>(No infinite looping allowed!)</em></p>
+          </div>
+        </div>
+
+        <div class="theorem-card" style="background: #fef2f2; border-color: #ef4444;">
+          <strong>The Halting Problem:</strong> Determining whether an arbitrary TM halts on an arbitrary input is
+          <em>Undecidable</em>. This means the circle of Decidable languages is strictly smaller than the circle of
+          Recognizable languages.
+        </div>
+      </div>
+
+      <!-- 7. Variations -->
+      <div id="variations" class="tab-content">
+        <h2 class="section-title">Other Variations of Turing Machines</h2>
+        <p>All of the following are equivalent in power to the standard Single-Tape DTM.</p>
+
+        <div class="definition-card">
+          <span class="def-term">1. Enumerators</span>
+          <div class="def-content">
+            A TM with a "printer" attached. Instead of accepting/rejecting inputs, it starts with a blank tape and
+            prints out strings.
+            <br>
+            <strong>Theorem:</strong> A language is Turing-Recognizable iff some enumerator enumerates it.
+          </div>
+        </div>
+
+        <div class="definition-card">
+          <span class="def-term">2. Two-Dimensional Tape</span>
+          <div class="def-content">
+            The tape is an infinite grid. The head can move L, R, U, D.
+            <br>
+            <strong>Simulation:</strong> Map \( \mathbb{Z}^2 \to \mathbb{Z} \) using a spiral mapping (Cantor pairing
+            function).
+          </div>
+        </div>
+
+        <div class="definition-card">
+          <span class="def-term">3. Random Access Memory (RAM)</span>
+          <div class="def-content">
+            Similar to modern computers with registers and memory addresses.
+            <br>
+            <strong>Equivalence:</strong> A TM can simulate RAM by using one tape for memory addresses and another for
+            values. It's slower (polynomial slowdown), but computes the same functions.
+          </div>
+        </div>
+      </div>
+
+      <!-- 8. Universal TM -->
+      <div id="universal" class="tab-content">
+        <h2 class="section-title">The Universal Turing Machine (UTM)</h2>
+        <p>A standard TM is hardwired to do one task. A UTM is a programmable machine.</p>
+
+        <div class="definition-card">
+          <div><span class="def-number">Concept</span><span class="def-term">Simulation</span></div>
+          <div class="def-content">
+            A UTM \(U\) takes as input the description of another machine \(M\) and an input string \(w\).
+            \[ \text{Input: } \langle M, w \rangle \]
+            \(U\) simulates the execution of \(M\) on \(w\).
+          </div>
+        </div>
+
+        <div class="theorem-card">
+          <strong>Significance:</strong> This is the theoretical basis for modern "Stored-Program Computers" (Von
+          Neumann Architecture). Your laptop is essentially a physical realization of a Universal Turing Machine.
+        </div>
+
+        <p><strong>Encoding:</strong> We encode the states, alphabet, and transition function of \(M\) into a string
+          (e.g., binary). The UTM reads this description on one tape and the contents of \(M\)'s simulated tape on
+          another.</p>
+      </div>
+
+      <!-- 9. Church-Turing Thesis -->
+      <div id="church-turing" class="tab-content">
+        <h2 class="section-title">The Church-Turing Thesis</h2>
+        <div class="definition-card">
+          <div class="def-content">
+            <p class="subtitle" style="color:black; font-style:italic;">"Everything that is intuitively computable can
+              be computed by a Turing Machine."</p>
+            <hr style="margin: 10px 0; border: 0; border-top: 1px solid #ccc;">
+            <p>This is a <strong>hypothesis</strong>, not a theorem. It equates the informal notion of an "Algorithm"
+              with the formal mathematical definition of a Turing Machine.</p>
+          </div>
+        </div>
+
+        <h3>Why do we believe it?</h3>
+        <ul style="margin-left: 20px;">
+          <li>Many different models were proposed in the 1930s (Lambda Calculus, Recursive Functions, Post Systems).
+          </li>
+          <li>All were proven to be mathematically equivalent to TMs.</li>
+          <li>No one has ever found a physically realizable computation method that is more powerful than a TM (Quantum
+            computers are faster, but not "more powerful" in terms of computability).</li>
+        </ul>
+      </div>
+
+      <!-- 2. Nondeterminism -->
+      <div id="nondeterminism" class="tab-content">
+        <h2 class="section-title">Nondeterministic Turing Machines (NDTM)</h2>
+
+        <div class="definition-card">
+          <div><span class="def-number">Def</span><span class="def-term">Transition Function Difference</span></div>
+          <div class="def-content">
+            <p><strong>Deterministic (DTM):</strong> \(\delta: Q \times \Gamma \to Q \times \Gamma \times \{L, R\}\)</p>
+            <p><strong>Nondeterministic (NDTM):</strong> \(\delta: Q \times \Gamma \to \mathcal{P}(Q \times \Gamma
+              \times \{L, R\})\)</p>
+            <p>An NDTM accepts input \(w\) if <em>at least one</em> branch of the computation tree leads to
+              \(q_{accept}\).</p>
+          </div>
+        </div>
+
+        <div class="theorem-card">
+          <strong>Theorem:</strong> Every Nondeterministic Turing Machine has an equivalent Deterministic Turing
+          Machine.
+        </div>
+
+        <h3>Simulation Strategy (Proof Sketch)</h3>
+        <p>We use a DTM with 3 tapes to simulate the NDTM using <strong>Breadth-First Search (BFS)</strong> on the
+          computation tree.</p>
+
+        <div class="svg-container">
+          <!-- Simple Tree Visualization -->
+          <svg width="500" height="200" viewBox="0 0 500 200">
+            <circle cx="250" cy="30" r="15" fill="#3b82f6" opacity="0.2" />
+            <text x="250" y="35" text-anchor="middle" font-size="12">Start</text>
+
+            <!-- Branching -->
+            <line x1="250" y1="45" x2="150" y2="90" stroke="#94a3b8" stroke-width="2" />
+            <line x1="250" y1="45" x2="350" y2="90" stroke="#94a3b8" stroke-width="2" />
+
+            <circle cx="150" cy="90" r="15" fill="#94a3b8" opacity="0.2" />
+            <circle cx="350" cy="90" r="15" fill="#94a3b8" opacity="0.2" />
+
+            <!-- Level 2 -->
+            <line x1="150" y1="105" x2="100" y2="150" stroke="#94a3b8" stroke-width="2" />
+            <line x1="150" y1="105" x2="200" y2="150" stroke="#94a3b8" stroke-width="2" />
+            <line x1="350" y1="105" x2="300" y2="150" stroke="#94a3b8" stroke-width="2" />
+            <line x1="350" y1="105" x2="400" y2="150" stroke="#10b981" stroke-width="3" /> <!-- Winning path -->
+
+            <circle cx="100" cy="150" r="15" fill="#ef4444" opacity="0.2" /> <!-- Reject -->
+            <circle cx="200" cy="150" r="15" fill="#ef4444" opacity="0.2" />
+            <circle cx="300" cy="150" r="15" fill="#64748b" opacity="0.2" /> <!-- Loop -->
+            <circle cx="400" cy="150" r="15" fill="#10b981" stroke="#059669" stroke-width="2" /> <!-- Accept -->
+            <text x="400" y="155" text-anchor="middle" font-size="10" fill="white">Acc</text>
+
+            <text x="250" y="190" text-anchor="middle" fill="#64748b">BFS ensures we find the green node
+              eventually.</text>
+          </svg>
+        </div>
+
+        <ul
+          style="background: white; padding: 20px; border-radius: 8px; border: 1px solid #e2e8f0; list-style-position: inside;">
+          <li><strong>Tape 1:</strong> Holds the original input \(w\) (read-only).</li>
+          <li><strong>Tape 2:</strong> Simulation tape (scratchpad).</li>
+          <li><strong>Tape 3:</strong> Address tape. Stores a sequence (e.g., 1-2-3-1) telling the NDTM which choice to
+            make at each step.</li>
+        </ul>
+      </div>
+
+    </div> <!-- End Content -->
+
+    <footer>
+      <p>&copy; 2026 CS 637: Mathematics-II | IIT Indore</p>
+    </footer>
+
+    <a href="index.html" class="fab-btn" title="Back to Course Home">🏠</a>
+  </div>
+
+  <script>
+    // --- 1. Tab Logic ---
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+
+      document.getElementById(tabId).classList.add('active');
+      // Find button that calls this function with specific tabId
+      const buttons = document.querySelectorAll('.tab-btn');
+      for (let btn of buttons) {
+        if (btn.getAttribute('onclick').includes(tabId)) {
+          btn.classList.add('active');
+          break;
+        }
+      }
+    }
+
+    // --- 2. Search Logic ---
+    function searchContent() {
+      let input = document.getElementById('searchBox').value.toLowerCase();
+      let contents = document.querySelectorAll('.tab-content');
+
+      // If search is active, show all tabs that match, or highlight sections
+      // Simple implementation: Search inside active tab, or switch if found elsewhere?
+      // Better: Filter visibility of cards within the active tab.
+
+      let cards = document.querySelectorAll('.definition-card, .theorem-card, .example-card, .comp-card');
+      cards.forEach(card => {
+        let text = card.innerText.toLowerCase();
+        if (text.includes(input)) {
+          card.style.display = "block";
+          // Highlight background slightly
+          card.style.backgroundColor = "#fffbeb";
+        } else {
+          if (input.length > 0) card.style.display = "none";
+          else {
+            card.style.display = "block";
+            card.style.backgroundColor = ""; // reset
+          }
+        }
+      });
+    }
+
+    // --- 3. Math Rendering ---
+    document.addEventListener("DOMContentLoaded", function () {
+      renderMathInElement(document.body, {
         delimiters: [
-            {left: "31952", right: "31952", display: true},
-            {left: "\[", right: "\]", display: true},
-            {left: "\(", right: "\)", display: false}
+          { left: "$$", right: "$$", display: true },
+          { left: "\\[", right: "\\]", display: true },
+          { left: "\\(", right: "\\)", display: false },
+          { left: "$", right: "$", display: false }
         ]
-    });
-});
-</script>
+      });
 
-<a href="index.html" class="fab-btn" title="Back to Index">🏠</a>
+      // Render initial tape for visual effect
+      renderTapes();
+    });
+
+    // --- 4. Binary Adder Simulation Logic ---
+    let simState = {
+      running: false,
+      step: 0,
+      tape1: [], // Result/scratch
+      tape2: [], // Num 1 (reversed)
+      tape3: [], // Num 2 (reversed)
+      heads: [0, 0, 0], // positions
+      carry: 0,
+      phase: 'INIT' // INIT, COPY, ADD, DONE
+    };
+
+    function log(msg) {
+      const c = document.getElementById('simLog');
+      c.innerHTML += `<div>> ${msg}</div>`;
+      c.scrollTop = c.scrollHeight;
+    }
+
+    function renderTapes() {
+      const container = document.getElementById('tapes-container');
+      if (!container) return;
+
+      let html = '';
+      const tapes = [simState.tape1, simState.tape2, simState.tape3];
+      const labels = ['Tape 1 (Sum)', 'Tape 2 (Num A)', 'Tape 3 (Num B)'];
+
+      tapes.forEach((tape, idx) => {
+        html += `<div style="margin-bottom: 10px;"><small>${labels[idx]}</small><div class="tape-visual">`;
+        // Show a window of cells around the head, or fixed width
+        for (let i = 0; i < 12; i++) {
+          let val = tape[i] !== undefined ? tape[i] : '_';
+          let activeClass = (simState.heads[idx] === i) ? 'active-head' : '';
+          html += `<div class="tape-cell ${activeClass}">${val}</div>`;
+        }
+        html += `</div></div>`;
+      });
+
+      container.innerHTML = html;
+    }
+
+    function simInit() {
+      const input = document.getElementById('binInput').value;
+      const parts = input.split('+');
+      if (parts.length !== 2) {
+        log("Error: Format must be BIN+BIN");
+        return;
+      }
+
+      simState = {
+        running: true,
+        step: 0,
+        tape1: input.split('').concat(['_', '_']), // Initially holds input
+        tape2: [],
+        tape3: [],
+        heads: [0, 0, 0], // Start at left
+        carry: 0,
+        phase: 'COPY',
+        num1: parts[0],
+        num2: parts[1]
+      };
+
+      log("Initialized. Phase: COPY input to working tapes.");
+      renderTapes();
+    }
+
+    function simStep() {
+      if (!simState.running) { log("Please Initialize first."); return; }
+
+      if (simState.phase === 'COPY') {
+        // Instant copy simulation for brevity (pure TM steps would take too long for UI)
+        // Reverse strings and put on Tape 2 and 3
+        simState.tape2 = simState.num1.split('').reverse();
+        simState.tape3 = simState.num2.split('').reverse();
+
+        // Clear Tape 1 for result
+        simState.tape1 = new Array(15).fill('_');
+
+        simState.heads = [0, 0, 0];
+        simState.phase = 'ADD';
+        log("Copied & Reversed inputs. T2: " + simState.tape2.join('') + ", T3: " + simState.tape3.join(''));
+        log("Phase: ADD (Head 0 starts at LSB)");
+      }
+      else if (simState.phase === 'ADD') {
+        // Read bits
+        let bit1 = parseInt(simState.tape2[simState.heads[1]] || 0);
+        let bit2 = parseInt(simState.tape3[simState.heads[2]] || 0);
+
+        // Check if we are done (past both lengths and no carry)
+        if (simState.tape2[simState.heads[1]] === undefined &&
+          simState.tape3[simState.heads[2]] === undefined &&
+          simState.carry === 0) {
+          simState.phase = 'DONE';
+          simState.tape1[simState.heads[0]] = '_'; // Clean up
+          log("Addition Complete. Result on Tape 1 (Reversed binary).");
+          renderTapes();
+          return;
+        }
+
+        let sum = bit1 + bit2 + simState.carry;
+        let writeBit = sum % 2;
+        simState.carry = Math.floor(sum / 2);
+
+        log(`Add: ${bit1} + ${bit2} + c(${simState.carry ? 1 : 0}) = ${writeBit}, new carry: ${simState.carry}`);
+
+        // Write to Tape 1
+        simState.tape1[simState.heads[0]] = writeBit;
+
+        // Move Heads Right
+        simState.heads[0]++;
+        simState.heads[1]++;
+        simState.heads[2]++;
+      }
+      else if (simState.phase === 'DONE') {
+        log("Machine Halted.");
+        simState.running = false;
+      }
+
+      renderTapes();
+    }
+
+    function simRun() {
+      let interval = setInterval(() => {
+        if (!simState.running || simState.phase === 'DONE') {
+          clearInterval(interval);
+        } else {
+          simStep();
+        }
+      }, 500);
+    }
+
+    function simReset() {
+      simState.running = false;
+      document.getElementById('simLog').innerHTML = 'Logs cleared.';
+      document.getElementById('tapes-container').innerHTML = '';
+      renderTapes();
+    }
+  </script>
 </body>
+
 </html>
