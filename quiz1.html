@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <title>CS 637 – Quiz 1 Solutions</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      line-height: 1.6;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      overflow: hidden;
+    }
+
+    header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 40px;
+      text-align: center;
+    }
+
+    h1 {
+      font-size: 2.5em;
+      margin-bottom: 10px;
+      font-weight: 700;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+    }
+
+    .subtitle {
+      font-size: 1.3em;
+      margin-bottom: 15px;
+      opacity: 0.95;
+    }
+
+    .instructor {
+      margin-top: 15px;
+      font-size: 1.05em;
+      opacity: 0.9;
+    }
+
+    .instructor a {
+      color: #ffd700;
+      text-decoration: none;
+      font-weight: 600;
+      transition: opacity 0.3s;
+    }
+
+    .instructor a:hover {
+      opacity: 0.8;
+      text-decoration: underline;
+    }
+
+    .content {
+      padding: 40px;
+    }
+
+    .instructions-box {
+      background: #f8fafc;
+      border: 2px solid #667eea;
+      padding: 20px;
+      margin-bottom: 35px;
+      border-radius: 12px;
+    }
+
+    .instructions-title {
+      font-weight: 700;
+      color: #1e293b;
+      margin-bottom: 10px;
+      display: block;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      font-size: 0.9em;
+    }
+
+    .instructions-list {
+      list-style-type: none;
+      padding-left: 0;
+    }
+
+    .instructions-list li {
+      margin-bottom: 8px;
+      padding-left: 20px;
+      position: relative;
+    }
+
+    .instructions-list li::before {
+      content: "•";
+      color: #667eea;
+      position: absolute;
+      left: 0;
+      font-weight: bold;
+    }
+
+    .section-title {
+      font-size: 1.8em;
+      color: #1e293b;
+      margin-bottom: 25px;
+      padding-bottom: 10px;
+      border-bottom: 3px solid #667eea;
+      font-weight: 700;
+    }
+
+    .question-card {
+      background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
+      border-left: 4px solid #667eea;
+      padding: 25px;
+      margin-bottom: 30px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+      transition: all 0.3s;
+    }
+
+    .question-card:hover {
+      transform: translateX(5px);
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+    }
+
+    .question-header {
+      display: flex;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+
+    .q-badge {
+      background: #667eea;
+      color: white;
+      padding: 5px 15px;
+      border-radius: 20px;
+      font-weight: 700;
+      font-size: 0.9em;
+      margin-right: 15px;
+    }
+
+    .q-title {
+      font-size: 1.2em;
+      font-weight: 700;
+      color: #1e293b;
+    }
+
+    .q-points {
+      margin-left: auto;
+      background: #e2e8f0;
+      color: #475569;
+      padding: 2px 10px;
+      border-radius: 12px;
+      font-size: 0.8em;
+      font-weight: 600;
+    }
+
+    .q-text {
+      margin-bottom: 20px;
+      color: #334155;
+    }
+
+    .solution-toggle {
+      background: #667eea;
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 0.9em;
+      transition: background 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .solution-toggle:hover {
+      background: #5a67d8;
+    }
+
+    .solution-block {
+      display: none;
+      margin-top: 15px;
+      padding: 15px;
+      background: #f1f5f9;
+      border-radius: 8px;
+      border-left: 4px solid #3b82f6;
+    }
+
+    .solution-block.visible {
+      display: block;
+      animation: slideDown 0.3s ease-out;
+    }
+
+    @keyframes slideDown {
+      from {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .solution-title {
+      font-weight: 700;
+      color: #1e293b;
+      margin-bottom: 10px;
+      display: block;
+    }
+
+    .katex {
+      font-size: 1.05em;
+    }
+
+    footer {
+      background: #1e293b;
+      color: white;
+      text-align: center;
+      padding: 25px;
+      font-size: 0.9em;
+    }
+
+    .fab-btn {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #3b82f6, #2563eb);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      cursor: pointer;
+      z-index: 1000;
+      border: none;
+      font-size: 24px;
+      transition: transform 0.2s, box-shadow 0.2s;
+      text-decoration: none;
+    }
+
+    .fab-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+    }
+
+    @media (max-width: 768px) {
+      .content {
+        padding: 20px;
+      }
+
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="container">
+    <header>
+      <h1>CS 637: Mathematics-II</h1>
+      <div class="subtitle">Quiz 1 Solutions – Spring 2026</div>
+      <div class="instructor">
+        <strong>Instructor:</strong> <a href="https://drdebmath.github.io" target="_blank">Dr. Debasish Pattanayak</a>
+      </div>
+    </header>
+
+    <div class="content">
+
+      <div class="instructions-box">
+        <span class="instructions-title">Instructions</span>
+        <ul class="instructions-list">
+          <li>Proofs must be rigorous and complete.</li>
+          <li>Write legibly. Illegible answers will not be graded.</li>
+          <li>No devices, books, or notes allowed.</li>
+          <li>Use only the space allocated.</li>
+        </ul>
+      </div>
+
+      <!-- Question 1 -->
+      <div class="question-card">
+        <div class="question-header">
+          <span class="q-badge">Q1</span>
+          <span class="q-title">Proof by Strong Induction</span>
+          <span class="q-points">5 pts</span>
+        </div>
+        <div class="q-text">
+          Let \( f_n \) denote the \( n \)-th Fibonacci number defined by \( f_0 = 0 \), \( f_1 = 1 \), and \( f_n =
+          f_{n-1} + f_{n-2} \) for \( n \geq 2 \).
+          <br><br>
+          Prove by strong induction that for all \( n \geq 1 \):
+          \[ f_n < \left(\frac{7}{4}\right)^n \] </div>
+            <button class="solution-toggle" onclick="toggleSolution(this)">
+              Show Solution
+            </button>
+            <div class="solution-block">
+              <span class="solution-title">Solution:</span>
+              We prove \( f_n < \left(\frac{7}{4}\right)^n \) for all \( n \geq 1 \) by strong induction. <br><br>
+                <strong>Base Cases:</strong>
+                \( f_1 = 1 < \frac{7}{4} \) and \( f_2=1 < \frac{49}{16} \). Both hold. <br><br>
+                  <strong>Inductive Step:</strong>
+                  Assume \( f_k < \left(\frac{7}{4}\right)^k \) for all \( 1 \leq k \leq n \). Then: \[ \begin{aligned}
+                    f_{n+1} &=f_n + f_{n-1} < \left(\frac{7}{4}\right)^n + \left(\frac{7}{4}\right)^{n-1}\\
+                    &=\left(\frac{7}{4}\right)^{n-1}\left(\frac{7}{4} + 1\right)=\left(\frac{7}{4}\right)^{n-1} \cdot
+                    \frac{11}{4} \end{aligned} \] Since \( \frac{11}{4}=\frac{44}{16} <
+                    \frac{49}{16}=\left(\frac{7}{4}\right)^2 \), we have: \[ f_{n+1} < \left(\frac{7}{4}\right)^{n-1}
+                    \cdot \left(\frac{7}{4}\right)^2=\left(\frac{7}{4}\right)^{n+1} \] </div>
+            </div>
+
+            <!-- Question 2 -->
+            <div class="question-card">
+              <div class="question-header">
+                <span class="q-badge">Q2</span>
+                <span class="q-title">Incomplete Proof - Fill the Gaps</span>
+                <span class="q-points">5 pts</span>
+              </div>
+              <div class="q-text">
+                Below is a proof that \( \sqrt{3} \) is irrational with several steps missing. Fill in the blanks with
+                the correct mathematical statements or justifications.
+                <br><br>
+                <strong>Proof:</strong>
+                Assume for contradiction that \( \sqrt{3} \) is rational. Then there exist coprime integers \( a, b \)
+                with \( b \neq 0 \) such that \( \sqrt{3} = \frac{a}{b} \).
+                <br><br>
+                Squaring both sides: \(\_\_\_\_\_\) <strong>(Step A)</strong>
+                <br>
+                Therefore, 3 divides \( a^2 \). Since 3 is prime, this implies \(\_\_\_\_\_\) <strong>(Step B)</strong>
+                <br>
+                We can write \( a = 3k \) for some integer \( k \). Substituting into our earlier equation:
+                \[ \_\_\_\_\_\_\_\_\_\_ \textbf{(Step C)} \]
+                Simplifying: \(\_\_\_\_\_\) <strong>(Step D)</strong>
+                <br>
+                This means 3 divides \( b^2 \), and by the same reasoning, \(\_\_\_\_\_\) <strong>(Step E)</strong>
+                <br>
+                But this contradicts our assumption that \( \gcd(a,b) = 1 \). Therefore, \( \sqrt{3} \) is irrational.
+              </div>
+              <button class="solution-toggle" onclick="toggleSolution(this)">
+                Show Solution
+              </button>
+              <div class="solution-block">
+                <span class="solution-title">Solution:</span>
+                <strong>Step A:</strong> \( 3 = \frac{a^2}{b^2} \), therefore \( 3b^2 = a^2 \)
+                <br>
+                <strong>Step B:</strong> 3 divides \( a \)
+                <br>
+                <strong>Step C:</strong> \( 3b^2 = (3k)^2 = 9k^2 \)
+                <br>
+                <strong>Step D:</strong> \( b^2 = 3k^2 \)
+                <br>
+                <strong>Step E:</strong> 3 divides \( b \)
+              </div>
+            </div>
+
+            <!-- Question 3 -->
+            <div class="question-card">
+              <div class="question-header">
+                <span class="q-badge">Q3</span>
+                <span class="q-title">Logical Equivalence with Quantifiers</span>
+                <span class="q-points">5 pts</span>
+              </div>
+              <div class="q-text">
+                Prove or disprove: For predicates \( P(x) \) and \( Q(x) \) over domain \( D \), the following are
+                logically equivalent:
+                \[ \neg(\forall x\, P(x) \to \exists x\, Q(x)) \equiv \forall x\, P(x) \land \forall x\, \neg Q(x) \]
+                If they are equivalent, provide a formal derivation using logical equivalence laws. If not, provide a
+                counterexample with a specific domain and predicates.
+              </div>
+              <button class="solution-toggle" onclick="toggleSolution(this)">
+                Show Solution
+              </button>
+              <div class="solution-block">
+                <span class="solution-title">Solution:</span>
+                The statements <strong>are logically equivalent</strong>.
+                <br><br>
+                <strong>Derivation:</strong>
+                \[ \begin{aligned} \neg(\forall x\, P(x) \to \exists x\, Q(x)) &\equiv \neg(\neg\forall x\, P(x) \lor
+                \exists x\, Q(x))\\ &\equiv \forall x\, P(x) \land \neg\exists x\, Q(x)\\ &\equiv \forall x\, P(x) \land
+                \forall x\, \neg Q(x) \end{aligned} \]
+                using the equivalences: \( A \to B \equiv \neg A \lor B \), De Morgan's law, and \( \neg\exists x\, Q(x)
+                \equiv \forall x\, \neg Q(x) \).
+              </div>
+            </div>
+
+            <!-- Question 4 -->
+            <div class="question-card">
+              <div class="question-header">
+                <span class="q-badge">Q4</span>
+                <span class="q-title">Structural Induction on Regular Expressions</span>
+                <span class="q-points">5 pts</span>
+              </div>
+              <div class="q-text">
+                Let \( \Sigma = \{a, b\} \). For a regular expression \( R \) over \( \Sigma \), define \( \#_a(R) \) as
+                the number of occurrences of the symbol \( a \) in \( R \) (counting \( a \) in the regex syntax, not in
+                the language).
+                <br><br>
+                Prove by structural induction that for any regular expressions \( R \) and \( S \):
+                \[ \#_a(R + S) = \#_a(R) + \#_a(S) \]
+                \[ \#_a(R \cdot S) = \#_a(R) + \#_a(S) \]
+                \[ \#_a(R^*) = \#_a(R) \]
+              </div>
+              <button class="solution-toggle" onclick="toggleSolution(this)">
+                Show Solution
+              </button>
+              <div class="solution-block">
+                <span class="solution-title">Solution:</span>
+                We prove by structural induction on the construction of regular expressions.
+                <br><br>
+                <strong>Base Cases:</strong> For atomic regex \( \emptyset, \varepsilon, a, b \), the properties hold
+                trivially (count the \( a \)'s directly).
+                <br><br>
+                <strong>Inductive Cases:</strong> Assume properties hold for \( R \) and \( S \).
+                <br><br>
+                <strong>Union:</strong> \( \#_a(R + S) \) counts all \( a \)'s appearing in the syntax of \( R \) plus
+                all in \( S \), giving \( \#_a(R) + \#_a(S) \).
+                <br><br>
+                <strong>Concatenation:</strong> \( \#_a(R \cdot S) \) counts all \( a \)'s in \( R \) and \( S \)
+                without adding new ones, giving \( \#_a(R) + \#_a(S) \).
+                <br><br>
+                <strong>Kleene Star:</strong> \( \#_a(R^*) \) adds only the \( * \) symbol to \( R \), preserving the
+                count: \( \#_a(R^*) = \#_a(R) \).
+              </div>
+            </div>
+
+            <!-- Question 5 -->
+            <div class="question-card">
+              <div class="question-header">
+                <span class="q-badge">Q5</span>
+                <span class="q-title">Divisibility and Proof by Cases</span>
+                <span class="q-points">5 pts</span>
+              </div>
+              <div class="q-text">
+                Prove that for any integer \( n \), the expression \( n^5 - n \) is divisible by 30.
+                <br><br>
+                <em>Hint: Factor the expression and use proof by cases considering \( n \bmod 2, 3, 5 \).</em>
+              </div>
+              <button class="solution-toggle" onclick="toggleSolution(this)">
+                Show Solution
+              </button>
+              <div class="solution-block">
+                <span class="solution-title">Solution:</span>
+                Factor: \( n^5 - n = n(n-1)(n+1)(n^2+1) \).
+                <br><br>
+                Since \( 30 = 2 \cdot 3 \cdot 5 \), we verify divisibility by each prime:
+                <br><br>
+                <strong>By 2:</strong> Among three consecutive integers \( n-1, n, n+1 \), one is even.
+                <br><br>
+                <strong>By 3:</strong> Considering \( n \bmod 3 \):
+                <ul>
+                  <li>\( n \equiv 0 \): then \( 3 \mid n \)</li>
+                  <li>\( n \equiv 1 \): then \( 3 \mid (n-1) \)</li>
+                  <li>\( n \equiv 2 \): then \( 3 \mid (n+1) \)</li>
+                </ul>
+                <br>
+                <strong>By 5:</strong> Considering \( n \bmod 5 \):
+                <ul>
+                  <li>\( n \equiv 0 \): then \( 5 \mid n \)</li>
+                  <li>\( n \equiv \pm 1 \): then \( 5 \mid (n \mp 1) \)</li>
+                  <li>\( n \equiv \pm 2 \): then \( n^2 \equiv 4 \pmod{5} \), so \( 5 \mid (n^2+1) \)</li>
+                </ul>
+                <br>
+                Therefore \( 2 \cdot 3 \cdot 5 = 30 \) divides \( n^5 - n \).
+              </div>
+            </div>
+
+            <!-- Question 6 -->
+            <div class="question-card">
+              <div class="question-header">
+                <span class="q-badge">Q6</span>
+                <span class="q-title">String Properties - Missing Steps</span>
+                <span class="q-points">5 pts</span>
+              </div>
+              <div class="q-text">
+                Consider the proof that for any strings \( w, x \in \Sigma^* \), we have \( |wx| = |w| + |x| \).
+                The proof proceeds by induction on the length of \( x \). Complete the missing steps:
+                <br><br>
+                <strong>Proof:</strong> We prove by induction on \( |x| \).
+                <br><br>
+                <strong>Base Case:</strong> When \( |x| = 0 \), we have \( x = \varepsilon \).
+                \(\_\_\_\_\_\) <strong>(Step 1)</strong>
+                Therefore, \( |w\varepsilon| = |w| = |w| + 0 = |w| + |\varepsilon| \). ✓
+                <br><br>
+                <strong>Inductive Step:</strong> Assume \( |wy| = |w| + |y| \) for all strings \( w \) and all strings
+                \( y \) with \( |y| = k \).
+                <br>
+                Consider a string \( x \) with \( |x| = k+1 \). We can write \( x = ya \) where \( |y| = k \) and \( a
+                \in \Sigma \).
+                Then:
+                \[ |wx| = |w(ya)| = \_\_\_\_\_\_\_\_\_\_ \textbf{(Step 2)} \]
+                By the inductive hypothesis:
+                \[ = \_\_\_\_\_\_\_\_\_\_ \textbf{(Step 3)} \]
+                By definition of string length:
+                \[ = \_\_\_\_\_\_\_\_\_\_ \textbf{(Step 4)} \]
+                Since \( |x| = |ya| = |y| + 1 = k + 1 \), we have shown \( |wx| = |w| + |x| \).
+              </div>
+              <button class="solution-toggle" onclick="toggleSolution(this)">
+                Show Solution
+              </button>
+              <div class="solution-block">
+                <span class="solution-title">Solution:</span>
+                <strong>Step 1:</strong> \( w\varepsilon = w \) (definition of empty string concatenation)
+                <br>
+                <strong>Step 2:</strong> \( |(wy)a| \) (associativity of concatenation)
+                <br>
+                <strong>Step 3:</strong> \( |wy| + |a| = (|w| + |y|) + 1 \) (inductive hypothesis, \( |a| = 1 \))
+                <br>
+                <strong>Step 4:</strong> \( |w| + |y| + 1 = |w| + (|y| + 1) = |w| + |x| \) (since \( |x| = |ya| = |y| +
+                1 \))
+              </div>
+            </div>
+
+            <!-- Question 7 -->
+            <div class="question-card">
+              <div class="question-header">
+                <span class="q-badge">Q7</span>
+                <span class="q-title">Resolution Proof System</span>
+                <span class="q-points">5 pts</span>
+              </div>
+              <div class="q-text">
+                Using <strong>only</strong> the Resolution rule (from \( p \lor q \) and \( \neg p \lor r \), infer \( q
+                \lor r \)), prove that the following set of clauses is unsatisfiable:
+                \[ \{p \lor q, \, \neg p \lor r, \, \neg q \lor s, \, \neg r \lor s, \, \neg s\} \]
+                Show each resolution step clearly, indicating which clauses are being resolved.
+              </div>
+              <button class="solution-toggle" onclick="toggleSolution(this)">
+                Show Solution
+              </button>
+              <div class="solution-block">
+                <span class="solution-title">Solution:</span>
+                Given: \( \{p \lor q,\, \neg p \lor r,\, \neg q \lor s,\, \neg r \lor s,\, \neg s\} \)
+                <br><br>
+                \[ \begin{aligned} (1) \land (2) &\implies q \lor r && \text{(resolve on } p) \\ (q \lor r) \land (3)
+                &\implies r \lor s && \text{(resolve on } q) \\ (r \lor s) \land (4) &\implies s && \text{(resolve on }
+                r) \\ s \land (5) &\implies \square && \text{(resolve on } s) \end{aligned} \]
+                The empty clause proves unsatisfiability.
+              </div>
+            </div>
+
+        </div>
+
+        <footer>
+          CS 637 – Quiz 1 Solutions • Spring 2026<br>
+          © Dr. Debasish Pattanayak • Department of Computer Science
+        </footer>
+      </div>
+
+      <script>
+        document.addEventListener("DOMContentLoaded", function () {
+          renderMathInElement(document.body, {
+            delimiters: [
+              { left: "$$", right: "$$", display: true },
+              { left: "\\[", right: "\\]", display: true },
+              { left: "\\(", right: "\\)", display: false }
+            ]
+          });
+        });
+
+        function toggleSolution(timer) {
+          const solutionBlock = timer.nextElementSibling;
+          if (solutionBlock.classList.contains('visible')) {
+            solutionBlock.classList.remove('visible');
+            timer.textContent = 'Show Solution';
+          } else {
+            solutionBlock.classList.add('visible');
+            timer.textContent = 'Hide Solution';
+          }
+        }
+      </script>
+
+      <a href="index.html" class="fab-btn" title="Back to Index">🏠</a>
+
+</body>
+
+</html>
