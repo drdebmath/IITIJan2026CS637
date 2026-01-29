@@ -1,117 +1,461 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="utf-8">
-  <title>CS 637 – Tutorial 3 Definitions</title>
+  <title>CS 637 – Tutorial 3: Turing Machines & Models of Computation</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
   <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
   <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
-
   <style>
-    body {
-      font-family: "Times New Roman", serif;
-      margin: 40px;
-      line-height: 1.5;
-      background-color: #ffffff;
-      color: #000000;
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
     }
-    h1, h2 {
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      line-height: 1.6;
+      background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+      overflow: hidden;
+    }
+
+    header {
+      background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+      color: white;
+      padding: 40px;
       text-align: center;
     }
+
     h1 {
-      font-size: 1.8em;
-      margin-bottom: 0.2em;
+      font-size: 2.5em;
+      margin-bottom: 10px;
+      font-weight: 700;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
     }
-    h2 {
-      font-size: 1.2em;
-      margin-top: 2em;
-      margin-bottom: 0.5em;
+
+    .subtitle {
+      font-size: 1.3em;
+      margin-bottom: 15px;
+      opacity: 0.95;
     }
-    .definition {
-      margin-bottom: 1em;
-    }
-    .term {
-      font-weight: bold;
-    }
-    .number {
-      font-weight: bold;
-    }
+
     .instructor {
-      margin-top: 8px;
-      font-size: 0.95rem;
-      color: #64748b;
+      margin-top: 15px;
+      font-size: 1.05em;
+      opacity: 0.9;
     }
+
     .instructor a {
-      color: #0ea5e9;
+      color: #ffd700;
       text-decoration: none;
-      font-weight: 500;
+      font-weight: 600;
+      transition: opacity 0.3s;
     }
+
     .instructor a:hover {
+      opacity: 0.8;
       text-decoration: underline;
     }
+
+    .content {
+      padding: 40px;
+    }
+
+    .section-title {
+      font-size: 1.8em;
+      color: #1e293b;
+      margin-bottom: 25px;
+      padding-bottom: 10px;
+      border-bottom: 3px solid #3b82f6;
+      font-weight: 700;
+    }
+
+    .question-card {
+      background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
+      border-left: 4px solid #3b82f6;
+      padding: 25px;
+      margin-bottom: 30px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+      transition: all 0.3s;
+    }
+
+    .question-card:hover {
+      transform: translateX(5px);
+      box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
+    }
+
+    .question-header {
+      display: flex;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+
+    .q-badge {
+      background: #3b82f6;
+      color: white;
+      padding: 5px 15px;
+      border-radius: 20px;
+      font-weight: 700;
+      font-size: 0.9em;
+      margin-right: 15px;
+    }
+
+    .q-title {
+      font-size: 1.2em;
+      font-weight: 700;
+      color: #1e293b;
+    }
+
+    .sub-question {
+      margin-top: 15px;
+      padding-top: 15px;
+      border-top: 1px dashed #cbd5e1;
+    }
+
+    .sub-label {
+      font-weight: 700;
+      color: #475569;
+      margin-right: 5px;
+    }
+
+    code {
+      background: #f1f5f9;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-family: 'Courier New', monospace;
+      color: #dc2626;
+      font-size: 0.9em;
+    }
+
+    .katex {
+      font-size: 1.05em;
+    }
+
     footer {
-      margin-top: 3em;
+      background: #1e293b;
+      color: white;
       text-align: center;
-      font-size: 0.85em;
-      color: #333;
+      padding: 25px;
+      font-size: 0.9em;
+    }
+
+    .fab-btn {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #3b82f6, #2563eb);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      cursor: pointer;
+      z-index: 1000;
+      border: none;
+      font-size: 24px;
+      transition: transform 0.2s, box-shadow 0.2s;
+      text-decoration: none;
+    }
+
+    .fab-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+    }
+
+    @media (max-width: 768px) {
+      .content {
+        padding: 20px;
+      }
+
+      h1 {
+        font-size: 1.8em;
+      }
     }
   </style>
-
-<style>
-.fab-btn {
-  position: fixed;
-  bottom: 24px;
-  right: 24px;
-  width: 56px;
-  height: 56px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #3b82f6, #2563eb);
-  color: white;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-  cursor: pointer;
-  z-index: 1000;
-  border: none;
-  font-size: 24px;
-  transition: transform 0.2s, box-shadow 0.2s;
-  text-decoration: none;
-}
-.fab-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(0,0,0,0.3);
-}
-</style>
-
 </head>
 
 <body>
 
-<h1>CS 637: Mathematics-II</h1>
-<div class="instructor">
-  <strong>Instructor:</strong> <a href="https://drdebmath.github.io" target="_blank">Dr. Debasish Pattanayak</a>
-</div>
-<h2>Tutorial 3: Problems from Models of Computation</h2>
+  <div class="container">
+    <header>
+      <h1>CS 637: Mathematics-II</h1>
+      <div class="subtitle">Tutorial 3: Turing Machine Design & Automata Theory</div>
+      <div class="instructor">
+        <strong>Instructor:</strong> <a href="https://drdebmath.github.io" target="_blank">Dr. Debasish Pattanayak</a>
+      </div>
+    </header>
 
-<footer>
-  
-</footer>
+    <div class="content">
 
-<script>
-document.addEventListener("DOMContentLoaded", function() {
-    renderMathInElement(document.body, {
+      <!-- Topic 1: TM Design & Traces -->
+      <h2 class="section-title">Topic 1: Turing Machine Design & Traces</h2>
+
+      <div class="question-card">
+        <div class="question-header">
+          <span class="q-badge">Q1</span>
+          <span class="q-title">Design of a Turing Machine for Binary Addition</span>
+        </div>
+        <div class="sub-question">
+          <span class="sub-label">(a)</span>
+          Design a Turing machine that accepts two binary numbers separated by a # symbol and computes their sum.
+          Describe the states, transitions, and tape alphabet clearly.
+        </div>
+        <div class="sub-question">
+          <span class="sub-label">(b)</span>
+          Trace the computation of your Turing machine on the input $101\#110$. Show the tape configuration and state at
+          each step.
+        </div>
+        <div class="sub-question">
+          <span class="sub-label">(c)</span>
+          Prove that your Turing machine halts for all valid inputs consisting of two binary numbers.
+        </div>
+        <div class="sub-question">
+          <span class="sub-label">(d)</span>
+          What is the time complexity of your Turing machine in terms of the length of the input string?
+        </div>
+      </div>
+
+      <div class="question-card">
+        <div class="question-header">
+          <span class="q-badge">Q2</span>
+          <span class="q-title">Turing Machine for Palindrome Recognition</span>
+        </div>
+        <div class="sub-question">
+          <span class="sub-label">(a)</span>
+          Design a single-tape Turing machine that accepts the language $L = \{w \in \{a,b\}^* \mid w = w^R\}$ where
+          $w^R$ denotes the reverse of string $w$.
+        </div>
+        <div class="sub-question">
+          <span class="sub-label">(b)</span>
+          Provide the formal 7-tuple representation of your Turing machine: $M = (Q, \Sigma, \Gamma, \delta, q_0,
+          q_{accept}, q_{reject})$.
+        </div>
+        <div class="sub-question">
+          <span class="sub-label">(c)</span>
+          Demonstrate the acceptance of the string $abaaba$ by showing all tape configurations during computation.
+        </div>
+        <div class="sub-question">
+          <span class="sub-label">(d)</span>
+          How would you modify your design to work with a two-tape Turing machine? What advantage would this provide?
+        </div>
+      </div>
+
+      <!-- Topic 2: Multi-Tape & Variants -->
+      <h2 class="section-title">Topic 2: Multi-Tape & Variants</h2>
+
+      <div class="question-card">
+        <div class="question-header">
+          <span class="q-badge">Q3</span>
+          <span class="q-title">Multi-Tape Turing Machine Design</span>
+        </div>
+        <div class="sub-question">
+          <span class="sub-label">(a)</span>
+          Design a 2-tape Turing machine that accepts the language $L = \{ww \mid w \in \{0,1\}^*\}$ (strings that are
+          concatenations of two identical substrings).
+        </div>
+        <div class="sub-question">
+          <span class="sub-label">(b)</span>
+          Explain how your multi-tape design is more efficient than a single-tape implementation for this problem.
+        </div>
+        <div class="sub-question">
+          <span class="sub-label">(c)</span>
+          Provide a formal proof or argument showing that any $k$-tape Turing machine can be simulated by a single-tape
+          Turing machine.
+        </div>
+        <div class="sub-question">
+          <span class="sub-label">(d)</span>
+          What is the time complexity overhead when converting a $k$-tape Turing machine to a single-tape machine?
+        </div>
+      </div>
+
+      <div class="question-card">
+        <div class="question-header">
+          <span class="q-badge">Q6</span>
+          <span class="q-title">Turing Machine Variants and Equivalence</span>
+        </div>
+        <div class="sub-question">
+          <span class="sub-label">(a)</span>
+          Describe a Turing machine with a semi-infinite tape (infinite in only one direction). Prove that it is
+          equivalent in computational power to a standard Turing machine with a doubly-infinite tape.
+        </div>
+        <div class="sub-question">
+          <span class="sub-label">(b)</span>
+          Design an enumerator for the language $L = \{a^i b^j c^k \mid i \cdot j = k, i,j,k \geq 1\}$.
+        </div>
+        <div class="sub-question">
+          <span class="sub-label">(c)</span>
+          Prove that a language is Turing-recognizable if and only if some enumerator enumerates it.
+        </div>
+        <div class="sub-question">
+          <span class="sub-label">(d)</span>
+          Compare the computational models of Turing machines, RAM machines, and lambda calculus in terms of the
+          languages they can recognize.
+        </div>
+      </div>
+
+      <!-- Topic 3: Decidability & Languages -->
+      <h2 class="section-title">Topic 3: Decidability & Languages</h2>
+
+      <div class="question-card">
+        <div class="question-header">
+          <span class="q-badge">Q4</span>
+          <span class="q-title">Decidability and Language Properties</span>
+        </div>
+        <div class="sub-question">
+          <span class="sub-label">(a)</span>
+          Define what it means for a language to be decidable, recognizable (recursively enumerable), and
+          co-recognizable.
+        </div>
+        <div class="sub-question">
+          <span class="sub-label">(b)</span>
+          Give an example of a language that is recognizable but not decidable. Prove that it has these properties.
+        </div>
+        <div class="sub-question">
+          <span class="sub-label">(c)</span>
+          Prove that if both a language $L$ and its complement $\overline{L}$ are recognizable, then $L$ is decidable.
+        </div>
+        <div class="sub-question">
+          <span class="sub-label">(d)</span>
+          Determine whether the language $L_{empty} = \{\langle M \rangle \mid M \text{ is a TM and } L(M) =
+          \emptyset\}$ is decidable, recognizable, or neither. Justify your answer.
+        </div>
+      </div>
+
+      <div class="question-card">
+        <div class="question-header">
+          <span class="q-badge">Q7</span>
+          <span class="q-title">Closure Properties of RE Languages</span>
+        </div>
+        <div class="sub-question">
+          <span class="sub-label">(a)</span>
+          Prove that the class of recursively enumerable (RE) languages is closed under union. Provide a construction of
+          a Turing machine that recognizes $L_1 \cup L_2$ given machines that recognize $L_1$ and $L_2$.
+        </div>
+        <div class="sub-question">
+          <span class="sub-label">(b)</span>
+          Prove that the class of RE languages is closed under concatenation and Kleene star.
+        </div>
+        <div class="sub-question">
+          <span class="sub-label">(c)</span>
+          Show that the class of RE languages is NOT closed under complementation by providing a counterexample.
+        </div>
+        <div class="sub-question">
+          <span class="sub-label">(d)</span>
+          Prove that the class of decidable (recursive) languages is closed under complementation, union, and
+          intersection.
+        </div>
+      </div>
+
+      <!-- Topic 4: Non-Deterministic Turing Machines -->
+      <h2 class="section-title">Topic 4: Non-Deterministic Turing Machines</h2>
+
+      <div class="question-card">
+        <div class="question-header">
+          <span class="q-badge">Q5</span>
+          <span class="q-title">Non-Deterministic Turing Machines</span>
+        </div>
+        <div class="sub-question">
+          <span class="sub-label">(a)</span>
+          Define a non-deterministic Turing machine (NTM) formally. How does it differ from a deterministic Turing
+          machine?
+        </div>
+        <div class="sub-question">
+          <span class="sub-label">(b)</span>
+          Design an NTM that accepts the language $L = \{w \in \{0,1\}^* \mid w \text{ contains an equal number of 0s
+          and 1s}\}$.
+        </div>
+        <div class="sub-question">
+          <span class="sub-label">(c)</span>
+          Prove that for every NTM, there exists an equivalent deterministic Turing machine that accepts the same
+          language.
+        </div>
+        <div class="sub-question">
+          <span class="sub-label">(d)</span>
+          Discuss the relationship between non-deterministic space complexity and deterministic space complexity
+          (Savitch's theorem).
+        </div>
+      </div>
+
+      <!-- Topic 5: Complex Languages -->
+      <h2 class="section-title">Topic 5: Complex Language Recognition</h2>
+
+      <div class="question-card">
+        <div class="question-header">
+          <span class="q-badge">Q8</span>
+          <span class="q-title">Complex Language Recognition</span>
+        </div>
+        <div class="sub-question">
+          <span class="sub-label">(a)</span>
+          Design a Turing machine that recognizes the language $L = \{a^{n^2} \mid n \geq 0\}$ (strings of $a$'s whose
+          length is a perfect square).
+        </div>
+        <div class="sub-question">
+          <span class="sub-label">(b)</span>
+          Provide a detailed state diagram or transition table for your Turing machine.
+        </div>
+        <div class="sub-question">
+          <span class="sub-label">(c)</span>
+          Trace the execution of your machine on the inputs $aaaa$ (which should be accepted) and $aaaaa$ (which should
+          be rejected).
+        </div>
+        <div class="sub-question">
+          <span class="sub-label">(d)</span>
+          Analyze the time and space complexity of your Turing machine. Can you design a more efficient version?
+        </div>
+        <div class="sub-question">
+          <span class="sub-label">(e)</span>
+          Design a Turing machine that recognizes $L_1 = \{a^{n^3} \mid n \geq 0\}$.
+        </div>
+        <div class="sub-question">
+          <span class="sub-label">(f)</span>
+          Design a Turing machine that recognizes $L_2 = \{a^{2^n} \mid n \geq 0\}$.
+        </div>
+        <div class="sub-question">
+          <span class="sub-label">(g)</span>
+          Design a Turing machine that recognizes $L_3 = \{a^n b^{n^2} \mid n \geq 0\}$.
+        </div>
+      </div>
+
+    </div>
+
+    <footer>
+      CS 637 – Tutorial 3: Turing Machines & Models of Computation • Spring 2026<br>
+      © Dr. Debasish Pattanayak • Department of Computer Science
+    </footer>
+  </div>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      renderMathInElement(document.body, {
         delimiters: [
-            {left: "31952", right: "31952", display: true},
-            {left: "\[", right: "\]", display: true},
-            {left: "\(", right: "\)", display: false}
+          { left: "$$", right: "$$", display: true },
+          { left: "\\[", right: "\\]", display: true },
+          { left: "\\(", right: "\\)", display: false },
+          { left: "$", right: "$", display: false }
         ]
+      });
     });
-});
-</script>
+  </script>
 
-<a href="index.html" class="fab-btn" title="Back to Index">🏠</a>
+  <a href="index.html" class="fab-btn" title="Back to Index">🏠</a>
+
 </body>
+
 </html>
