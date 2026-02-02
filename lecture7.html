@@ -1,117 +1,1446 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="utf-8">
-  <title>CS 637 – Lecture 7 Definitions</title>
+  <title>CS 637 – Lecture 7: Configuration Graphs & Induction</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+  <!-- Math Rendering -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
   <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
   <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
 
   <style>
+    :root {
+      --primary: #1a2a6c;
+      --secondary: #b21f1f;
+      --accent: #fdbb2d;
+      --accent-hover: #f59e0b;
+      --success: #10b981;
+      --danger: #ef4444;
+      --warning: #f59e0b;
+      --bg-light: #f8fafc;
+      --text-dark: #1e293b;
+      --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.08);
+      --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.12);
+      --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.15);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
     body {
-      font-family: "Times New Roman", serif;
-      margin: 40px;
-      line-height: 1.5;
-      background-color: #ffffff;
-      color: #000000;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      line-height: 1.7;
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%);
+      min-height: 100vh;
+      padding: 20px;
+      position: relative;
+      overflow-x: hidden;
     }
-    h1, h2 {
+
+    /* Animated background particles */
+    .particles {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .particle {
+      position: absolute;
+      background: rgba(253, 187, 45, 0.1);
+      border-radius: 50%;
+      animation: float 20s infinite;
+    }
+
+    @keyframes float {
+
+      0%,
+      100% {
+        transform: translateY(0) translateX(0) rotate(0deg);
+      }
+
+      25% {
+        transform: translateY(-100px) translateX(50px) rotate(90deg);
+      }
+
+      50% {
+        transform: translateY(-50px) translateX(100px) rotate(180deg);
+      }
+
+      75% {
+        transform: translateY(-150px) translateX(25px) rotate(270deg);
+      }
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 25px 80px rgba(0, 0, 0, 0.4);
+      overflow: hidden;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Header with gradient animation */
+    header {
+      background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
+      background-size: 200% 200%;
+      animation: gradientShift 15s ease infinite;
+      color: white;
+      padding: 50px 40px;
       text-align: center;
+      position: relative;
+      overflow: hidden;
     }
+
+    @keyframes gradientShift {
+      0% {
+        background-position: 0% 50%;
+      }
+
+      50% {
+        background-position: 100% 50%;
+      }
+
+      100% {
+        background-position: 0% 50%;
+      }
+    }
+
+    header::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+      animation: rotate 30s linear infinite;
+    }
+
+    @keyframes rotate {
+      from {
+        transform: rotate(0deg);
+      }
+
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
     h1 {
-      font-size: 1.8em;
-      margin-bottom: 0.2em;
+      font-size: 2.8em;
+      margin-bottom: 12px;
+      font-weight: 800;
+      position: relative;
+      z-index: 1;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+      letter-spacing: -0.5px;
     }
-    h2 {
-      font-size: 1.2em;
-      margin-top: 2em;
-      margin-bottom: 0.5em;
-    }
-    .definition {
-      margin-bottom: 1em;
-    }
-    .term {
-      font-weight: bold;
-    }
-    .number {
-      font-weight: bold;
-    }
-    .instructor {
-      margin-top: 8px;
-      font-size: 0.95rem;
-      color: #64748b;
-    }
-    .instructor a {
-      color: #0ea5e9;
-      text-decoration: none;
+
+    .subtitle {
+      font-size: 1.4em;
+      margin-bottom: 20px;
+      opacity: 0.95;
+      position: relative;
+      z-index: 1;
       font-weight: 500;
     }
+
+    .instructor {
+      margin-top: 20px;
+      font-size: 1.1em;
+      opacity: 0.95;
+      position: relative;
+      z-index: 1;
+    }
+
+    .instructor a {
+      color: #ffd700;
+      text-decoration: none;
+      font-weight: 600;
+      transition: all 0.3s;
+      padding: 4px 8px;
+      border-radius: 4px;
+    }
+
     .instructor a:hover {
+      background: rgba(255, 215, 0, 0.2);
       text-decoration: underline;
     }
-    footer {
-      margin-top: 3em;
+
+    /* Progress indicator */
+    .progress-bar {
+      position: sticky;
+      top: 0;
+      height: 4px;
+      background: #e2e8f0;
+      z-index: 101;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--primary), var(--secondary), var(--accent));
+      width: 0%;
+      transition: width 0.3s ease;
+    }
+
+    /* Navigation */
+    .nav-wrapper {
+      background: #fff;
+      position: sticky;
+      top: 4px;
+      z-index: 100;
+      border-bottom: 2px solid #e2e8f0;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    }
+
+    .nav-tabs {
+      display: flex;
+      gap: 0;
+      overflow-x: auto;
+      padding: 0 20px;
+      scrollbar-width: thin;
+      scrollbar-color: var(--primary) #f1f5f9;
+    }
+
+    .nav-tabs::-webkit-scrollbar {
+      height: 6px;
+    }
+
+    .nav-tabs::-webkit-scrollbar-track {
+      background: #f1f5f9;
+    }
+
+    .nav-tabs::-webkit-scrollbar-thumb {
+      background: var(--primary);
+      border-radius: 3px;
+    }
+
+    .tab-btn {
+      padding: 15px 24px;
+      background: none;
+      border: none;
+      font-size: 1em;
+      cursor: pointer;
+      color: #64748b;
+      font-weight: 600;
+      border-bottom: 3px solid transparent;
+      transition: all 0.3s;
+      white-space: nowrap;
+      position: relative;
+    }
+
+    .tab-btn::before {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%) scaleX(0);
+      width: 80%;
+      height: 3px;
+      background: var(--primary);
+      transition: transform 0.3s;
+    }
+
+    .tab-btn:hover {
+      color: var(--primary);
+      background: #f8fafc;
+    }
+
+    .tab-btn.active {
+      color: var(--primary);
+    }
+
+    .tab-btn.active::before {
+      transform: translateX(-50%) scaleX(1);
+    }
+
+    /* Content Area */
+    .content {
+      padding: 50px 40px;
+      min-height: 600px;
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+      animation: slideIn 0.5s ease-out;
+    }
+
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Typography */
+    .section-title {
+      font-size: 2em;
+      color: var(--text-dark);
+      margin-bottom: 30px;
+      padding-bottom: 12px;
+      border-bottom: 4px solid var(--secondary);
+      position: relative;
+      font-weight: 700;
+    }
+
+    .section-title::after {
+      content: '';
+      position: absolute;
+      bottom: -4px;
+      left: 0;
+      width: 100px;
+      height: 4px;
+      background: var(--accent);
+    }
+
+    /* Card components with enhanced styling */
+    .definition-card {
+      background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
+      border-left: 5px solid var(--primary);
+      padding: 25px;
+      margin-bottom: 25px;
+      border-radius: 12px;
+      box-shadow: var(--shadow-sm);
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .definition-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 5px;
+      height: 100%;
+      background: linear-gradient(180deg, var(--primary), var(--accent));
+      opacity: 0;
+      transition: opacity 0.4s;
+    }
+
+    .definition-card:hover {
+      transform: translateX(8px) translateY(-4px);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .definition-card:hover::before {
+      opacity: 1;
+    }
+
+    .example-card {
+      background: linear-gradient(135deg, #fef3c7 0%, #fef9c3 100%);
+      border-left: 5px solid var(--warning);
+      padding: 25px;
+      border-radius: 12px;
+      margin-bottom: 25px;
+      box-shadow: var(--shadow-sm);
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+    }
+
+    .example-card::before {
+      content: '💡';
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      font-size: 2em;
+      opacity: 0.2;
+      transition: all 0.4s;
+    }
+
+    .example-card:hover {
+      transform: translateX(8px) translateY(-4px);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .example-card:hover::before {
+      opacity: 0.4;
+      transform: rotate(15deg) scale(1.1);
+    }
+
+    .theorem-card {
+      background: linear-gradient(135deg, #dfe9f3 0%, #ffffff 100%);
+      border-left: 5px solid #3b82f6;
+      padding: 25px;
+      border-radius: 12px;
+      margin-bottom: 25px;
+      box-shadow: var(--shadow-sm);
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+    }
+
+    .theorem-card::before {
+      content: '📐';
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      font-size: 2em;
+      opacity: 0.2;
+      transition: all 0.4s;
+    }
+
+    .theorem-card:hover {
+      transform: translateX(8px) translateY(-4px);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .theorem-card:hover::before {
+      opacity: 0.4;
+      transform: rotate(-15deg) scale(1.1);
+    }
+
+    .card-title {
+      font-size: 1.3em;
+      font-weight: 700;
+      margin-bottom: 15px;
+      color: var(--text-dark);
+    }
+
+    /* SVG Container */
+    .svg-container {
+      display: flex;
+      justify-content: center;
+      margin: 40px 0;
+      padding: 30px;
+      background: linear-gradient(135deg, #f8fafc, #ffffff);
+      border-radius: 16px;
+      border: 2px solid #e2e8f0;
+      overflow-x: auto;
+      box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05);
+      transition: all 0.3s;
+    }
+
+    .svg-container:hover {
+      box-shadow: var(--shadow-md);
+      border-color: var(--primary);
+    }
+
+    /* Interactive elements */
+    .interactive-demo {
+      background: linear-gradient(135deg, #e0e7ff, #f5f3ff);
+      padding: 30px;
+      border-radius: 16px;
+      margin: 30px 0;
+      box-shadow: var(--shadow-md);
+    }
+
+    .demo-controls {
+      display: flex;
+      gap: 15px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      padding: 12px 24px;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+      font-size: 1em;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--primary), #2563eb);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+
+    .btn-secondary {
+      background: linear-gradient(135deg, var(--secondary), #dc2626);
+      color: white;
+    }
+
+    .btn-secondary:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+
+    .btn-success {
+      background: linear-gradient(135deg, var(--success), #059669);
+      color: white;
+    }
+
+    .btn-success:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    /* Tape visualization */
+    .tape-container {
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      margin: 20px 0;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .tape {
+      display: flex;
+      gap: 2px;
+      overflow-x: auto;
+      padding: 10px;
+      justify-content: center;
+    }
+
+    .tape-cell {
+      min-width: 50px;
+      height: 50px;
+      border: 2px solid #cbd5e1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      font-size: 1.2em;
+      background: white;
+      border-radius: 6px;
+      transition: all 0.3s;
+    }
+
+    .tape-cell.active {
+      border-color: var(--primary);
+      background: linear-gradient(135deg, #dbeafe, #bfdbfe);
+      transform: scale(1.1);
+      box-shadow: 0 4px 12px rgba(26, 42, 108, 0.3);
+    }
+
+    .state-indicator {
+      margin-top: 15px;
+      padding: 15px;
+      background: #f1f5f9;
+      border-radius: 8px;
       text-align: center;
-      font-size: 0.85em;
-      color: #333;
+      font-weight: 600;
+      font-size: 1.1em;
+      color: var(--primary);
+    }
+
+    /* Lists */
+    ul,
+    ol {
+      margin-left: 25px;
+      margin-top: 15px;
+    }
+
+    li {
+      margin-bottom: 10px;
+      line-height: 1.8;
+    }
+
+    /* Code blocks */
+    code {
+      background: #f1f5f9;
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 0.95em;
+      color: #e11d48;
+      font-weight: 600;
+    }
+
+    /* Footer */
+    footer {
+      background: linear-gradient(135deg, var(--primary), #0f172a);
+      color: white;
+      text-align: center;
+      padding: 30px;
+      font-size: 1.05em;
+    }
+
+    /* Floating action button */
+    .fab-btn {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #1a2a6c, #b21f1f);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+      cursor: pointer;
+      z-index: 1000;
+      border: none;
+      font-size: 28px;
+      transition: all 0.3s;
+      text-decoration: none;
+    }
+
+    .fab-btn:hover {
+      transform: translateY(-4px) scale(1.05);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+    }
+
+    /* Scroll to top button */
+    .scroll-top {
+      position: fixed;
+      bottom: 100px;
+      right: 30px;
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent), var(--accent-hover));
+      color: white;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      box-shadow: var(--shadow-md);
+      cursor: pointer;
+      z-index: 999;
+      border: none;
+      font-size: 24px;
+      transition: all 0.3s;
+    }
+
+    .scroll-top.visible {
+      display: flex;
+    }
+
+    .scroll-top:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-lg);
+    }
+
+    /* Key points highlight */
+    .key-point {
+      background: linear-gradient(135deg, #ecfdf5, #d1fae5);
+      border-left: 4px solid var(--success);
+      padding: 20px;
+      margin: 20px 0;
+      border-radius: 8px;
+      font-weight: 500;
+    }
+
+    .key-point::before {
+      content: '🔑 ';
+      font-size: 1.2em;
+    }
+
+    /* Responsive design */
+    @media (max-width: 768px) {
+      body {
+        padding: 10px;
+      }
+
+      h1 {
+        font-size: 2em;
+      }
+
+      .subtitle {
+        font-size: 1.1em;
+      }
+
+      .content {
+        padding: 30px 20px;
+      }
+
+      .section-title {
+        font-size: 1.5em;
+      }
+
+      .nav-tabs {
+        padding: 0 10px;
+      }
+
+      .tab-btn {
+        padding: 12px 16px;
+        font-size: 0.9em;
+      }
+
+      .demo-controls {
+        flex-direction: column;
+      }
+
+      .btn {
+        width: 100%;
+      }
+
+      header {
+        padding: 30px 20px;
+      }
+    }
+
+    /* Print styles */
+    @media print {
+      body {
+        background: white;
+      }
+
+      .container {
+        box-shadow: none;
+      }
+
+      .fab-btn,
+      .scroll-top,
+      .nav-wrapper {
+        display: none !important;
+      }
+
+      .tab-content {
+        display: block !important;
+        page-break-after: always;
+      }
     }
   </style>
-
-<style>
-.fab-btn {
-  position: fixed;
-  bottom: 24px;
-  right: 24px;
-  width: 56px;
-  height: 56px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #3b82f6, #2563eb);
-  color: white;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-  cursor: pointer;
-  z-index: 1000;
-  border: none;
-  font-size: 24px;
-  transition: transform 0.2s, box-shadow 0.2s;
-  text-decoration: none;
-}
-.fab-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(0,0,0,0.3);
-}
-</style>
-
 </head>
 
 <body>
+  <!-- Background particles -->
+  <div class="particles" id="particles"></div>
 
-<h1>CS 637: Mathematics-II</h1>
-<div class="instructor">
-  <strong>Instructor:</strong> <a href="https://drdebmath.github.io" target="_blank">Dr. Debasish Pattanayak</a>
-</div>
-<h2>Lecture 7 – Configuration Graphs and Computation as Reachability</h2>
+  <div class="container">
+    <!-- Progress bar -->
+    <div class="progress-bar">
+      <div class="progress-fill" id="progressFill"></div>
+    </div>
 
-<footer>
-  
-</footer>
+    <header>
+      <h1>CS 637: Mathematics-II</h1>
+      <div class="subtitle">Lecture 7: Configuration Graphs and Reachability</div>
+      <div class="instructor">
+        <strong>Instructor:</strong> <a href="https://drdebmath.github.io/" target="_blank">Dr. Debasish Pattanayak</a>
+      </div>
+    </header>
 
-<script>
-document.addEventListener("DOMContentLoaded", function() {
-    renderMathInElement(document.body, {
-        delimiters: [
-            {left: "31952", right: "31952", display: true},
-            {left: "\[", right: "\]", display: true},
-            {left: "\(", right: "\)", display: false}
-        ]
+    <div class="nav-wrapper">
+      <div class="nav-tabs">
+        <button class="tab-btn active" onclick="switchTab('problem')">The Problem</button>
+        <button class="tab-btn" onclick="switchTab('machine')">Machine Design</button>
+        <button class="tab-btn" onclick="switchTab('configurations')">Configurations</button>
+        <button class="tab-btn" onclick="switchTab('reachability')">Reachability</button>
+        <button class="tab-btn" onclick="switchTab('proof')">Inductive Proof</button>
+        <button class="tab-btn" onclick="switchTab('simulator')">Interactive Demo</button>
+      </div>
+    </div>
+
+    <div class="content">
+      <!-- 1. The Problem -->
+      <div id="problem" class="tab-content active">
+        <h2 class="section-title">Induction and Turing Machines: A Unified Problem</h2>
+
+        <div class="definition-card">
+          <h3 class="card-title">Problem Statement</h3>
+          <p>Consider the language of unary strings:</p>
+          \[ L = \{ 1^n \mid n \ge 0 \} \]
+          <p style="margin-top: 15px;"><strong>Task:</strong> Design a <em>single-tape deterministic Turing machine</em>
+            \(M\) such that, on input \(1^n\), the machine erases exactly one symbol per phase and halts on the empty
+            tape.</p>
+        </div>
+
+        <div class="example-card">
+          <h4 class="card-title">Learning Objectives</h4>
+          <ol>
+            <li><strong>Formal Specification:</strong> Write the complete transition function of the Turing machine
+              \(M\)</li>
+            <li><strong>Visualization:</strong> Construct the configuration graph of \(M\) on input \(1^n\)</li>
+            <li><strong>Formal Verification:</strong> Prove using mathematical induction on \(n\) that the halting
+              configuration is reachable from the initial configuration</li>
+          </ol>
+        </div>
+
+        <div class="key-point">
+          <strong>Key Insight:</strong> This problem bridges computational theory and mathematical reasoning,
+          demonstrating how induction proves properties of computational processes.
+        </div>
+
+        <div class="theorem-card">
+          <h4 class="card-title">Why This Matters</h4>
+          <p>Understanding configuration graphs and inductive proofs is fundamental to:</p>
+          <ul>
+            <li>Analyzing algorithm correctness</li>
+            <li>Verifying computational complexity</li>
+            <li>Establishing termination properties</li>
+            <li>Designing provably correct systems</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- 2. Machine Design -->
+      <div id="machine" class="tab-content">
+        <h2 class="section-title">Machine Specification</h2>
+        <p style="margin-bottom: 30px;">The Turing machine \(M = (Q,\Sigma,\Gamma,\delta,q_0,\sqcup,q_h)\) is defined as
+          follows.</p>
+
+        <div
+          style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 25px; margin-top: 20px;">
+          <div class="definition-card">
+            <h4 class="card-title">Formal Definition</h4>
+            <ul>
+              <li><strong>Input alphabet:</strong> \(\Sigma = \{1\}\)</li>
+              <li><strong>Tape alphabet:</strong> \(\Gamma = \{1, \sqcup\}\)</li>
+              <li><strong>States:</strong> \(Q = \{q_0, q_1, q_2, q_h\}\)</li>
+              <li><strong>Initial state:</strong> \(q_0\)</li>
+              <li><strong>Blank symbol:</strong> \(\sqcup\)</li>
+              <li><strong>Halting state:</strong> \(q_h\)</li>
+            </ul>
+          </div>
+
+          <div class="definition-card">
+            <h4 class="card-title">Transition Function \(\delta\)</h4>
+            \[
+            \begin{aligned}
+            \delta(q_0,1) &= (q_0,1,R) \\
+            \delta(q_0,\sqcup) &= (q_1,\sqcup,L) \\
+            \delta(q_1,1) &= (q_2,\sqcup,L) \\
+            \delta(q_1,\sqcup) &= (q_h,\sqcup,R) \\
+            \delta(q_2,1) &= (q_2,1,L) \\
+            \delta(q_2,\sqcup) &= (q_0,\sqcup,R)
+            \end{aligned}
+            \]
+          </div>
+        </div>
+
+        <div class="svg-container">
+          <svg width="800" height="350" viewBox="0 0 800 350">
+            <!-- Background grid -->
+            <defs>
+              <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orientation="auto"
+                markerUnits="strokeWidth">
+                <path d="M0,0 L0,6 L9,3 z" fill="#334155" />
+              </marker>
+              <filter id="shadow">
+                <feDropShadow dx="2" dy="2" stdDeviation="2" flood-opacity="0.2" />
+              </filter>
+            </defs>
+
+            <!-- States -->
+            <!-- q0 -->
+            <g filter="url(#shadow)">
+              <circle cx="120" cy="100" r="40" fill="#dbeafe" stroke="#1e40af" stroke-width="3" />
+              <text x="120" y="108" text-anchor="middle" font-weight="bold" font-size="18">q₀</text>
+              <text x="120" y="160" text-anchor="middle" font-size="12" fill="#64748b">Start State</text>
+            </g>
+
+            <!-- q1 -->
+            <g filter="url(#shadow)">
+              <circle cx="450" cy="100" r="40" fill="#fef3c7" stroke="#f59e0b" stroke-width="3" />
+              <text x="450" y="108" text-anchor="middle" font-weight="bold" font-size="18">q₁</text>
+              <text x="450" y="160" text-anchor="middle" font-size="12" fill="#64748b">Delete State</text>
+            </g>
+
+            <!-- q2 -->
+            <g filter="url(#shadow)">
+              <circle cx="280" cy="270" r="40" fill="#e9d5ff" stroke="#9333ea" stroke-width="3" />
+              <text x="280" y="278" text-anchor="middle" font-weight="bold" font-size="18">q₂</text>
+              <text x="280" y="330" text-anchor="middle" font-size="12" fill="#64748b">Return Left</text>
+            </g>
+
+            <!-- qh -->
+            <g filter="url(#shadow)">
+              <circle cx="700" cy="100" r="40" fill="#dcfce7" stroke="#166534" stroke-width="3" />
+              <circle cx="700" cy="100" r="35" fill="none" stroke="#166534" stroke-width="2" />
+              <text x="700" y="108" text-anchor="middle" font-weight="bold" font-size="18">q_h</text>
+              <text x="700" y="160" text-anchor="middle" font-size="12" fill="#64748b">Halt State</text>
+            </g>
+
+            <!-- Transitions -->
+            <!-- q0 loop (self) -->
+            <path d="M 95,70 A 35,35 0 1,1 145,70" fill="none" stroke="#1e40af" stroke-width="2.5"
+              marker-end="url(#arrow)" />
+            <rect x="95" y="15" width="50" height="30" fill="white" opacity="0.9" rx="4" />
+            <text x="120" y="35" text-anchor="middle" font-size="14" font-weight="600">1/1,R</text>
+
+            <!-- q0 -> q1 -->
+            <line x1="160" y1="100" x2="410" y2="100" stroke="#64748b" stroke-width="2.5" marker-end="url(#arrow)" />
+            <rect x="255" y="75" width="60" height="25" fill="white" opacity="0.9" rx="4" />
+            <text x="285" y="92" text-anchor="middle" font-size="14" font-weight="600">⊔/⊔,L</text>
+
+            <!-- q1 -> q2 -->
+            <path d="M 425,130 Q 350,200 305,240" fill="none" stroke="#f59e0b" stroke-width="2.5"
+              marker-end="url(#arrow)" />
+            <rect x="340" y="175" width="60" height="25" fill="white" opacity="0.9" rx="4" />
+            <text x="370" y="192" text-anchor="middle" font-size="14" font-weight="600">1/⊔,L</text>
+
+            <!-- q1 -> qh -->
+            <line x1="490" y1="100" x2="660" y2="100" stroke="#166534" stroke-width="2.5" marker-end="url(#arrow)" />
+            <rect x="545" y="75" width="60" height="25" fill="white" opacity="0.9" rx="4" />
+            <text x="575" y="92" text-anchor="middle" font-size="14" font-weight="600">⊔/⊔,R</text>
+
+            <!-- q2 loop (self) -->
+            <path d="M 255,295 A 35,35 0 1,1 305,295" fill="none" stroke="#9333ea" stroke-width="2.5"
+              marker-end="url(#arrow)" />
+            <rect x="255" y="305" width="50" height="30" fill="white" opacity="0.9" rx="4" />
+            <text x="280" y="325" text-anchor="middle" font-size="14" font-weight="600">1/1,L</text>
+
+            <!-- q2 -> q0 -->
+            <path d="M 255,245 Q 185,175 145,125" fill="none" stroke="#9333ea" stroke-width="2.5"
+              marker-end="url(#arrow)" />
+            <rect x="165" y="175" width="60" height="25" fill="white" opacity="0.9" rx="4" />
+            <text x="195" y="192" text-anchor="middle" font-size="14" font-weight="600">⊔/⊔,R</text>
+          </svg>
+        </div>
+
+        <div class="theorem-card">
+          <h4 class="card-title">Machine Behavior</h4>
+          <p><strong>State \(q_0\):</strong> Scans right across the tape until reaching the first blank symbol</p>
+          <p><strong>State \(q_1\):</strong> Reached after scanning right; if a '1' is found, erase it and move to
+            \(q_2\); if blank, halt</p>
+          <p><strong>State \(q_2\):</strong> Moves left across all remaining '1' symbols until reaching a blank, then
+            returns to \(q_0\)</p>
+          <p><strong>State \(q_h\):</strong> Halts when no more symbols remain on the tape</p>
+        </div>
+
+        <div class="key-point">
+          <strong>Execution Pattern:</strong> The machine cycles through \(q_0 \to q_1 \to q_2 \to q_0\), erasing one
+          symbol per cycle and repositioning the head to the leftmost position, until all symbols are removed.
+        </div>
+      </div>
+
+      <!-- 3. Configurations -->
+      <div id="configurations" class="tab-content">
+        <h2 class="section-title">Machine Configurations</h2>
+
+        <div class="definition-card">
+          <h4 class="card-title">Configuration Notation</h4>
+          <p>A configuration is written as \(u(q)v\), where:</p>
+          <ul>
+            <li>The tape contains the string \(uv\)</li>
+            <li>The machine is in state \(q\)</li>
+            <li>The read/write head scans the first symbol of \(v\)</li>
+          </ul>
+          <div style="margin-top: 20px; padding: 15px; background: #f8fafc; border-radius: 8px;">
+            <p><strong>Initial configuration on input \(1^n\):</strong> \[(q_0)1^n\]</p>
+            <p><strong>Halting configuration:</strong> \[(q_h)\sqcup\]</p>
+          </div>
+        </div>
+
+        <div class="example-card">
+          <h4 class="card-title">One Complete Phase of Computation</h4>
+          <p>For any \(k \ge 1\), the following sequence of configurations demonstrates one complete phase:</p>
+          \[
+          \begin{aligned}
+          &(q_0)1^k && \text{(Start: head at leftmost position)} \\
+          &\vdash\; 1(q_0)1^{k-1} && \text{(Move right)} \\
+          &\vdash\; 1^2(q_0)1^{k-2} && \text{(Continue right)} \\
+          &\vdash\; \cdots \\
+          &\vdash\; 1^{k-1}(q_0)1 && \text{(Reach last symbol)} \\
+          &\vdash\; 1^k(q_0)\sqcup && \text{(Reach blank, switch to } q_1 \text{)} \\
+          &\vdash\; 1^{k-1}(q_1)1 && \text{(Move left to } q_1 \text{)} \\
+          &\vdash\; 1^{k-1}(q_2)\sqcup && \text{(Erase last 1, switch to } q_2 \text{)} \\
+          &\vdash\; 1^{k-2}(q_2)1 && \text{(Move left in } q_2 \text{)} \\
+          &\vdash\; \cdots \\
+          &\vdash\; (q_2)1^{k-1} && \text{(Reach leftmost 1)} \\
+          &\vdash\; \sqcup(q_2)1^{k-1} && \text{(Move left, reach blank)} \\
+          &\vdash\; (q_0)1^{k-1} && \text{(Return to start position)}
+          \end{aligned}
+          \]
+          <p style="margin-top: 15px; font-weight: 600;">Result: One full phase reduces the input length by exactly one
+            symbol and repositions the head at the start.</p>
+        </div>
+
+        <div class="theorem-card">
+          <h4 class="card-title">Configuration Sequence Analysis</h4>
+          <p>Each phase consists of:</p>
+          <ol>
+            <li><strong>Scanning Phase (\(q_0\)):</strong> Move right across \(k\) symbols (\(k+1\) steps to reach
+              blank)</li>
+            <li><strong>Deletion Phase (\(q_1\)):</strong> Move left and erase rightmost '1' (1 step)</li>
+            <li><strong>Return Phase (\(q_2\)):</strong> Move left across remaining \(k-1\) symbols to leftmost blank
+              (\(k\) steps)</li>
+            <li><strong>Reposition (\(q_2 \to q_0\)):</strong> Move right to start of remaining string (1 step)</li>
+          </ol>
+          <p style="margin-top: 10px;"><strong>Total steps per phase:</strong> \(k + 1 + 1 + k + 1 = 2k + 3\)</p>
+        </div>
+
+        <div class="key-point">
+          <strong>Critical Observation:</strong> The machine always returns to configuration \((q_0)1^{k-1}\) after
+          processing \((q_0)1^k\), forming a clear recursive structure.
+        </div>
+      </div>
+
+      <!-- 4. Reachability -->
+      <div id="reachability" class="tab-content">
+        <h2 class="section-title">The Configuration Graph</h2>
+        <p style="margin-bottom: 30px;">The configuration graph visualizes the execution path from start to halt. Each
+          arrow represents a complete phase (multiple TM steps).</p>
+
+        <div class="svg-container">
+          <svg width="900" height="180" viewBox="0 0 900 180">
+            <defs>
+              <marker id="arrow2" markerWidth="10" markerHeight="10" refX="9" refY="3" orientation="auto"
+                markerUnits="strokeWidth">
+                <path d="M0,0 L0,6 L9,3 z" fill="#1e293b" />
+              </marker>
+              <filter id="glow">
+                <feGaussianBlur stdDeviation="2" result="coloredBlur" />
+                <feMerge>
+                  <feMergeNode in="coloredBlur" />
+                  <feMergeNode in="SourceGraphic" />
+                </feMerge>
+              </filter>
+            </defs>
+
+            <!-- Nodes -->
+            <rect x="20" y="60" width="120" height="60" rx="12" fill="#dbeafe" stroke="#1e40af" stroke-width="2"
+              filter="url(#glow)" />
+            <text x="80" y="95" text-anchor="middle" font-family="monospace" font-size="16"
+              font-weight="600">(q₀)1ⁿ</text>
+
+            <line x1="140" y1="90" x2="190" y2="90" stroke="#1e293b" stroke-width="3" marker-end="url(#arrow2)" />
+            <text x="165" y="78" text-anchor="middle" font-size="11" font-weight="600" fill="#64748b">phase 1</text>
+
+            <rect x="190" y="60" width="130" height="60" rx="12" fill="#fef3c7" stroke="#f59e0b" stroke-width="2"
+              filter="url(#glow)" />
+            <text x="255" y="95" text-anchor="middle" font-family="monospace" font-size="16"
+              font-weight="600">(q₀)1ⁿ⁻¹</text>
+
+            <line x1="320" y1="90" x2="370" y2="90" stroke="#1e293b" stroke-width="3" marker-end="url(#arrow2)" />
+            <text x="345" y="78" text-anchor="middle" font-size="11" font-weight="600" fill="#64748b">phase 2</text>
+
+            <text x="420" y="100" font-size="28" text-anchor="middle" font-weight="bold" fill="#64748b">⋯</text>
+
+            <line x1="470" y1="90" x2="520" y2="90" stroke="#1e293b" stroke-width="3" marker-end="url(#arrow2)" />
+
+            <rect x="520" y="60" width="100" height="60" rx="12" fill="#fef3c7" stroke="#f59e0b" stroke-width="2"
+              filter="url(#glow)" />
+            <text x="570" y="95" text-anchor="middle" font-family="monospace" font-size="16"
+              font-weight="600">(q₀)1</text>
+
+            <line x1="620" y1="90" x2="670" y2="90" stroke="#1e293b" stroke-width="3" marker-end="url(#arrow2)" />
+            <text x="645" y="78" text-anchor="middle" font-size="11" font-weight="600" fill="#64748b">phase n</text>
+
+            <rect x="670" y="60" width="100" height="60" rx="12" fill="#fef3c7" stroke="#f59e0b" stroke-width="2"
+              filter="url(#glow)" />
+            <text x="720" y="95" text-anchor="middle" font-family="monospace" font-size="16"
+              font-weight="600">(q₀)⊔</text>
+
+            <line x1="770" y1="90" x2="810" y2="90" stroke="#166534" stroke-width="3" marker-end="url(#arrow2)" />
+
+            <circle cx="860" cy="90" r="30" fill="#dcfce7" stroke="#166534" stroke-width="2" filter="url(#glow)" />
+            <text x="860" y="98" text-anchor="middle" font-weight="bold" font-size="16" fill="#166534">Halt</text>
+          </svg>
+        </div>
+
+        <div class="theorem-card">
+          <h4 class="card-title">Reachability Relation</h4>
+          <p>The configuration graph for input \(1^n\) contains the following directed path:</p>
+          \[
+          (q_0)1^n
+          \;\vdash^*\;
+          (q_0)1^{n-1}
+          \;\vdash^*\;
+          (q_0)1^{n-2}
+          \;\vdash^*\;
+          \cdots
+          \;\vdash^*\;
+          (q_0)1
+          \;\vdash^*\;
+          (q_0)\sqcup
+          \;\vdash^*\;
+          (q_h)\sqcup
+          \]
+          <p style="margin-top: 15px;">Where \(\vdash^*\) denotes the reflexive transitive closure of the single-step
+            relation \(\vdash\).</p>
+        </div>
+
+        <div class="definition-card">
+          <h4 class="card-title">Graph Properties</h4>
+          <ul>
+            <li><strong>Path Length:</strong> \(n + 1\) nodes (including halt state)</li>
+            <li><strong>Path Type:</strong> Linear (no branching for deterministic TM)</li>
+            <li><strong>Transitivity:</strong> If \(C_1 \vdash^* C_2\) and \(C_2 \vdash^* C_3\), then \(C_1 \vdash^*
+              C_3\)</li>
+            <li><strong>Irreversibility:</strong> No backward edges (computation is forward-only)</li>
+          </ul>
+        </div>
+
+        <div class="key-point">
+          <strong>Reachability Definition:</strong> Configuration \(C_2\) is reachable from \(C_1\) if there exists a
+          sequence of transitions from \(C_1\) to \(C_2\).
+        </div>
+      </div>
+
+      <!-- 5. Inductive Proof -->
+      <div id="proof" class="tab-content">
+        <h2 class="section-title">Inductive Reachability Proof</h2>
+
+        <div class="theorem-card"
+          style="border-left-color: var(--secondary); background: linear-gradient(135deg, #fff1f2, #ffffff);">
+          <h4 class="card-title">Theorem</h4>
+          <p><strong>Claim:</strong> For all \(n \ge 0\), the halting configuration \((q_h)\sqcup\) is reachable from
+            the initial configuration \((q_0)1^n\).</p>
+          <p style="margin-top: 10px;"><strong>Formal Statement:</strong> \(\forall n \ge 0: (q_0)1^n \vdash^*
+            (q_h)\sqcup\)</p>
+        </div>
+
+        <div class="definition-card">
+          <h4 class="card-title">📌 Base Case (\(n=0\))</h4>
+          <p><strong>Given:</strong> Input is the empty string, so the initial configuration is \((q_0)\sqcup\)</p>
+          <p style="margin-top: 10px;"><strong>Computation:</strong></p>
+          \[
+          \begin{aligned}
+          (q_0)\sqcup &\vdash (q_1)\sqcup && \text{by } \delta(q_0,\sqcup) = (q_1,\sqcup,L) \\
+          &\vdash (q_h)\sqcup && \text{by } \delta(q_1,\sqcup) = (q_h,\sqcup,R)
+          \end{aligned}
+          \]
+          <p style="margin-top: 10px;"><strong>Conclusion:</strong> \((q_0)\sqcup \vdash^* (q_h)\sqcup\) ✓</p>
+        </div>
+
+        <div class="definition-card">
+          <h4 class="card-title">🔄 Inductive Hypothesis</h4>
+          <p><strong>Assume:</strong> For some arbitrary \(k \ge 0\), the configuration \((q_h)\sqcup\) is reachable
+            from \((q_0)1^k\)</p>
+          <p style="margin-top: 10px;"><strong>Symbolic Form:</strong></p>
+          \[ P(k): (q_0)1^k \vdash^* (q_h)\sqcup \]
+          <p style="margin-top: 10px;">We assume this is true and use it to prove \(P(k+1)\).</p>
+        </div>
+
+        <div class="definition-card">
+          <h4 class="card-title">⚡ Inductive Step (\(n = k+1\))</h4>
+          <p><strong>Goal:</strong> Show that \((q_0)1^{k+1} \vdash^* (q_h)\sqcup\)</p>
+
+          <div
+            style="margin-top: 20px; padding: 20px; background: #f8fafc; border-radius: 8px; border-left: 4px solid #3b82f6;">
+            <p><strong>Step 1: One Phase of Computation</strong></p>
+            <p>From the configuration analysis, we know that one complete phase transforms:</p>
+            \[ (q_0)1^{k+1} \vdash^* (q_0)1^k \]
+            <p style="margin-top: 10px;">This phase consists of:</p>
+            <ul style="margin-left: 20px;">
+              <li>\(q_0\) scans right across \(k+1\) symbols to reach the blank</li>
+              <li>\(q_1\) erases the rightmost '1' and moves to \(q_2\)</li>
+              <li>\(q_2\) moves left across the remaining \(k\) symbols</li>
+              <li>\(q_2\) transitions to \(q_0\) at the leftmost position</li>
+            </ul>
+            In detail, the configuration changes from \((q_0)1^{k+1}\) to \((q_0)1^k\) in \(2(k+1)+1\) steps. It goes
+            through
+            the following configurations:
+            \((q_0)1^{k+1} \vdash 1^{k+1}(q_0)\sqcup \vdash 1^k(q_1)\sqcup \sqcup \vdash 1^{k-1}(q_2)1\sqcup \sqcup
+            \vdash
+            1^{k-2}(q_2)11\sqcup \sqcup \vdash \dots \vdash 1(q_2)1^k\sqcup \sqcup \vdash (q_2)1^k\sqcup \sqcup
+            \vdash (q_0)1^k\sqcup \sqcup \)
+          </div>
+
+          <div
+            style="margin-top: 15px; padding: 20px; background: #fef3c7; border-radius: 8px; border-left: 4px solid #f59e0b;">
+            <p><strong>Step 2: Apply Inductive Hypothesis</strong></p>
+            <p>By our inductive hypothesis \(P(k)\), we have:</p>
+            \[ (q_0)1^k \vdash^* (q_h)\sqcup \]
+          </div>
+
+          <div
+            style="margin-top: 15px; padding: 20px; background: #dcfce7; border-radius: 8px; border-left: 4px solid #10b981;">
+            <p><strong>Step 3: Transitivity</strong></p>
+            <p>By the transitivity property of the reachability relation \(\vdash^*\):</p>
+            \[
+            \begin{aligned}
+            (q_0)1^{k+1} &\vdash^* (q_0)1^k && \text{(Step 1)} \\
+            (q_0)1^k &\vdash^* (q_h)\sqcup && \text{(Step 2)} \\
+            \hline
+            \therefore\; (q_0)1^{k+1} &\vdash^* (q_h)\sqcup && \text{(Transitivity)}
+            \end{aligned}
+            \]
+          </div>
+
+          <p style="margin-top: 20px; font-weight: 600; color: var(--success);">Thus, \(P(k+1)\) is true, completing the
+            inductive step. ✓</p>
+        </div>
+
+        <div class="example-card"
+          style="border-left-color: var(--success); background: linear-gradient(135deg, #f0fdf4, #dcfce7);">
+          <h4 class="card-title">✅ Conclusion</h4>
+          <p>By the principle of <strong>mathematical induction</strong>, we have proven that:</p>
+          \[ \forall n \ge 0: (q_0)1^n \vdash^* (q_h)\sqcup \]
+          <p style="margin-top: 15px;">The halting configuration \((q_h)\sqcup\) is reachable from the initial
+            configuration \((q_0)1^n\) for all non-negative integers \(n\).</p>
+          <p style="margin-top: 15px; font-weight: 600;">This completes the correctness proof for the Turing machine
+            \(M\). □</p>
+        </div>
+
+        <div class="key-point">
+          <strong>Proof Technique:</strong> This proof demonstrates structural induction on the input length, showing
+          how mathematical reasoning verifies computational processes.
+        </div>
+      </div>
+
+      <!-- 6. Interactive Simulator -->
+      <div id="simulator" class="tab-content">
+        <h2 class="section-title">Interactive Turing Machine Simulator</h2>
+
+        <div class="interactive-demo">
+          <h3 style="margin-bottom: 20px; color: var(--text-dark);">Visualize the Execution</h3>
+
+          <div class="demo-controls">
+            <button class="btn btn-primary" onclick="resetSimulation()">Reset</button>
+            <button class="btn btn-success" onclick="stepForward()" id="stepBtn">Step Forward</button>
+            <button class="btn btn-secondary" onclick="runToEnd()" id="runBtn">Run to End</button>
+            <input type="number" id="inputLength" value="5" min="0" max="10"
+              style="padding: 12px; border-radius: 8px; border: 2px solid #cbd5e1; font-size: 1em; width: 120px;"
+              onchange="resetSimulation()">
+            <label for="inputLength" style="padding: 12px; font-weight: 600;">Input Length (n)</label>
+          </div>
+
+          <div class="tape-container">
+            <div class="tape" id="tape"></div>
+            <div class="state-indicator" id="stateIndicator">State: q₀ | Position: 0 | Step: 0</div>
+          </div>
+
+          <div style="margin-top: 20px; padding: 20px; background: white; border-radius: 12px;">
+            <h4 style="margin-bottom: 15px; color: var(--text-dark);">Execution Log</h4>
+            <div id="executionLog"
+              style="max-height: 200px; overflow-y: auto; font-family: monospace; font-size: 0.9em; line-height: 1.8; color: #475569;">
+            </div>
+          </div>
+        </div>
+
+        <div class="theorem-card" style="margin-top: 30px;">
+          <h4 class="card-title">How to Use the Simulator</h4>
+          <ol>
+            <li><strong>Set Input Length:</strong> Choose a value for \(n\) (0-10)</li>
+            <li><strong>Step Through:</strong> Click "Step Forward" to execute one transition at a time</li>
+            <li><strong>Run Automatically:</strong> Click "Run to End" to see the complete execution</li>
+            <li><strong>Reset:</strong> Start over with a new configuration</li>
+          </ol>
+          <p style="margin-top: 15px;">Watch how the machine systematically erases symbols one by one, always returning
+            to the leftmost position!</p>
+        </div>
+      </div>
+
+    </div> <!-- End Content -->
+
+    <footer>
+      <p>&copy; 2026 CS 637: Mathematics-II | IIT Indore</p>
+      <p style="margin-top: 10px; font-size: 0.9em; opacity: 0.9;">Enhanced Interactive Lecture Materials</p>
+    </footer>
+
+    <a href="index.html" class="fab-btn" title="Back to Course Home">🏠</a>
+    <button class="scroll-top" id="scrollTop" onclick="scrollToTop()">↑</button>
+  </div>
+
+  <script>
+    // Tab switching
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+
+      document.getElementById(tabId).classList.add('active');
+      const buttons = document.querySelectorAll('.tab-btn');
+      for (let btn of buttons) {
+        if (btn.getAttribute('onclick').includes(tabId)) {
+          btn.classList.add('active');
+          break;
+        }
+      }
+
+      // Update progress
+      const tabs = ['problem', 'machine', 'configurations', 'reachability', 'proof', 'simulator'];
+      const currentIndex = tabs.indexOf(tabId);
+      const progress = ((currentIndex + 1) / tabs.length) * 100;
+      document.getElementById('progressFill').style.width = progress + '%';
+    }
+
+    // Scroll to top functionality
+    window.addEventListener('scroll', function () {
+      const scrollTop = document.getElementById('scrollTop');
+      if (window.pageYOffset > 300) {
+        scrollTop.classList.add('visible');
+      } else {
+        scrollTop.classList.remove('visible');
+      }
     });
-});
-</script>
 
-<a href="index.html" class="fab-btn" title="Back to Index">🏠</a>
+    function scrollToTop() {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // Background particles
+    function createParticles() {
+      const particles = document.getElementById('particles');
+      for (let i = 0; i < 15; i++) {
+        const particle = document.createElement('div');
+        particle.className = 'particle';
+        particle.style.width = Math.random() * 100 + 50 + 'px';
+        particle.style.height = particle.style.width;
+        particle.style.left = Math.random() * 100 + '%';
+        particle.style.top = Math.random() * 100 + '%';
+        particle.style.animationDelay = Math.random() * 20 + 's';
+        particle.style.animationDuration = Math.random() * 10 + 15 + 's';
+        particles.appendChild(particle);
+      }
+    }
+
+    // Turing Machine Simulator
+    let tape = [];
+    let headPosition = 0;
+    let currentState = 'q0';
+    let stepCount = 0;
+    let executionLog = [];
+    let isRunning = false;
+
+    function resetSimulation() {
+      const n = parseInt(document.getElementById('inputLength').value) || 0;
+
+      // Initialize tape with blank on left, n ones, and blank on right
+      tape = ['⊔'].concat(Array(n).fill('1')).concat(['⊔']);
+      headPosition = 1; // Start at first '1' (or blank if n=0)
+      currentState = 'q0';
+      stepCount = 0;
+      executionLog = [];
+      isRunning = false;
+
+      updateDisplay();
+      document.getElementById('stepBtn').disabled = false;
+      document.getElementById('runBtn').disabled = false;
+      addLog(`Initialized with input 1^${n}`);
+      addLog(`Starting at position ${headPosition} in state q₀`);
+    }
+
+    function updateDisplay() {
+      const tapeElement = document.getElementById('tape');
+      tapeElement.innerHTML = '';
+
+      tape.forEach((symbol, index) => {
+        const cell = document.createElement('div');
+        cell.className = 'tape-cell';
+        if (index === headPosition) {
+          cell.classList.add('active');
+        }
+        cell.textContent = symbol;
+        tapeElement.appendChild(cell);
+      });
+
+      document.getElementById('stateIndicator').textContent =
+        `State: ${currentState} | Position: ${headPosition} | Step: ${stepCount}`;
+    }
+
+    function addLog(message) {
+      executionLog.push(`[Step ${stepCount}] ${message}`);
+      const logElement = document.getElementById('executionLog');
+      logElement.innerHTML = executionLog.map(log => `<div>${log}</div>`).join('');
+      logElement.scrollTop = logElement.scrollHeight;
+    }
+
+    function stepForward() {
+      if (currentState === 'qh') {
+        addLog('Machine has halted!');
+        document.getElementById('stepBtn').disabled = true;
+        document.getElementById('runBtn').disabled = true;
+        return;
+      }
+
+      const currentSymbol = tape[headPosition];
+
+      if (currentState === 'q0') {
+        if (currentSymbol === '1') {
+          // δ(q0,1) = (q0,1,R)
+          headPosition++;
+          stepCount++;
+          addLog(`δ(q₀,1) = (q₀,1,R): Read 1, move right, stay in q₀`);
+        } else if (currentSymbol === '⊔') {
+          // δ(q0,⊔) = (q1,⊔,L)
+          currentState = 'q1';
+          headPosition--;
+          stepCount++;
+          addLog(`δ(q₀,⊔) = (q₁,⊔,L): Read blank, move left, switch to q₁`);
+        }
+      } else if (currentState === 'q1') {
+        if (currentSymbol === '1') {
+          // δ(q1,1) = (q2,⊔,L)
+          tape[headPosition] = '⊔';
+          currentState = 'q2';
+          headPosition--;
+          stepCount++;
+          addLog(`δ(q₁,1) = (q₂,⊔,L): Erase 1, write blank, move left to q₂`);
+        } else if (currentSymbol === '⊔') {
+          // δ(q1,⊔) = (qh,⊔,R)
+          currentState = 'qh';
+          headPosition++;
+          stepCount++;
+          addLog(`δ(q₁,⊔) = (qₕ,⊔,R): Read blank (no symbols left), HALT!`);
+        }
+      } else if (currentState === 'q2') {
+        if (currentSymbol === '1') {
+          // δ(q2,1) = (q2,1,L)
+          headPosition--;
+          stepCount++;
+          addLog(`δ(q₂,1) = (q₂,1,L): Read 1, move left, stay in q₂`);
+        } else if (currentSymbol === '⊔') {
+          // δ(q2,⊔) = (q0,⊔,R)
+          currentState = 'q0';
+          headPosition++;
+          stepCount++;
+          addLog(`δ(q₂,⊔) = (q₀,⊔,R): Read blank (leftmost), move right to q₀`);
+        }
+      }
+
+      // Extend tape if needed
+      if (headPosition >= tape.length) {
+        tape.push('⊔');
+      }
+      if (headPosition < 0) {
+        tape.unshift('⊔');
+        headPosition = 0;
+      }
+
+      updateDisplay();
+    }
+
+    function runToEnd() {
+      if (isRunning) return;
+      isRunning = true;
+      document.getElementById('runBtn').disabled = true;
+
+      const interval = setInterval(() => {
+        if (currentState === 'qh' || !isRunning) {
+          clearInterval(interval);
+          isRunning = false;
+          document.getElementById('runBtn').disabled = false;
+          return;
+        }
+        stepForward();
+      }, 400);
+    }
+
+    // Math rendering
+    document.addEventListener("DOMContentLoaded", function () {
+      renderMathInElement(document.body, {
+        delimiters: [
+          { left: "$$", right: "$$", display: true },
+          { left: "\\[", right: "\\]", display: true },
+          { left: "\\(", right: "\\)", display: false },
+          { left: "$", right: "$", display: false }
+        ]
+      });
+
+      createParticles();
+      resetSimulation();
+    });
+  </script>
 </body>
+
 </html>
