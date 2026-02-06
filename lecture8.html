@@ -1,117 +1,1713 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="utf-8">
-  <title>CS 637 – Lecture 8 Definitions</title>
+  <title>CS 637 – Lecture 8: Universal Turing Machines</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+  <!-- Math Rendering -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
   <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
   <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
 
   <style>
+    :root {
+      --primary: #1a2a6c;
+      --secondary: #b21f1f;
+      --accent: #fdbb2d;
+      --accent-hover: #f59e0b;
+      --success: #10b981;
+      --danger: #ef4444;
+      --warning: #f59e0b;
+      --bg-light: #f8fafc;
+      --text-dark: #1e293b;
+      --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.08);
+      --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.12);
+      --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.15);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
     body {
-      font-family: "Times New Roman", serif;
-      margin: 40px;
-      line-height: 1.5;
-      background-color: #ffffff;
-      color: #000000;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      line-height: 1.7;
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%);
+      min-height: 100vh;
+      padding: 20px;
+      position: relative;
+      overflow-x: hidden;
     }
-    h1, h2 {
+
+    /* Animated background particles */
+    .particles {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .particle {
+      position: absolute;
+      background: rgba(253, 187, 45, 0.1);
+      border-radius: 50%;
+      animation: float 20s infinite;
+    }
+
+    @keyframes float {
+      0%, 100% {
+        transform: translateY(0) translateX(0) rotate(0deg);
+      }
+      25% {
+        transform: translateY(-100px) translateX(50px) rotate(90deg);
+      }
+      50% {
+        transform: translateY(-50px) translateX(100px) rotate(180deg);
+      }
+      75% {
+        transform: translateY(-150px) translateX(25px) rotate(270deg);
+      }
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 25px 80px rgba(0, 0, 0, 0.4);
+      overflow: hidden;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Header with gradient animation */
+    header {
+      background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
+      background-size: 200% 200%;
+      animation: gradientShift 15s ease infinite;
+      color: white;
+      padding: 50px 40px;
       text-align: center;
+      position: relative;
+      overflow: hidden;
     }
+
+    @keyframes gradientShift {
+      0% {
+        background-position: 0% 50%;
+      }
+      50% {
+        background-position: 100% 50%;
+      }
+      100% {
+        background-position: 0% 50%;
+      }
+    }
+
+    header::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+      animation: rotate 30s linear infinite;
+    }
+
+    @keyframes rotate {
+      from {
+        transform: rotate(0deg);
+      }
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
     h1 {
-      font-size: 1.8em;
-      margin-bottom: 0.2em;
+      font-size: 2.8em;
+      margin-bottom: 12px;
+      font-weight: 800;
+      position: relative;
+      z-index: 1;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+      letter-spacing: -0.5px;
     }
-    h2 {
-      font-size: 1.2em;
-      margin-top: 2em;
-      margin-bottom: 0.5em;
-    }
-    .definition {
-      margin-bottom: 1em;
-    }
-    .term {
-      font-weight: bold;
-    }
-    .number {
-      font-weight: bold;
-    }
-    .instructor {
-      margin-top: 8px;
-      font-size: 0.95rem;
-      color: #64748b;
-    }
-    .instructor a {
-      color: #0ea5e9;
-      text-decoration: none;
+
+    .subtitle {
+      font-size: 1.4em;
+      margin-bottom: 20px;
+      opacity: 0.95;
+      position: relative;
+      z-index: 1;
       font-weight: 500;
     }
+
+    .instructor {
+      margin-top: 20px;
+      font-size: 1.1em;
+      opacity: 0.95;
+      position: relative;
+      z-index: 1;
+    }
+
+    .instructor a {
+      color: #ffd700;
+      text-decoration: none;
+      font-weight: 600;
+      transition: all 0.3s;
+      padding: 4px 8px;
+      border-radius: 4px;
+    }
+
     .instructor a:hover {
+      background: rgba(255, 215, 0, 0.2);
       text-decoration: underline;
     }
-    footer {
-      margin-top: 3em;
+
+    /* Progress indicator */
+    .progress-bar {
+      position: sticky;
+      top: 0;
+      height: 4px;
+      background: #e2e8f0;
+      z-index: 101;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--primary), var(--secondary), var(--accent));
+      width: 0%;
+      transition: width 0.3s ease;
+    }
+
+    /* Navigation */
+    .nav-wrapper {
+      background: #fff;
+      position: sticky;
+      top: 4px;
+      z-index: 100;
+      border-bottom: 2px solid #e2e8f0;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    }
+
+    .nav-tabs {
+      display: flex;
+      gap: 0;
+      overflow-x: auto;
+      padding: 0 20px;
+      scrollbar-width: thin;
+      scrollbar-color: var(--primary) #f1f5f9;
+    }
+
+    .nav-tabs::-webkit-scrollbar {
+      height: 6px;
+    }
+
+    .nav-tabs::-webkit-scrollbar-track {
+      background: #f1f5f9;
+    }
+
+    .nav-tabs::-webkit-scrollbar-thumb {
+      background: var(--primary);
+      border-radius: 3px;
+    }
+
+    .tab-btn {
+      padding: 15px 24px;
+      background: none;
+      border: none;
+      font-size: 1em;
+      cursor: pointer;
+      color: #64748b;
+      font-weight: 600;
+      border-bottom: 3px solid transparent;
+      transition: all 0.3s;
+      white-space: nowrap;
+      position: relative;
+    }
+
+    .tab-btn::before {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%) scaleX(0);
+      width: 80%;
+      height: 3px;
+      background: var(--primary);
+      transition: transform 0.3s;
+    }
+
+    .tab-btn:hover {
+      color: var(--primary);
+      background: #f8fafc;
+    }
+
+    .tab-btn.active {
+      color: var(--primary);
+    }
+
+    .tab-btn.active::before {
+      transform: translateX(-50%) scaleX(1);
+    }
+
+    /* Content Area */
+    .content {
+      padding: 50px 40px;
+      min-height: 600px;
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+      animation: slideIn 0.5s ease-out;
+    }
+
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Typography */
+    .section-title {
+      font-size: 2em;
+      color: var(--text-dark);
+      margin-bottom: 30px;
+      padding-bottom: 12px;
+      border-bottom: 4px solid var(--secondary);
+      position: relative;
+      font-weight: 700;
+    }
+
+    .section-title::after {
+      content: '';
+      position: absolute;
+      bottom: -4px;
+      left: 0;
+      width: 100px;
+      height: 4px;
+      background: var(--accent);
+    }
+
+    /* Card components with enhanced styling */
+    .definition-card {
+      background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
+      border-left: 5px solid var(--primary);
+      padding: 25px;
+      margin-bottom: 25px;
+      border-radius: 12px;
+      box-shadow: var(--shadow-sm);
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .definition-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 5px;
+      height: 100%;
+      background: linear-gradient(180deg, var(--primary), var(--accent));
+      opacity: 0;
+      transition: opacity 0.4s;
+    }
+
+    .definition-card:hover {
+      transform: translateX(8px) translateY(-4px);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .definition-card:hover::before {
+      opacity: 1;
+    }
+
+    .example-card {
+      background: linear-gradient(135deg, #fef3c7 0%, #fef9c3 100%);
+      border-left: 5px solid var(--warning);
+      padding: 25px;
+      border-radius: 12px;
+      margin-bottom: 25px;
+      box-shadow: var(--shadow-sm);
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+    }
+
+    .example-card::before {
+      content: '💡';
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      font-size: 2em;
+      opacity: 0.2;
+      transition: all 0.4s;
+    }
+
+    .example-card:hover {
+      transform: translateX(8px) translateY(-4px);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .example-card:hover::before {
+      opacity: 0.4;
+      transform: rotate(15deg) scale(1.1);
+    }
+
+    .theorem-card {
+      background: linear-gradient(135deg, #dfe9f3 0%, #ffffff 100%);
+      border-left: 5px solid #3b82f6;
+      padding: 25px;
+      border-radius: 12px;
+      margin-bottom: 25px;
+      box-shadow: var(--shadow-sm);
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+    }
+
+    .theorem-card::before {
+      content: '📐';
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      font-size: 2em;
+      opacity: 0.2;
+      transition: all 0.4s;
+    }
+
+    .theorem-card:hover {
+      transform: translateX(8px) translateY(-4px);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .theorem-card:hover::before {
+      opacity: 0.4;
+      transform: rotate(-15deg) scale(1.1);
+    }
+
+    .card-title {
+      font-size: 1.3em;
+      font-weight: 700;
+      margin-bottom: 15px;
+      color: var(--text-dark);
+    }
+
+    /* SVG Container */
+    .svg-container {
+      display: flex;
+      justify-content: center;
+      margin: 40px 0;
+      padding: 30px;
+      background: linear-gradient(135deg, #f8fafc, #ffffff);
+      border-radius: 16px;
+      border: 2px solid #e2e8f0;
+      overflow-x: auto;
+      box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05);
+      transition: all 0.3s;
+    }
+
+    .svg-container:hover {
+      box-shadow: var(--shadow-md);
+      border-color: var(--primary);
+    }
+
+    /* Interactive elements */
+    .interactive-demo {
+      background: linear-gradient(135deg, #e0e7ff, #f5f3ff);
+      padding: 30px;
+      border-radius: 16px;
+      margin: 30px 0;
+      box-shadow: var(--shadow-md);
+    }
+
+    .demo-controls {
+      display: flex;
+      gap: 15px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      padding: 12px 24px;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+      font-size: 1em;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--primary), #2563eb);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+
+    .btn-secondary {
+      background: linear-gradient(135deg, var(--secondary), #dc2626);
+      color: white;
+    }
+
+    .btn-secondary:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+
+    .btn-success {
+      background: linear-gradient(135deg, var(--success), #059669);
+      color: white;
+    }
+
+    .btn-success:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    /* Tape visualization */
+    .tape-container {
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      margin: 20px 0;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .tape {
+      display: flex;
+      gap: 2px;
+      overflow-x: auto;
+      padding: 10px;
+      justify-content: center;
+    }
+
+    .tape-cell {
+      min-width: 50px;
+      height: 50px;
+      border: 2px solid #cbd5e1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      font-size: 1.2em;
+      background: white;
+      border-radius: 6px;
+      transition: all 0.3s;
+    }
+
+    .tape-cell.active {
+      border-color: var(--primary);
+      background: linear-gradient(135deg, #dbeafe, #bfdbfe);
+      transform: scale(1.1);
+      box-shadow: 0 4px 12px rgba(26, 42, 108, 0.3);
+    }
+
+    .state-indicator {
+      margin-top: 15px;
+      padding: 15px;
+      background: #f1f5f9;
+      border-radius: 8px;
       text-align: center;
-      font-size: 0.85em;
-      color: #333;
+      font-weight: 600;
+      font-size: 1.1em;
+      color: var(--primary);
+    }
+
+    /* Lists */
+    ul, ol {
+      margin-left: 25px;
+      margin-top: 15px;
+    }
+
+    li {
+      margin-bottom: 10px;
+      line-height: 1.8;
+    }
+
+    /* Code blocks */
+    code {
+      background: #f1f5f9;
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 0.95em;
+      color: #e11d48;
+      font-weight: 600;
+    }
+
+    pre {
+      background: #1e293b;
+      color: #e2e8f0;
+      padding: 20px;
+      border-radius: 8px;
+      overflow-x: auto;
+      margin: 20px 0;
+      font-family: 'Courier New', Courier, monospace;
+      line-height: 1.6;
+    }
+
+    /* Footer */
+    footer {
+      background: linear-gradient(135deg, var(--primary), #0f172a);
+      color: white;
+      text-align: center;
+      padding: 30px;
+      font-size: 1.05em;
+    }
+
+    /* Floating action button */
+    .fab-btn {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #1a2a6c, #b21f1f);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+      cursor: pointer;
+      z-index: 1000;
+      border: none;
+      font-size: 28px;
+      transition: all 0.3s;
+      text-decoration: none;
+    }
+
+    .fab-btn:hover {
+      transform: translateY(-4px) scale(1.05);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+    }
+
+    /* Scroll to top button */
+    .scroll-top {
+      position: fixed;
+      bottom: 100px;
+      right: 30px;
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent), var(--accent-hover));
+      color: white;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      box-shadow: var(--shadow-md);
+      cursor: pointer;
+      z-index: 999;
+      border: none;
+      font-size: 24px;
+      transition: all 0.3s;
+    }
+
+    .scroll-top.visible {
+      display: flex;
+    }
+
+    .scroll-top:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-lg);
+    }
+
+    /* Key points highlight */
+    .key-point {
+      background: linear-gradient(135deg, #ecfdf5, #d1fae5);
+      border-left: 4px solid var(--success);
+      padding: 20px;
+      margin: 20px 0;
+      border-radius: 8px;
+      font-weight: 500;
+    }
+
+    .key-point::before {
+      content: '🔑 ';
+      font-size: 1.2em;
+    }
+
+    /* Encoding display */
+    .encoding-display {
+      background: #1e293b;
+      color: #e2e8f0;
+      padding: 20px;
+      border-radius: 8px;
+      margin: 20px 0;
+      font-family: 'Courier New', Courier, monospace;
+      overflow-x: auto;
+      border: 2px solid #3b82f6;
+    }
+
+    /* Responsive design */
+    @media (max-width: 768px) {
+      body {
+        padding: 10px;
+      }
+
+      h1 {
+        font-size: 2em;
+      }
+
+      .subtitle {
+        font-size: 1.1em;
+      }
+
+      .content {
+        padding: 30px 20px;
+      }
+
+      .section-title {
+        font-size: 1.5em;
+      }
+
+      .nav-tabs {
+        padding: 0 10px;
+      }
+
+      .tab-btn {
+        padding: 12px 16px;
+        font-size: 0.9em;
+      }
+
+      .demo-controls {
+        flex-direction: column;
+      }
+
+      .btn {
+        width: 100%;
+      }
+
+      header {
+        padding: 30px 20px;
+      }
+    }
+
+    /* Print styles */
+    @media print {
+      body {
+        background: white;
+      }
+
+      .container {
+        box-shadow: none;
+      }
+
+      .fab-btn,
+      .scroll-top,
+      .nav-wrapper {
+        display: none !important;
+      }
+
+      .tab-content {
+        display: block !important;
+        page-break-after: always;
+      }
     }
   </style>
-
-<style>
-.fab-btn {
-  position: fixed;
-  bottom: 24px;
-  right: 24px;
-  width: 56px;
-  height: 56px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #3b82f6, #2563eb);
-  color: white;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-  cursor: pointer;
-  z-index: 1000;
-  border: none;
-  font-size: 24px;
-  transition: transform 0.2s, box-shadow 0.2s;
-  text-decoration: none;
-}
-.fab-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(0,0,0,0.3);
-}
-</style>
-
 </head>
 
 <body>
+  <!-- Background particles -->
+  <div class="particles" id="particles"></div>
 
-<h1>CS 637: Mathematics-II</h1>
-<div class="instructor">
-  <strong>Instructor:</strong> <a href="https://drdebmath.github.io" target="_blank">Dr. Debasish Pattanayak</a>
-</div>
-<h2>Lecture 8 – Equivalence of Computational Models</h2>
+  <div class="container">
+    <!-- Progress bar -->
+    <div class="progress-bar">
+      <div class="progress-fill" id="progressFill"></div>
+    </div>
 
-<footer>
-  
-</footer>
+    <header>
+      <h1>CS 637: Mathematics-II</h1>
+      <div class="subtitle">Lecture 8: Universal Turing Machines</div>
+      <div class="instructor">
+        <strong>Instructor:</strong> <a href="https://drdebmath.github.io/" target="_blank">Dr. Debasish Pattanayak</a>
+      </div>
+    </header>
 
-<script>
-document.addEventListener("DOMContentLoaded", function() {
-    renderMathInElement(document.body, {
-        delimiters: [
-            {left: "31952", right: "31952", display: true},
-            {left: "\[", right: "\]", display: true},
-            {left: "\(", right: "\)", display: false}
-        ]
+    <div class="nav-wrapper">
+      <div class="nav-tabs">
+        <button class="tab-btn active" onclick="switchTab('introduction')">Introduction</button>
+        <button class="tab-btn" onclick="switchTab('utm')">Universal TM</button>
+        <button class="tab-btn" onclick="switchTab('re-languages')">RE Languages</button>
+        <button class="tab-btn" onclick="switchTab('encoding')">TM Encoding</button>
+        <button class="tab-btn" onclick="switchTab('example1')">Example: 1<sup>n</sup></button>
+        <button class="tab-btn" onclick="switchTab('example2')">Example: 1<sup>n²</sup></button>
+        <button class="tab-btn" onclick="switchTab('simulator')">Interactive Demo</button>
+      </div>
+    </div>
+
+    <div class="content">
+      <!-- 1. Introduction -->
+      <div id="introduction" class="tab-content active">
+        <h2 class="section-title">The Universal Turing Machine Concept</h2>
+
+        <div class="definition-card">
+          <h3 class="card-title">What is a Universal Turing Machine?</h3>
+          <p>A <strong>Universal Turing Machine (UTM)</strong> is a single Turing machine \(U\) that can simulate any other Turing machine \(M\) on any input \(w\).</p>
+          <p style="margin-top: 15px;"><strong>Key Insight:</strong> The UTM takes as input:</p>
+          <ol>
+            <li>An <em>encoding</em> of the Turing machine \(M\): denoted \(\langle M \rangle\)</li>
+            <li>An input string \(w\)</li>
+          </ol>
+          <p style="margin-top: 15px;">The UTM then simulates \(M\) running on \(w\), producing the same output that \(M(w)\) would produce.</p>
+        </div>
+
+        <div class="svg-container">
+          <svg width="700" height="300" viewBox="0 0 700 300">
+            <defs>
+              <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orientation="auto" markerUnits="strokeWidth">
+                <path d="M0,0 L0,6 L9,3 z" fill="#334155" />
+              </marker>
+              <filter id="shadow">
+                <feDropShadow dx="2" dy="2" stdDeviation="2" flood-opacity="0.2" />
+              </filter>
+            </defs>
+
+            <!-- Input box -->
+            <rect x="50" y="100" width="150" height="100" rx="10" fill="#dbeafe" stroke="#1e40af" stroke-width="2" filter="url(#shadow)" />
+            <text x="125" y="135" text-anchor="middle" font-weight="bold" font-size="16">Input</text>
+            <text x="125" y="160" text-anchor="middle" font-family="monospace" font-size="14">⟨M⟩, w</text>
+            <text x="125" y="180" text-anchor="middle" font-size="12" fill="#64748b">(Encoded TM + Input)</text>
+
+            <!-- Arrow -->
+            <line x1="200" y1="150" x2="280" y2="150" stroke="#64748b" stroke-width="3" marker-end="url(#arrow)" />
+
+            <!-- UTM box -->
+            <rect x="280" y="50" width="180" height="200" rx="10" fill="#fef3c7" stroke="#f59e0b" stroke-width="3" filter="url(#shadow)" />
+            <text x="370" y="90" text-anchor="middle" font-weight="bold" font-size="20">Universal TM</text>
+            <text x="370" y="120" text-anchor="middle" font-size="14">U</text>
+            <circle cx="370" cy="150" r="40" fill="none" stroke="#f59e0b" stroke-width="2" stroke-dasharray="5,3" />
+            <text x="370" y="155" text-anchor="middle" font-size="12" fill="#64748b">Simulates M</text>
+            <text x="370" y="200" text-anchor="middle" font-size="12" fill="#64748b">on input w</text>
+            <text x="370" y="230" text-anchor="middle" font-weight="600" font-size="13">M(w)</text>
+
+            <!-- Arrow -->
+            <line x1="460" y1="150" x2="540" y2="150" stroke="#64748b" stroke-width="3" marker-end="url(#arrow)" />
+
+            <!-- Output box -->
+            <rect x="540" y="100" width="150" height="100" rx="10" fill="#dcfce7" stroke="#166534" stroke-width="2" filter="url(#shadow)" />
+            <text x="615" y="135" text-anchor="middle" font-weight="bold" font-size="16">Output</text>
+            <text x="615" y="160" text-anchor="middle" font-family="monospace" font-size="14">M(w)</text>
+            <text x="615" y="180" text-anchor="middle" font-size="12" fill="#64748b">(Same as direct execution)</text>
+          </svg>
+        </div>
+
+        <div class="theorem-card">
+          <h4 class="card-title">Historical Significance</h4>
+          <p>The Universal Turing Machine, proposed by Alan Turing in 1936, is one of the most profound concepts in computer science:</p>
+          <ul>
+            <li><strong>Foundation of programmability:</strong> The idea that a single machine can execute any algorithm by reading a program</li>
+            <li><strong>Stored-program concept:</strong> Programs and data are both stored in memory (modern computers)</li>
+            <li><strong>Church-Turing Thesis:</strong> Any effectively computable function can be computed by a Turing machine</li>
+            <li><strong>Undecidability:</strong> The halting problem shows fundamental limits of computation</li>
+          </ul>
+        </div>
+
+        <div class="key-point">
+          <strong>Modern Analogy:</strong> A Universal Turing Machine is like a general-purpose computer that can run any program. The encoding \(\langle M \rangle\) is like the program code, and \(w\) is the input data.
+        </div>
+
+        <div class="example-card">
+          <h4 class="card-title">Why This Matters</h4>
+          <p>Understanding UTMs helps us grasp:</p>
+          <ol>
+            <li>The fundamental nature of computation itself</li>
+            <li>How compilers and interpreters work</li>
+            <li>The theoretical limits of what computers can and cannot do</li>
+            <li>The concept of recursively enumerable languages</li>
+          </ol>
+        </div>
+      </div>
+
+      <!-- 2. Universal TM Details -->
+      <div id="utm" class="tab-content">
+        <h2 class="section-title">How the Universal Turing Machine Works</h2>
+
+        <div class="definition-card">
+          <h4 class="card-title">Formal Definition</h4>
+          <p>A Universal Turing Machine \(U\) has the following components:</p>
+          <ul>
+            <li><strong>Input format:</strong> \(\langle M \rangle \# w\), where:
+              <ul style="margin-top: 10px;">
+                <li>\(\langle M \rangle\) is an encoding of TM \(M = (Q, \Sigma, \Gamma, \delta, q_0, \sqcup, F)\)</li>
+                <li>\(\#\) is a separator symbol</li>
+                <li>\(w\) is the input string for \(M\)</li>
+              </ul>
+            </li>
+            <li><strong>Simulation process:</strong> \(U\) maintains:
+              <ul style="margin-top: 10px;">
+                <li>The current state of \(M\)</li>
+                <li>The tape contents of \(M\)</li>
+                <li>The head position of \(M\)</li>
+              </ul>
+            </li>
+            <li><strong>Execution:</strong> For each step, \(U\) looks up the transition in \(\langle M \rangle\) and updates accordingly</li>
+          </ul>
+        </div>
+
+        <div class="example-card">
+          <h4 class="card-title">Simulation Algorithm</h4>
+          <p><strong>Step 1:</strong> Parse the encoding \(\langle M \rangle\) to extract states, alphabet, and transition function</p>
+          <p><strong>Step 2:</strong> Initialize simulated tape with input \(w\), head at position 0, state = \(q_0\)</p>
+          <p><strong>Step 3:</strong> Repeat until halting state reached:</p>
+          <ol style="margin-left: 20px; margin-top: 10px;">
+            <li>Read current symbol under simulated head</li>
+            <li>Look up transition \(\delta(\text{current_state}, \text{symbol})\) in \(\langle M \rangle\)</li>
+            <li>Update simulated state, write symbol, move head according to transition</li>
+            <li>If no transition exists or halting state reached, halt</li>
+          </ol>
+        </div>
+
+        <div class="theorem-card">
+          <h4 class="card-title">Theorem: Existence of Universal TM</h4>
+          <p><strong>Claim:</strong> There exists a Turing machine \(U\) such that for every Turing machine \(M\) and input \(w\):</p>
+          \[ U(\langle M \rangle, w) = M(w) \]
+          <p style="margin-top: 15px;"><strong>Proof Sketch:</strong></p>
+          <ol>
+            <li>Any TM can be encoded as a finite string over a fixed alphabet</li>
+            <li>A TM can parse this encoding to extract transition rules</li>
+            <li>A TM can maintain state, tape, and position information</li>
+            <li>A TM can simulate one step of another TM by table lookup</li>
+            <li>Therefore, \(U\) can simulate arbitrarily many steps of \(M\)</li>
+          </ol>
+        </div>
+
+        <div class="key-point">
+          <strong>Computational Overhead:</strong> The UTM is slower than running \(M\) directly. If \(M\) takes \(t(n)\) steps on input of length \(n\), then \(U\) might take \(O(t(n) \cdot |\langle M \rangle|^2)\) steps due to table lookup overhead.
+        </div>
+
+        <div class="definition-card">
+          <h4 class="card-title">Three-Tape UTM Architecture</h4>
+          <p>A practical UTM often uses three tapes for efficiency:</p>
+          <ol>
+            <li><strong>Tape 1:</strong> Stores the encoding \(\langle M \rangle\) (read-only)</li>
+            <li><strong>Tape 2:</strong> Simulates \(M\)'s tape (working tape)</li>
+            <li><strong>Tape 3:</strong> Stores current state of \(M\) and head position</li>
+          </ol>
+          <p style="margin-top: 15px;">This architecture makes simulation more efficient and easier to understand conceptually.</p>
+        </div>
+      </div>
+
+      <!-- 3. RE Languages -->
+      <div id="re-languages" class="tab-content">
+        <h2 class="section-title">Recursively Enumerable Languages</h2>
+
+        <div class="definition-card">
+          <h4 class="card-title">Definition: Recursively Enumerable (RE)</h4>
+          <p>A language \(L\) is <strong>recursively enumerable</strong> (also called <em>Turing-recognizable</em>) if there exists a Turing machine \(M\) such that:</p>
+          <ul>
+            <li>For all \(w \in L\): \(M\) halts and accepts \(w\)</li>
+            <li>For all \(w \notin L\): \(M\) either rejects or <em>loops forever</em></li>
+          </ul>
+          <p style="margin-top: 15px;"><strong>Key Point:</strong> An RE language recognizer may not halt on inputs not in the language.</p>
+        </div>
+
+        <div class="example-card">
+          <h4 class="card-title">🔥 Example: Infinite "Hell" String</h4>
+          <p><strong>Problem:</strong> Consider the language:</p>
+          \[ L_{\text{hell}} = \{ w \in \{h,e,l,o\}^* \mid w \text{ contains "hello" as a substring} \} \]
+          <p style="margin-top: 15px;"><strong>Scenario:</strong> What happens if we give the TM an infinite string that never contains "hello"?</p>
+          <div style="margin-top: 15px; padding: 15px; background: #fee2e2; border-radius: 8px; border-left: 4px solid #dc2626;">
+            <p><strong>The Infinite Hell String:</strong></p>
+            <code style="background: #1e293b; color: #fca5a5; padding: 10px; display: block; border-radius: 4px; margin-top: 10px;">
+              hellhellhellhellhellhellhellhellhellhellhell...
+            </code>
+            <p style="margin-top: 10px;">This string repeats "hell" forever but <strong>never</strong> contains "hello".</p>
+            <p style="margin-top: 10px;"><strong>Result:</strong> A TM searching for "hello" will scan forever, never halting. The string is not in \(L_{\text{hell}}\), but the TM cannot recognize this fact in finite time!</p>
+          </div>
+        </div>
+
+        <div class="theorem-card">
+          <h4 class="card-title">TM for \(L_{\text{hell}}\)</h4>
+          <p><strong>Machine Design:</strong> A 5-state TM that searches for "hello":</p>
+          <ul>
+            <li>\(q_0\): Initial state, searching for 'h'</li>
+            <li>\(q_1\): Found 'h', searching for first 'e'</li>
+            <li>\(q_2\): Found 'he', searching for first 'l'</li>
+            <li>\(q_3\): Found 'hel', searching for second 'l'</li>
+            <li>\(q_4\): Found 'hell', searching for 'o'</li>
+            <li>\(q_{\text{accept}}\): Found "hello" - ACCEPT!</li>
+          </ul>
+          <p style="margin-top: 15px;"><strong>Behavior:</strong></p>
+          <ul>
+            <li>On input "hello world" → Halts and accepts ✓</li>
+            <li>On input "hell" → Halts and rejects ✗</li>
+            <li>On input "hellhellhell..." (infinite) → Loops forever ∞</li>
+          </ul>
+        </div>
+
+        <div class="definition-card">
+          <h4 class="card-title">Recursive vs. Recursively Enumerable</h4>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 15px;">
+            <div style="padding: 15px; background: #dcfce7; border-radius: 8px;">
+              <h5 style="margin-bottom: 10px; color: #166534;">Recursive (Decidable)</h5>
+              <ul style="font-size: 0.95em;">
+                <li>TM always halts</li>
+                <li>Always gives yes/no answer</li>
+                <li>Example: \(L = \{1^n \mid n \ge 0\}\)</li>
+              </ul>
+            </div>
+            <div style="padding: 15px; background: #fef3c7; border-radius: 8px;">
+              <h5 style="margin-bottom: 10px; color: #92400e;">RE but not Recursive</h5>
+              <ul style="font-size: 0.95em;">
+                <li>TM may loop forever</li>
+                <li>Accepts members, may not halt on non-members</li>
+                <li>Example: Halting problem</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <div class="key-point">
+          <strong>Critical Insight:</strong> The class RE (recursively enumerable languages) is strictly larger than the class R (recursive/decidable languages). There exist problems that can be recognized but not decided!
+        </div>
+      </div>
+
+      <!-- 4. Encoding -->
+      <div id="encoding" class="tab-content">
+        <h2 class="section-title">Encoding Turing Machines</h2>
+
+        <div class="definition-card">
+          <h4 class="card-title">Why Encoding Matters</h4>
+          <p>To build a Universal TM, we need a systematic way to represent any TM as a string. This encoding \(\langle M \rangle\) must capture all components of the TM.</p>
+        </div>
+
+        <div class="example-card">
+          <h4 class="card-title">Encoding Scheme</h4>
+          <p><strong>Step 1: Assign numeric IDs</strong></p>
+          <ul>
+            <li>States: \(q_0, q_1, q_2, \ldots \rightarrow 0, 1, 2, \ldots\)</li>
+            <li>Tape symbols: \(\sqcup, 1, a, b, \ldots \rightarrow 0, 1, 2, 3, \ldots\)</li>
+            <li>Directions: \(L \rightarrow 0\), \(R \rightarrow 1\)</li>
+          </ul>
+          
+          <p style="margin-top: 20px;"><strong>Step 2: Encode each transition</strong></p>
+          <p>For transition \(\delta(q_i, a) = (q_j, b, D)\), encode as:</p>
+          <div class="encoding-display">0<sup>i+1</sup> 1 0<sup>a+1</sup> 1 0<sup>j+1</sup> 1 0<sup>b+1</sup> 1 0<sup>D+1</sup></div>
+          <p style="margin-top: 10px;">Where we use unary encoding (strings of 0s) separated by 1s as delimiters.</p>
+
+          <p style="margin-top: 20px;"><strong>Step 3: Concatenate all transitions</strong></p>
+          <p>Separate each transition encoding with "11":</p>
+          <div class="encoding-display">(transition₁) 11 (transition₂) 11 (transition₃) 11 ...</div>
+        </div>
+
+        <div class="theorem-card">
+          <h4 class="card-title">Properties of the Encoding</h4>
+          <ul>
+            <li><strong>Uniqueness:</strong> Each TM has a unique encoding</li>
+            <li><strong>Parsability:</strong> Given \(\langle M \rangle\), we can reconstruct \(M\)</li>
+            <li><strong>Finite length:</strong> Any TM with finitely many states/symbols has finite encoding</li>
+            <li><strong>Alphabet:</strong> Encodings use only \(\{0, 1\}\)</li>
+          </ul>
+        </div>
+
+        <div class="key-point">
+          <strong>Important:</strong> Not every binary string is a valid TM encoding. Invalid strings can be treated as encoding a TM that immediately halts or can be mapped to a default TM.
+        </div>
+
+        <div class="example-card">
+          <h4 class="card-title">Alternative Encoding Schemes</h4>
+          <p>Many encoding schemes work, as long as they're:</p>
+          <ol>
+            <li><strong>Complete:</strong> Capture all TM information</li>
+            <li><strong>Decidable:</strong> Can verify if string is valid encoding</li>
+            <li><strong>Efficient:</strong> Parsing doesn't add too much overhead</li>
+          </ol>
+          <p style="margin-top: 15px;">Common alternatives: ASCII, XML-like format, binary packed format</p>
+        </div>
+      </div>
+
+      <!-- 5. Example 1: Encoding TM for 1^n -->
+      <div id="example1" class="tab-content">
+        <h2 class="section-title">Complete Example: Encoding \(M\) for \(L = \{1^n \mid n > 0\}\)</h2>
+
+        <div class="definition-card">
+          <h4 class="card-title">Problem Statement</h4>
+          <p>Design a Turing machine that accepts strings of the form \(1^n\) where \(n > 0\), and show its complete encoding for use in a Universal TM.</p>
+        </div>
+
+        <div class="example-card">
+          <h4 class="card-title">Machine Design</h4>
+          <p><strong>TM Definition:</strong> \(M = (Q, \Sigma, \Gamma, \delta, q_0, \sqcup, F)\)</p>
+          <ul>
+            <li>\(Q = \{q_0, q_1, q_{\text{accept}}, q_{\text{reject}}\}\)</li>
+            <li>\(\Sigma = \{1\}\)</li>
+            <li>\(\Gamma = \{1, \sqcup\}\)</li>
+            <li>\(q_0 = q_0\) (initial state)</li>
+            <li>\(F = \{q_{\text{accept}}\}\)</li>
+          </ul>
+
+          <p style="margin-top: 20px;"><strong>Transition Function \(\delta\):</strong></p>
+          <ol>
+            <li>\(\delta(q_0, 1) = (q_1, 1, R)\) — Read first 1, move right</li>
+            <li>\(\delta(q_1, 1) = (q_1, 1, R)\) — Continue reading 1s</li>
+            <li>\(\delta(q_1, \sqcup) = (q_{\text{accept}}, \sqcup, R)\) — Reached end, accept</li>
+            <li>\(\delta(q_0, \sqcup) = (q_{\text{reject}}, \sqcup, R)\) — Empty string, reject</li>
+          </ol>
+        </div>
+
+        <div class="svg-container">
+          <svg width="700" height="250" viewBox="0 0 700 250">
+            <defs>
+              <marker id="arrow2" markerWidth="10" markerHeight="10" refX="9" refY="3" orientation="auto" markerUnits="strokeWidth">
+                <path d="M0,0 L0,6 L9,3 z" fill="#334155" />
+              </marker>
+            </defs>
+
+            <!-- States -->
+            <circle cx="100" cy="125" r="40" fill="#dbeafe" stroke="#1e40af" stroke-width="3" />
+            <text x="100" y="133" text-anchor="middle" font-weight="bold" font-size="18">q₀</text>
+
+            <circle cx="300" cy="125" r="40" fill="#fef3c7" stroke="#f59e0b" stroke-width="3" />
+            <text x="300" y="133" text-anchor="middle" font-weight="bold" font-size="18">q₁</text>
+
+            <circle cx="500" cy="125" r="40" fill="#dcfce7" stroke="#166534" stroke-width="3" />
+            <circle cx="500" cy="125" r="35" fill="none" stroke="#166534" stroke-width="2" />
+            <text x="500" y="133" text-anchor="middle" font-weight="bold" font-size="16">q_acc</text>
+
+            <circle cx="300" cy="50" r="35" fill="#fee2e2" stroke="#dc2626" stroke-width="3" />
+            <text x="300" y="58" text-anchor="middle" font-weight="bold" font-size="14">q_rej</text>
+
+            <!-- Transitions -->
+            <path d="M 140,125 L 260,125" stroke="#1e40af" stroke-width="2.5" marker-end="url(#arrow2)" />
+            <rect x="175" y="100" width="50" height="25" fill="white" opacity="0.9" rx="4" />
+            <text x="200" y="117" text-anchor="middle" font-size="14" font-weight="600">1/1,R</text>
+
+            <path d="M 285,165 A 50,50 0 1,1 315,165" fill="none" stroke="#f59e0b" stroke-width="2.5" marker-end="url(#arrow2)" />
+            <rect x="275" y="180" width="50" height="25" fill="white" opacity="0.9" rx="4" />
+            <text x="300" y="197" text-anchor="middle" font-size="14" font-weight="600">1/1,R</text>
+
+            <path d="M 340,125 L 460,125" stroke="#166534" stroke-width="2.5" marker-end="url(#arrow2)" />
+            <rect x="375" y="100" width="50" height="25" fill="white" opacity="0.9" rx="4" />
+            <text x="400" y="117" text-anchor="middle" font-size="14" font-weight="600">⊔/⊔,R</text>
+
+            <path d="M 115,90 Q 200,40 275,60" fill="none" stroke="#dc2626" stroke-width="2.5" marker-end="url(#arrow2)" />
+            <rect x="165" y="30" width="50" height="25" fill="white" opacity="0.9" rx="4" />
+            <text x="190" y="47" text-anchor="middle" font-size="14" font-weight="600">⊔/⊔,R</text>
+          </svg>
+        </div>
+
+        <div class="theorem-card">
+          <h4 class="card-title">Step-by-Step Encoding</h4>
+          
+          <p><strong>Numeric Assignment:</strong></p>
+          <ul>
+            <li>States: \(q_0 = 0, q_1 = 1, q_{\text{accept}} = 2, q_{\text{reject}} = 3\)</li>
+            <li>Symbols: \(\sqcup = 0, 1 = 1\)</li>
+            <li>Directions: \(L = 0, R = 1\)</li>
+          </ul>
+
+          <p style="margin-top: 20px;"><strong>Transition Encodings:</strong></p>
+          
+          <p style="margin-top: 15px;">1. \(\delta(q_0, 1) = (q_1, 1, R)\):</p>
+          <div class="encoding-display">
+            State=0, Read=1, NewState=1, Write=1, Dir=R(1)<br>
+            0¹ 1 0² 1 0² 1 0² 1 0² = <strong>0 1 00 1 00 1 00 1 00</strong>
+          </div>
+
+          <p style="margin-top: 15px;">2. \(\delta(q_1, 1) = (q_1, 1, R)\):</p>
+          <div class="encoding-display">
+            State=1, Read=1, NewState=1, Write=1, Dir=R(1)<br>
+            0² 1 0² 1 0² 1 0² 1 0² = <strong>00 1 00 1 00 1 00 1 00</strong>
+          </div>
+
+          <p style="margin-top: 15px;">3. \(\delta(q_1, \sqcup) = (q_{\text{accept}}, \sqcup, R)\):</p>
+          <div class="encoding-display">
+            State=1, Read=0, NewState=2, Write=0, Dir=R(1)<br>
+            0² 1 0¹ 1 0³ 1 0¹ 1 0² = <strong>00 1 0 1 000 1 0 1 00</strong>
+          </div>
+
+          <p style="margin-top: 15px;">4. \(\delta(q_0, \sqcup) = (q_{\text{reject}}, \sqcup, R)\):</p>
+          <div class="encoding-display">
+            State=0, Read=0, NewState=3, Write=0, Dir=R(1)<br>
+            0¹ 1 0¹ 1 0⁴ 1 0¹ 1 0² = <strong>0 1 0 1 0000 1 0 1 00</strong>
+          </div>
+
+          <p style="margin-top: 20px;"><strong>Complete Encoding \(\langle M \rangle\):</strong></p>
+          <div class="encoding-display" style="word-wrap: break-word;">
+            0 1 00 1 00 1 00 1 00 <span style="color: #fca5a5;">11</span>
+            00 1 00 1 00 1 00 1 00 <span style="color: #fca5a5;">11</span>
+            00 1 0 1 000 1 0 1 00 <span style="color: #fca5a5;">11</span>
+            0 1 0 1 0000 1 0 1 00
+          </div>
+        </div>
+
+        <div class="key-point">
+          <strong>Result:</strong> This binary string is the complete description of the TM. A Universal TM can parse this encoding and simulate the original machine's behavior on any input!
+        </div>
+      </div>
+
+      <!-- 6. Example 2: TM for 1^(n²) -->
+      <div id="example2" class="tab-content">
+        <h2 class="section-title">Complete Example: Designing TM for \(L = \{1^{n^2} \mid n > 0\}\)</h2>
+
+        <div class="definition-card">
+          <h4 class="card-title">Problem Statement</h4>
+          <p>Design a Turing machine that accepts exactly those strings consisting of \(1^{n^2}\) ones, where \(n\) is a positive integer.</p>
+          <p style="margin-top: 15px;"><strong>Examples:</strong></p>
+          <ul>
+            <li>\(n=1\): \(1^1 = 1\) ✓</li>
+            <li>\(n=2\): \(1^4 = 1111\) ✓</li>
+            <li>\(n=3\): \(1^9 = 111111111\) ✓</li>
+            <li>\(n=4\): \(1^{16} = 1111111111111111\) ✓</li>
+          </ul>
+          <p style="margin-top: 10px;">But reject: \(11\), \(111\), \(11111\) (not perfect squares)</p>
+        </div>
+
+        <div class="example-card">
+          <h4 class="card-title">Algorithm Strategy</h4>
+          <p>The key insight: \(n^2 = 1 + 3 + 5 + \cdots + (2n-1)\)</p>
+          <p style="margin-top: 15px;"><strong>High-Level Approach:</strong></p>
+          <ol>
+            <li>Use a <strong>counter</strong> on a separate tape track to track which odd number to delete (1st, 3rd, 5th, etc.)</li>
+            <li>In iteration \(k\), delete exactly \(2k-1\) symbols from the input</li>
+            <li>After each deletion, increment the counter</li>
+            <li>If we delete exactly all symbols with no remainder, accept</li>
+            <li>Otherwise, reject</li>
+          </ol>
+          <p style="margin-top: 15px;"><strong>Example for \(n=3\) (9 ones):</strong></p>
+          <ul>
+            <li>Iteration 1 (k=1): Delete 1 symbol → <code>1 1 1 1 1 1 1 1</code> (8 remain)</li>
+            <li>Iteration 2 (k=2): Delete 3 symbols → <code>1 1 1 1 1</code> (5 remain)</li>
+            <li>Iteration 3 (k=3): Delete 5 symbols → <code>⊔</code> (0 remain) ✓ Perfect!</li>
+          </ul>
+        </div>
+
+        <div class="theorem-card">
+          <h4 class="card-title">Detailed Two-Tape TM Design</h4>
+          <p><strong>Using 2 tapes for clarity:</strong></p>
+          <ul>
+            <li><strong>Tape 1:</strong> Input tape containing \(1^{n^2}\)</li>
+            <li><strong>Tape 2:</strong> Counter tape (stores current iteration number in unary)</li>
+          </ul>
+          <p style="margin-top: 15px;"><strong>Tape Alphabet:</strong> \(\Gamma = \{1, X, C, \sqcup\}\)</p>
+          <ul style="margin-left: 20px; margin-top: 10px;">
+            <li>\(1\): Original input symbol</li>
+            <li>\(X\): Marked/deleted symbol</li>
+            <li>\(C\): Counter symbol on tape 2</li>
+          </ul>
+
+          <p style="margin-top: 20px;"><strong>State Groups:</strong></p>
+          <ul>
+            <li>\(q_{\text{init}}\): Initialize counter with one C</li>
+            <li>\(q_{\text{copy}}\): Copy counter value (read \(k\) Cs, prepare to delete \(2k-1\) symbols)</li>
+            <li>\(q_{\text{del}_1}, q_{\text{del}_2}, \ldots\): Delete \(2k-1\) symbols from tape 1</li>
+            <li>\(q_{\text{incr}}\): Increment counter on tape 2</li>
+            <li>\(q_{\text{check}}\): Check if all input symbols deleted</li>
+            <li>\(q_{\text{accept}}, q_{\text{reject}}\): Final states</li>
+          </ul>
+
+          <p style="margin-top: 20px;"><strong>Algorithm in Detail:</strong></p>
+          
+          <div style="background: #f8fafc; padding: 15px; border-radius: 8px; margin-top: 15px;">
+            <p><strong>Phase 1: Initialize Counter</strong></p>
+            <ul style="font-family: monospace; font-size: 0.9em;">
+              <li>Write one C on tape 2 (counter = 1)</li>
+              <li>Move to Phase 2</li>
+            </ul>
+          </div>
+
+          <div style="background: #fef3c7; padding: 15px; border-radius: 8px; margin-top: 15px;">
+            <p><strong>Phase 2: Read Counter Value</strong></p>
+            <ul style="font-family: monospace; font-size: 0.9em;">
+              <li>Count number of Cs on tape 2 → this is \(k\)</li>
+              <li>Compute \(2k-1\) (the number of symbols to delete this iteration)</li>
+              <li>Mark these symbols on tape 1 with X</li>
+            </ul>
+            <p style="margin-top: 10px;"><strong>Sub-algorithm for computing \(2k-1\):</strong></p>
+            <ol style="font-size: 0.95em; margin-left: 20px;">
+              <li>Read \(k\) Cs from tape 2, marking each as we go</li>
+              <li>For each C, mark TWO symbols on tape 1 (this gives \(2k\))</li>
+              <li>Unmark one symbol (giving \(2k-1\))</li>
+            </ol>
+          </div>
+
+          <div style="background: #e9d5ff; padding: 15px; border-radius: 8px; margin-top: 15px;">
+            <p><strong>Phase 3: Check if More Symbols Remain</strong></p>
+            <ul style="font-family: monospace; font-size: 0.9em;">
+              <li>Scan tape 1 for any unmarked 1s</li>
+              <li>If unmarked 1s exist: Increment counter on tape 2, go to Phase 2</li>
+              <li>If all marked (all Xs): Accept!</li>
+              <li>If we can't mark enough symbols: Reject</li>
+            </ul>
+          </div>
+
+          <div style="background: #dcfce7; padding: 15px; border-radius: 8px; margin-top: 15px;">
+            <p><strong>Phase 4: Increment Counter</strong></p>
+            <ul style="font-family: monospace; font-size: 0.9em;">
+              <li>Add one more C to tape 2</li>
+              <li>Return to Phase 2</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="example-card">
+          <h4 class="card-title">Detailed Execution Trace for \(n=2\) (input: \(1111\))</h4>
+          <div style="background: #1e293b; color: #e2e8f0; padding: 15px; border-radius: 8px; font-family: monospace; font-size: 0.85em; line-height: 1.8; overflow-x: auto;">
+            <strong>Initial Configuration:</strong><br>
+            Tape 1: (q_init) 1 1 1 1<br>
+            Tape 2: ⊔<br>
+            <br>
+            <strong>After Phase 1 (Initialize):</strong><br>
+            Tape 1: 1 1 1 1<br>
+            Tape 2: C  ← counter = 1<br>
+            <br>
+            <strong>Iteration 1 (k=1, delete 2×1-1 = 1 symbol):</strong><br>
+            Tape 1: X 1 1 1  ← marked 1 symbol<br>
+            Tape 2: C<br>
+            More symbols remain → increment counter<br>
+            Tape 2: C C  ← counter = 2<br>
+            <br>
+            <strong>Iteration 2 (k=2, delete 2×2-1 = 3 symbols):</strong><br>
+            Tape 1: X X X X  ← marked 3 more symbols (all now marked!)<br>
+            Tape 2: C C<br>
+            <br>
+            <strong>Verification:</strong><br>
+            All symbols on tape 1 are X (none are 1)<br>
+            Total deleted: 1 + 3 = 4 = 2² ✓<br>
+            <br>
+            <span style="color: #86efac;">ACCEPT! ✓</span>
+          </div>
+        </div>
+
+        <div class="example-card">
+          <h4 class="card-title">Execution Trace for \(n=3\) (input: \(111111111\))</h4>
+          <div style="background: #1e293b; color: #e2e8f0; padding: 15px; border-radius: 8px; font-family: monospace; font-size: 0.85em; line-height: 1.8; overflow-x: auto;">
+            <strong>Initial:</strong><br>
+            Tape 1: 1 1 1 1 1 1 1 1 1  (9 symbols)<br>
+            Tape 2: ⊔<br>
+            <br>
+            <strong>After Initialize:</strong><br>
+            Tape 2: C  ← counter = 1<br>
+            <br>
+            <strong>Iteration 1 (k=1, delete 1):</strong><br>
+            Tape 1: X 1 1 1 1 1 1 1 1  (8 remain)<br>
+            Tape 2: C C  ← increment to 2<br>
+            <br>
+            <strong>Iteration 2 (k=2, delete 3):</strong><br>
+            Tape 1: X X X X 1 1 1 1 1  (5 remain)<br>
+            Tape 2: C C C  ← increment to 3<br>
+            <br>
+            <strong>Iteration 3 (k=3, delete 5):</strong><br>
+            Tape 1: X X X X X X X X X  (0 remain)<br>
+            Tape 2: C C C<br>
+            <br>
+            Total deleted: 1 + 3 + 5 = 9 = 3² ✓<br>
+            <span style="color: #86efac;">ACCEPT! ✓</span>
+          </div>
+        </div>
+
+        <div class="example-card">
+          <h4 class="card-title">Rejection Example (input: \(11111\) - not a perfect square)</h4>
+          <div style="background: #1e293b; color: #e2e8f0; padding: 15px; border-radius: 8px; font-family: monospace; font-size: 0.85em; line-height: 1.8; overflow-x: auto;">
+            <strong>Initial:</strong><br>
+            Tape 1: 1 1 1 1 1  (5 symbols)<br>
+            <br>
+            <strong>Iteration 1 (k=1, delete 1):</strong><br>
+            Tape 1: X 1 1 1 1  (4 remain)<br>
+            Tape 2: C C  ← counter = 2<br>
+            <br>
+            <strong>Iteration 2 (k=2, delete 3):</strong><br>
+            Tape 1: X X X X 1  (1 remains)<br>
+            Tape 2: C C C  ← counter = 3<br>
+            <br>
+            <strong>Iteration 3 (k=3, need to delete 5):</strong><br>
+            Only 1 symbol remains, but need to delete 5!<br>
+            Cannot complete deletion → <span style="color: #fca5a5;">REJECT! ✗</span><br>
+            <br>
+            (Note: 1 + 3 = 4, but we have 5 symbols total,<br>
+             so 5 is not a perfect square)
+          </div>
+        </div>
+
+        <div class="key-point">
+          <strong>Time Complexity:</strong> For input of length \(n^2\), the machine makes approximately \(O(n^3)\) moves. Each of the \(n\) iterations requires scanning the tape (\(O(n^2)\) length) and the counter (\(O(n)\) length).
+        </div>
+
+        <div class="theorem-card">
+          <h4 class="card-title">Correctness Proof</h4>
+          <p><strong>Claim:</strong> The TM accepts input \(w\) if and only if \(|w| = n^2\) for some \(n > 0\).</p>
+          
+          <p style="margin-top: 15px;"><strong>Proof:</strong></p>
+          
+          <p style="margin-top: 10px;"><strong>Invariant:</strong> After \(k\) iterations, the machine has deleted exactly \(\sum_{i=1}^{k} (2i-1) = k^2\) symbols, and the counter contains \(k+1\) Cs.</p>
+          
+          <p style="margin-top: 15px;"><strong>Base case (k=1):</strong></p>
+          <ul>
+            <li>After iteration 1: deleted \(2(1)-1 = 1\) symbol</li>
+            <li>Counter has 2 Cs (ready for k=2)</li>
+            <li>Total deleted: \(1 = 1^2\) ✓</li>
+          </ul>
+
+          <p style="margin-top: 15px;"><strong>Inductive step:</strong></p>
+          <ul>
+            <li>Assume after \(k\) iterations: \(k^2\) symbols deleted, counter = \(k+1\)</li>
+            <li>In iteration \(k+1\): delete \(2(k+1)-1 = 2k+1\) symbols</li>
+            <li>Total deleted: \(k^2 + (2k+1) = k^2 + 2k + 1 = (k+1)^2\) ✓</li>
+            <li>Counter increments to \(k+2\)</li>
+          </ul>
+
+          <p style="margin-top: 15px;"><strong>Termination:</strong></p>
+          <ul>
+            <li><strong>If \(|w| = n^2\):</strong> After \(n\) iterations, exactly \(n^2\) symbols deleted, all symbols marked → Accept</li>
+            <li><strong>If \(|w| \neq n^2\):</strong> Either:
+              <ul style="margin-left: 20px; margin-top: 5px;">
+                <li>After some iteration, symbols remain but next odd number is larger than remaining symbols → Reject</li>
+                <li>Or: symbols exhausted but some unmarked in middle → Reject</li>
+              </ul>
+            </li>
+          </ul>
+
+          <p style="margin-top: 15px;"><strong>Why the counter is necessary:</strong> Without the counter, the TM cannot "remember" which odd number it's currently processing. The counter stores the iteration number \(k\), allowing the machine to compute \(2k-1\) correctly each iteration.</p>
+        </div>
+
+        <div class="definition-card">
+          <h4 class="card-title">Single-Tape Implementation</h4>
+          <p>A single-tape TM can simulate this by using different tape regions:</p>
+          <ul>
+            <li><strong>Left region:</strong> Counter symbols (Cs)</li>
+            <li><strong>Delimiter:</strong> Special symbol (#) separating counter from input</li>
+            <li><strong>Right region:</strong> Input symbols (1s and Xs)</li>
+          </ul>
+          <p style="margin-top: 10px;"><strong>Example configuration:</strong></p>
+          <div class="encoding-display">C C C # X X X 1 1 1 1</div>
+          <p style="margin-top: 10px;">This shows counter=3, with some symbols already marked. The TM shuttles back and forth between the counter and input regions.</p>
+        </div>
+      </div>
+
+      <!-- 7. Interactive Simulator -->
+      <div id="simulator" class="tab-content">
+        <h2 class="section-title">Interactive Universal TM Simulator</h2>
+
+        <div class="interactive-demo">
+          <h3 style="margin-bottom: 20px; color: var(--text-dark);">Simulate TM for \(1^n\) (n > 0)</h3>
+
+          <div class="demo-controls">
+            <button class="btn btn-primary" onclick="resetUTM()">Reset</button>
+            <button class="btn btn-success" onclick="stepUTM()" id="utmStepBtn">Step Forward</button>
+            <button class="btn btn-secondary" onclick="runUTM()" id="utmRunBtn">Run to End</button>
+            <input type="text" id="utmInput" value="111" placeholder="Enter input (e.g., 111)"
+              style="padding: 12px; border-radius: 8px; border: 2px solid #cbd5e1; font-size: 1em; width: 200px;">
+            <button class="btn btn-primary" onclick="setUTMInput()">Set Input</button>
+          </div>
+
+          <div class="tape-container">
+            <div class="tape" id="utmTape"></div>
+            <div class="state-indicator" id="utmState">State: q₀ | Position: 0 | Step: 0</div>
+          </div>
+
+          <div style="margin-top: 20px; padding: 20px; background: white; border-radius: 12px;">
+            <h4 style="margin-bottom: 15px; color: var(--text-dark);">Execution Log</h4>
+            <div id="utmLog"
+              style="max-height: 200px; overflow-y: auto; font-family: monospace; font-size: 0.9em; line-height: 1.8; color: #475569;">
+            </div>
+          </div>
+        </div>
+
+        <div style="margin-top: 30px;">
+          <h3 style="margin-bottom: 20px; color: var(--text-dark);">Search for "hello" in String</h3>
+          <div class="interactive-demo">
+            <div class="demo-controls">
+              <input type="text" id="helloInput" value="hellohello" placeholder="Enter string"
+                style="padding: 12px; border-radius: 8px; border: 2px solid #cbd5e1; font-size: 1em; width: 300px;">
+              <button class="btn btn-primary" onclick="searchHello()">Search</button>
+              <button class="btn btn-secondary" onclick="demonstrateHell()">Show "Hell" Loop</button>
+            </div>
+            <div style="margin-top: 20px; padding: 20px; background: white; border-radius: 12px;">
+              <div id="helloResult" style="font-family: monospace; font-size: 1em; color: #475569;"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="theorem-card" style="margin-top: 30px;">
+          <h4 class="card-title">How to Use</h4>
+          <ol>
+            <li><strong>Top Simulator:</strong> Tests strings of form \(1^n\) with \(n > 0\)</li>
+            <li><strong>Bottom Simulator:</strong> Searches for substring "hello"</li>
+            <li><strong>"Show Hell Loop":</strong> Demonstrates infinite loop on "hellhellhell..."</li>
+            <li>Watch state transitions and tape movements in real-time</li>
+          </ol>
+        </div>
+      </div>
+
+    </div> <!-- End Content -->
+
+    <footer>
+      <p>&copy; 2026 CS 637: Mathematics-II | IIT Indore</p>
+      <p style="margin-top: 10px; font-size: 0.9em; opacity: 0.9;">Enhanced Interactive Lecture Materials</p>
+    </footer>
+
+    <a href="index.html" class="fab-btn" title="Back to Course Home">🏠</a>
+    <button class="scroll-top" id="scrollTop" onclick="scrollToTop()">↑</button>
+  </div>
+
+  <script>
+    // Tab switching
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+
+      document.getElementById(tabId).classList.add('active');
+      const buttons = document.querySelectorAll('.tab-btn');
+      for (let btn of buttons) {
+        if (btn.getAttribute('onclick').includes(tabId)) {
+          btn.classList.add('active');
+          break;
+        }
+      }
+
+      // Update progress
+      const tabs = ['introduction', 'utm', 're-languages', 'encoding', 'example1', 'example2', 'simulator'];
+      const currentIndex = tabs.indexOf(tabId);
+      const progress = ((currentIndex + 1) / tabs.length) * 100;
+      document.getElementById('progressFill').style.width = progress + '%';
+    }
+
+    // Scroll to top functionality
+    window.addEventListener('scroll', function () {
+      const scrollTop = document.getElementById('scrollTop');
+      if (window.pageYOffset > 300) {
+        scrollTop.classList.add('visible');
+      } else {
+        scrollTop.classList.remove('visible');
+      }
     });
-});
-</script>
 
-<a href="index.html" class="fab-btn" title="Back to Index">🏠</a>
+    function scrollToTop() {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // Background particles
+    function createParticles() {
+      const particles = document.getElementById('particles');
+      for (let i = 0; i < 15; i++) {
+        const particle = document.createElement('div');
+        particle.className = 'particle';
+        particle.style.width = Math.random() * 100 + 50 + 'px';
+        particle.style.height = particle.style.width;
+        particle.style.left = Math.random() * 100 + '%';
+        particle.style.top = Math.random() * 100 + '%';
+        particle.style.animationDelay = Math.random() * 20 + 's';
+        particle.style.animationDuration = Math.random() * 10 + 15 + 's';
+        particles.appendChild(particle);
+      }
+    }
+
+    // UTM Simulator for 1^n (n > 0)
+    let utmTape = [];
+    let utmHead = 0;
+    let utmState = 'q0';
+    let utmStep = 0;
+    let utmLog = [];
+    let utmRunning = false;
+
+    function resetUTM() {
+      const input = document.getElementById('utmInput').value;
+      utmTape = ['⊔'].concat(input.split('')).concat(['⊔', '⊔']);
+      utmHead = 1;
+      utmState = 'q0';
+      utmStep = 0;
+      utmLog = [];
+      utmRunning = false;
+
+      updateUTMDisplay();
+      document.getElementById('utmStepBtn').disabled = false;
+      document.getElementById('utmRunBtn').disabled = false;
+      addUTMLog(`Initialized with input: ${input}`);
+      addUTMLog(`Machine will check if this is 1^n with n > 0`);
+    }
+
+    function setUTMInput() {
+      resetUTM();
+    }
+
+    function updateUTMDisplay() {
+      const tapeElement = document.getElementById('utmTape');
+      tapeElement.innerHTML = '';
+
+      utmTape.forEach((symbol, index) => {
+        const cell = document.createElement('div');
+        cell.className = 'tape-cell';
+        if (index === utmHead) {
+          cell.classList.add('active');
+        }
+        cell.textContent = symbol;
+        tapeElement.appendChild(cell);
+      });
+
+      document.getElementById('utmState').textContent =
+        `State: ${utmState} | Position: ${utmHead} | Step: ${utmStep}`;
+    }
+
+    function addUTMLog(message) {
+      utmLog.push(`[Step ${utmStep}] ${message}`);
+      const logElement = document.getElementById('utmLog');
+      logElement.innerHTML = utmLog.map(log => `<div>${log}</div>`).join('');
+      logElement.scrollTop = logElement.scrollHeight;
+    }
+
+    function stepUTM() {
+      if (utmState === 'q_accept' || utmState === 'q_reject') {
+        addUTMLog(`Machine halted in ${utmState}`);
+        document.getElementById('utmStepBtn').disabled = true;
+        document.getElementById('utmRunBtn').disabled = true;
+        return;
+      }
+
+      const currentSymbol = utmTape[utmHead];
+
+      if (utmState === 'q0') {
+        if (currentSymbol === '1') {
+          utmState = 'q1';
+          utmHead++;
+          utmStep++;
+          addUTMLog(`δ(q₀, 1) = (q₁, 1, R): Read first 1, accept and move right`);
+        } else if (currentSymbol === '⊔') {
+          utmState = 'q_reject';
+          utmStep++;
+          addUTMLog(`δ(q₀, ⊔) = (q_reject, ⊔, R): Empty input, REJECT`);
+        }
+      } else if (utmState === 'q1') {
+        if (currentSymbol === '1') {
+          utmHead++;
+          utmStep++;
+          addUTMLog(`δ(q₁, 1) = (q₁, 1, R): Continue reading 1s`);
+        } else if (currentSymbol === '⊔') {
+          utmState = 'q_accept';
+          utmStep++;
+          addUTMLog(`δ(q₁, ⊔) = (q_accept, ⊔, R): Reached end, all 1s, ACCEPT!`);
+        }
+      }
+
+      // Extend tape if needed
+      if (utmHead >= utmTape.length) {
+        utmTape.push('⊔');
+      }
+      if (utmHead < 0) {
+        utmTape.unshift('⊔');
+        utmHead = 0;
+      }
+
+      updateUTMDisplay();
+    }
+
+    function runUTM() {
+      if (utmRunning) return;
+      utmRunning = true;
+      document.getElementById('utmRunBtn').disabled = true;
+
+      const interval = setInterval(() => {
+        if (utmState === 'q_accept' || utmState === 'q_reject' || !utmRunning) {
+          clearInterval(interval);
+          utmRunning = false;
+          document.getElementById('utmRunBtn').disabled = false;
+          return;
+        }
+        stepUTM();
+      }, 500);
+    }
+
+    // Hello search simulator
+    function searchHello() {
+      const input = document.getElementById('helloInput').value;
+      const resultDiv = document.getElementById('helloResult');
+      
+      let steps = 0;
+      let found = false;
+      let position = -1;
+
+      for (let i = 0; i <= input.length - 5; i++) {
+        steps++;
+        if (input.substring(i, i + 5) === 'hello') {
+          found = true;
+          position = i;
+          break;
+        }
+      }
+
+      if (found) {
+        resultDiv.innerHTML = `
+          <div style="color: #166534; font-weight: 600;">✓ FOUND "hello" at position ${position}</div>
+          <div style="margin-top: 10px;">Steps taken: ${steps}</div>
+          <div style="margin-top: 10px;">String: ${input.substring(0, position)}<span style="background: #dcfce7; padding: 2px 4px; border-radius: 3px; font-weight: bold;">hello</span>${input.substring(position + 5)}</div>
+          <div style="margin-top: 15px; color: #166534;">Machine ACCEPTS and HALTS ✓</div>
+        `;
+      } else {
+        resultDiv.innerHTML = `
+          <div style="color: #dc2626; font-weight: 600;">✗ "hello" NOT FOUND</div>
+          <div style="margin-top: 10px;">Steps taken: ${steps}</div>
+          <div style="margin-top: 10px;">Input: ${input}</div>
+          <div style="margin-top: 15px; color: #dc2626;">Machine REJECTS and HALTS ✗</div>
+        `;
+      }
+    }
+
+    function demonstrateHell() {
+      const resultDiv = document.getElementById('helloResult');
+      const hellString = 'hell'.repeat(50); // 200 chars
+      
+      resultDiv.innerHTML = `
+        <div style="color: #dc2626; font-weight: 600;">🔥 INFINITE "HELL" STRING DEMONSTRATION</div>
+        <div style="margin-top: 15px; background: #fee2e2; padding: 15px; border-radius: 8px; border-left: 4px solid #dc2626;">
+          <div style="font-weight: 600; margin-bottom: 10px;">Searching in: "${hellString}..."</div>
+          <div style="margin-top: 10px;">Pattern: "hell" repeats forever, but "hello" NEVER appears</div>
+          <div style="margin-top: 15px; font-weight: 600; color: #dc2626;">
+            ⚠️ Machine will LOOP FOREVER searching for "hello"
+          </div>
+          <div style="margin-top: 10px;">
+            Status: <span style="animation: pulse 1.5s infinite;">RUNNING...</span> (never halts)
+          </div>
+          <div style="margin-top: 15px; font-size: 0.9em; color: #64748b;">
+            This demonstrates a recursively enumerable but not recursive language:<br>
+            The TM can recognize strings containing "hello", but cannot decide<br>
+            strings that don't contain it (may loop forever).
+          </div>
+        </div>
+      `;
+    }
+
+    // Math rendering
+    document.addEventListener("DOMContentLoaded", function () {
+      renderMathInElement(document.body, {
+        delimiters: [
+          { left: "$$", right: "$$", display: true },
+          { left: "\\[", right: "\\]", display: true },
+          { left: "\\(", right: "\\)", display: false },
+          { left: "$", right: "$", display: false }
+        ]
+      });
+
+      createParticles();
+      resetUTM();
+    });
+  </script>
 </body>
+
 </html>
