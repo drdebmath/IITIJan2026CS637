@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <title>CS637 - Quiz 2</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      line-height: 1.6;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      overflow: hidden;
+    }
+
+    header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 40px;
+      text-align: center;
+    }
+
+    h1 {
+      font-size: 2.4em;
+      margin-bottom: 10px;
+      font-weight: 700;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+    }
+
+    .subtitle {
+      font-size: 1.2em;
+      margin-bottom: 10px;
+      opacity: 0.95;
+    }
+
+    .instructor {
+      margin-top: 10px;
+      font-size: 1.02em;
+      opacity: 0.9;
+    }
+
+    .content {
+      padding: 40px;
+    }
+
+    .instructions-box {
+      background: #f8fafc;
+      border: 2px solid #667eea;
+      padding: 20px;
+      margin-bottom: 30px;
+      border-radius: 12px;
+    }
+
+    .instructions-title {
+      font-weight: 700;
+      color: #1e293b;
+      margin-bottom: 10px;
+      display: block;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      font-size: 0.9em;
+    }
+
+    .instructions-list {
+      list-style-type: none;
+      padding-left: 0;
+    }
+
+    .instructions-list li {
+      margin-bottom: 8px;
+      padding-left: 20px;
+      position: relative;
+    }
+
+    .instructions-list li::before {
+      content: "•";
+      color: #667eea;
+      position: absolute;
+      left: 0;
+      font-weight: bold;
+    }
+
+    .tm-spec {
+      margin: 14px 0 0;
+      padding-left: 18px;
+      color: #334155;
+    }
+
+    .question-card {
+      background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
+      border-left: 4px solid #667eea;
+      padding: 25px;
+      margin-bottom: 30px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    }
+
+    .question-header {
+      display: flex;
+      align-items: center;
+      margin-bottom: 15px;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .q-badge {
+      background: #667eea;
+      color: white;
+      padding: 5px 15px;
+      border-radius: 20px;
+      font-weight: 700;
+      font-size: 0.9em;
+    }
+
+    .q-title {
+      font-size: 1.18em;
+      font-weight: 700;
+      color: #1e293b;
+    }
+
+    .q-text {
+      margin-bottom: 18px;
+      color: #334155;
+    }
+
+    .two-col {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 12px;
+      margin: 12px 0 16px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.95em;
+      background: #fff;
+    }
+
+    th,
+    td {
+      border: 1px solid #cbd5e1;
+      padding: 8px;
+      text-align: left;
+    }
+
+    th {
+      background: #e2e8f0;
+      color: #1e293b;
+    }
+
+    .solution-toggle {
+      background: #667eea;
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 0.9em;
+    }
+
+    .solution-toggle:hover {
+      background: #5a67d8;
+    }
+
+    .solution-block {
+      display: none;
+      margin-top: 15px;
+      padding: 15px;
+      background: #f1f5f9;
+      border-radius: 8px;
+      border-left: 4px solid #3b82f6;
+      color: #0f172a;
+    }
+
+    .solution-block.visible {
+      display: block;
+    }
+
+    .solution-title {
+      font-weight: 700;
+      color: #1e293b;
+      margin-bottom: 8px;
+      display: block;
+    }
+
+    .summary-table {
+      margin-top: 10px;
+      margin-bottom: 12px;
+    }
+
+    .code-block {
+      margin-top: 10px;
+      background: #0f172a;
+      color: #e2e8f0;
+      border-radius: 8px;
+      padding: 14px;
+      overflow-x: auto;
+      white-space: pre;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 0.86em;
+      line-height: 1.35;
+    }
+
+    details {
+      margin-top: 12px;
+      background: #e2e8f0;
+      border-radius: 8px;
+      padding: 8px 10px;
+    }
+
+    summary {
+      cursor: pointer;
+      font-weight: 700;
+      color: #1e293b;
+    }
+
+    footer {
+      background: #1e293b;
+      color: white;
+      text-align: center;
+      padding: 25px;
+      font-size: 0.9em;
+    }
+
+    .fab-btn {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #3b82f6, #2563eb);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      cursor: pointer;
+      z-index: 1000;
+      border: none;
+      font-size: 24px;
+      text-decoration: none;
+    }
+
+    @media (max-width: 768px) {
+      .content {
+        padding: 20px;
+      }
+
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <header>
+      <h1>CS637 - Quiz 2</h1>
+      <div class="subtitle">Theory of Computation</div>
+      <div class="instructor"><strong>Instructor:</strong> Dr. Debasish Pattanayak</div>
+    </header>
+
+    <div class="content">
+      <div class="instructions-box">
+        <span class="instructions-title">Instructions</span>
+        <ul class="instructions-list">
+          <li>Attempt all questions.</li>
+          <li>Show complete reasoning.</li>
+          <li>A computation halts if no transition is defined for the current configuration.</li>
+        </ul>
+        <ul class="tm-spec">
+          <li>Tape alphabet: \(\{0,1,B\}\), where \(B\) is blank</li>
+          <li>States: \(\{q_0,q_1,q_2\}\), start state \(q_0\)</li>
+          <li>Transition form: \((q,a)\to(p,b,D)\), where \(D\in\{L,R\}\)</li>
+        </ul>
+      </div>
+
+      <div class="question-card">
+        <div class="question-header">
+          <span class="q-badge">Q1</span>
+          <span class="q-title">Matchings and Halting Behavior</span>
+        </div>
+        <div class="q-text">
+          Match entries from Column A with Column B to construct a transition subset.
+          <div class="two-col">
+            <table>
+              <tr><th>Column A</th><th>Entry</th></tr>
+              <tr><td>A1</td><td>\((q_0,0)\)</td></tr>
+              <tr><td>A2</td><td>\((q_0,1)\)</td></tr>
+              <tr><td>A3</td><td>\((q_1,0)\)</td></tr>
+              <tr><td>A4</td><td>\((q_1,B)\)</td></tr>
+              <tr><td>A5</td><td>\((q_2,1)\)</td></tr>
+            </table>
+            <table>
+              <tr><th>Column B</th><th>Entry</th></tr>
+              <tr><td>B1</td><td>\((q_1,1,R)\)</td></tr>
+              <tr><td>B2</td><td>\((q_0,0,R)\)</td></tr>
+              <tr><td>B3</td><td>\((q_2,0,L)\)</td></tr>
+              <tr><td>B4</td><td>\((q_2,1,R)\)</td></tr>
+              <tr><td>B5</td><td>\((q_0,1,L)\)</td></tr>
+              <tr><td>B6</td><td>\((q_1,B,R)\)</td></tr>
+            </table>
+          </div>
+          Choose five matchings to form a one-to-one transition subset.
+          <br><br>
+          Input strings: \(0,1,01,001,111\).
+          <ol>
+            <li>For each one-to-one matching between Column A and a 5-element subset of Column B, determine whether the machine halts on each input string.</li>
+            <li>Identify all matchings for which the machine halts on every input.</li>
+            <li>Identify all matchings for which the machine halts on at least one input but not all.</li>
+          </ol>
+        </div>
+        <button class="solution-toggle" onclick="toggleSolution(this)">Show Solution</button>
+        <div class="solution-block">
+          <span class="solution-title">Solution</span>
+          Total one-to-one matchings:
+          \[
+          \binom{6}{5}\cdot 5! = 6\cdot 120 = 720.
+          \]
+          Exhaustive simulation over the five required inputs gives:
+          <table class="summary-table">
+            <tr><th>Category</th><th>Count</th></tr>
+            <tr><td>Halts on all inputs \(\{0,1,01,001,111\}\)</td><td>561</td></tr>
+            <tr><td>Halts on at least one but not all inputs</td><td>159</td></tr>
+            <tr><td>Halts on none of the five inputs</td><td>0</td></tr>
+          </table>
+          Outcome signatures for the 159 partial-halting matchings:
+          <table class="summary-table">
+            <tr><th>Signature in order \((0,1,01,001,111)\)</th><th>Count</th></tr>
+            <tr><td>N H H H H</td><td>50</td></tr>
+            <tr><td>H N H H H</td><td>36</td></tr>
+            <tr><td>H H N N H</td><td>24</td></tr>
+            <tr><td>H H H H N</td><td>20</td></tr>
+            <tr><td>H N N N H</td><td>12</td></tr>
+            <tr><td>H H N H H</td><td>12</td></tr>
+            <tr><td>N H H H N</td><td>4</td></tr>
+            <tr><td>H H H N H</td><td>1</td></tr>
+          </table>
+          Here, \(H=\) halts, \(N=\) non-halting (cycle or unbounded drift).
+
+          <details>
+            <summary>Full list of all 159 partial-halting matchings</summary>
+            <pre class="code-block">001. A1->B1 A2->B4 A3->B2 A4->B3 A5->B5 | non-halt on 111
+002. A1->B1 A2->B4 A3->B3 A4->B2 A5->B5 | non-halt on 111
+003. A1->B1 A2->B4 A3->B5 A4->B3 A5->B2 | non-halt on 0
+004. A1->B1 A2->B5 A3->B4 A4->B3 A5->B2 | non-halt on 0
+005. A1->B2 A2->B4 A3->B1 A4->B3 A5->B5 | non-halt on 111
+006. A1->B2 A2->B4 A3->B3 A4->B1 A5->B5 | non-halt on 111
+007. A1->B2 A2->B5 A3->B1 A4->B3 A5->B4 | non-halt on 01,001
+008. A1->B2 A2->B5 A3->B1 A4->B4 A5->B3 | non-halt on 01,001
+009. A1->B2 A2->B5 A3->B3 A4->B1 A5->B4 | non-halt on 01,001
+010. A1->B2 A2->B5 A3->B3 A4->B4 A5->B1 | non-halt on 01,001
+011. A1->B2 A2->B5 A3->B4 A4->B1 A5->B3 | non-halt on 01,001
+012. A1->B2 A2->B5 A3->B4 A4->B3 A5->B1 | non-halt on 01,001
+013. A1->B3 A2->B4 A3->B1 A4->B2 A5->B5 | non-halt on 111
+014. A1->B3 A2->B4 A3->B2 A4->B1 A5->B5 | non-halt on 111
+015. A1->B1 A2->B2 A3->B3 A4->B6 A5->B4 | non-halt on 0
+016. A1->B1 A2->B2 A3->B4 A4->B6 A5->B3 | non-halt on 0
+017. A1->B1 A2->B3 A3->B2 A4->B6 A5->B4 | non-halt on 0
+018. A1->B1 A2->B3 A3->B4 A4->B6 A5->B2 | non-halt on 0
+019. A1->B1 A2->B4 A3->B2 A4->B6 A5->B3 | non-halt on 0
+020. A1->B1 A2->B4 A3->B3 A4->B6 A5->B2 | non-halt on 0
+021. A1->B1 A2->B4 A3->B6 A4->B3 A5->B2 | non-halt on 0
+022. A1->B1 A2->B6 A3->B4 A4->B3 A5->B2 | non-halt on 0
+023. A1->B2 A2->B1 A3->B3 A4->B6 A5->B4 | non-halt on 1,01,001
+024. A1->B2 A2->B1 A3->B4 A4->B6 A5->B3 | non-halt on 1,01,001
+025. A1->B2 A2->B6 A3->B3 A4->B1 A5->B4 | non-halt on 1,01,001
+026. A1->B2 A2->B6 A3->B4 A4->B1 A5->B3 | non-halt on 1,01,001
+027. A1->B3 A2->B1 A3->B2 A4->B6 A5->B4 | non-halt on 1
+028. A1->B3 A2->B1 A3->B4 A4->B6 A5->B2 | non-halt on 1
+029. A1->B3 A2->B6 A3->B2 A4->B1 A5->B4 | non-halt on 1
+030. A1->B3 A2->B6 A3->B4 A4->B1 A5->B2 | non-halt on 1
+031. A1->B4 A2->B1 A3->B2 A4->B6 A5->B3 | non-halt on 1
+032. A1->B4 A2->B1 A3->B3 A4->B6 A5->B2 | non-halt on 1
+033. A1->B4 A2->B2 A3->B3 A4->B1 A5->B6 | non-halt on 01
+034. A1->B4 A2->B2 A3->B3 A4->B6 A5->B1 | non-halt on 01
+035. A1->B4 A2->B3 A3->B2 A4->B1 A5->B6 | non-halt on 01
+036. A1->B4 A2->B3 A3->B2 A4->B6 A5->B1 | non-halt on 01
+037. A1->B4 A2->B6 A3->B2 A4->B1 A5->B3 | non-halt on 1
+038. A1->B4 A2->B6 A3->B3 A4->B1 A5->B2 | non-halt on 1
+039. A1->B6 A2->B2 A3->B3 A4->B1 A5->B4 | non-halt on 0
+040. A1->B6 A2->B2 A3->B4 A4->B1 A5->B3 | non-halt on 0
+041. A1->B6 A2->B3 A3->B2 A4->B1 A5->B4 | non-halt on 0
+042. A1->B6 A2->B3 A3->B4 A4->B1 A5->B2 | non-halt on 0
+043. A1->B6 A2->B4 A3->B2 A4->B1 A5->B3 | non-halt on 0
+044. A1->B6 A2->B4 A3->B3 A4->B1 A5->B2 | non-halt on 0
+045. A1->B1 A2->B2 A3->B3 A4->B6 A5->B5 | non-halt on 0
+046. A1->B1 A2->B2 A3->B5 A4->B6 A5->B3 | non-halt on 0
+047. A1->B1 A2->B3 A3->B2 A4->B6 A5->B5 | non-halt on 0
+048. A1->B1 A2->B3 A3->B5 A4->B6 A5->B2 | non-halt on 0
+049. A1->B1 A2->B5 A3->B2 A4->B6 A5->B3 | non-halt on 0
+050. A1->B1 A2->B5 A3->B3 A4->B6 A5->B2 | non-halt on 0
+051. A1->B1 A2->B5 A3->B6 A4->B3 A5->B2 | non-halt on 0
+052. A1->B1 A2->B6 A3->B5 A4->B3 A5->B2 | non-halt on 0
+053. A1->B2 A2->B1 A3->B3 A4->B6 A5->B5 | non-halt on 1,01,001
+054. A1->B2 A2->B1 A3->B5 A4->B6 A5->B3 | non-halt on 1,01,001
+055. A1->B2 A2->B5 A3->B1 A4->B3 A5->B6 | non-halt on 01,001
+056. A1->B2 A2->B5 A3->B1 A4->B6 A5->B3 | non-halt on 01,001
+057. A1->B2 A2->B5 A3->B3 A4->B1 A5->B6 | non-halt on 01,001
+058. A1->B2 A2->B5 A3->B3 A4->B6 A5->B1 | non-halt on 01,001
+059. A1->B2 A2->B5 A3->B6 A4->B1 A5->B3 | non-halt on 01,001
+060. A1->B2 A2->B5 A3->B6 A4->B3 A5->B1 | non-halt on 01,001
+061. A1->B2 A2->B6 A3->B3 A4->B1 A5->B5 | non-halt on 1,01,001
+062. A1->B2 A2->B6 A3->B5 A4->B1 A5->B3 | non-halt on 1,01,001
+063. A1->B3 A2->B1 A3->B2 A4->B6 A5->B5 | non-halt on 1
+064. A1->B3 A2->B1 A3->B5 A4->B6 A5->B2 | non-halt on 1
+065. A1->B3 A2->B6 A3->B2 A4->B1 A5->B5 | non-halt on 1
+066. A1->B3 A2->B6 A3->B5 A4->B1 A5->B2 | non-halt on 1
+067. A1->B5 A2->B1 A3->B2 A4->B6 A5->B3 | non-halt on 1
+068. A1->B5 A2->B1 A3->B3 A4->B6 A5->B2 | non-halt on 1
+069. A1->B5 A2->B6 A3->B2 A4->B1 A5->B3 | non-halt on 1
+070. A1->B5 A2->B6 A3->B3 A4->B1 A5->B2 | non-halt on 1
+071. A1->B6 A2->B2 A3->B3 A4->B1 A5->B5 | non-halt on 0
+072. A1->B6 A2->B2 A3->B5 A4->B1 A5->B3 | non-halt on 0
+073. A1->B6 A2->B3 A3->B2 A4->B1 A5->B5 | non-halt on 0
+074. A1->B6 A2->B3 A3->B5 A4->B1 A5->B2 | non-halt on 0
+075. A1->B6 A2->B5 A3->B2 A4->B1 A5->B3 | non-halt on 0
+076. A1->B6 A2->B5 A3->B3 A4->B1 A5->B2 | non-halt on 0
+077. A1->B1 A2->B2 A3->B4 A4->B6 A5->B5 | non-halt on 0
+078. A1->B1 A2->B2 A3->B5 A4->B6 A5->B4 | non-halt on 0
+079. A1->B1 A2->B4 A3->B2 A4->B6 A5->B5 | non-halt on 0,111
+080. A1->B1 A2->B4 A3->B5 A4->B6 A5->B2 | non-halt on 0
+081. A1->B1 A2->B4 A3->B6 A4->B2 A5->B5 | non-halt on 111
+082. A1->B1 A2->B5 A3->B2 A4->B6 A5->B4 | non-halt on 0
+083. A1->B1 A2->B5 A3->B4 A4->B6 A5->B2 | non-halt on 0
+084. A1->B2 A2->B1 A3->B4 A4->B6 A5->B5 | non-halt on 1,01,001
+085. A1->B2 A2->B1 A3->B5 A4->B6 A5->B4 | non-halt on 1,01,001
+086. A1->B2 A2->B4 A3->B1 A4->B6 A5->B5 | non-halt on 111
+087. A1->B2 A2->B4 A3->B6 A4->B1 A5->B5 | non-halt on 111
+088. A1->B2 A2->B5 A3->B1 A4->B4 A5->B6 | non-halt on 01,001
+089. A1->B2 A2->B5 A3->B1 A4->B6 A5->B4 | non-halt on 01,001
+090. A1->B2 A2->B5 A3->B4 A4->B1 A5->B6 | non-halt on 01,001
+091. A1->B2 A2->B5 A3->B4 A4->B6 A5->B1 | non-halt on 01,001
+092. A1->B2 A2->B5 A3->B6 A4->B1 A5->B4 | non-halt on 01,001
+093. A1->B2 A2->B5 A3->B6 A4->B4 A5->B1 | non-halt on 01,001
+094. A1->B2 A2->B6 A3->B4 A4->B1 A5->B5 | non-halt on 1,01,001
+095. A1->B2 A2->B6 A3->B5 A4->B1 A5->B4 | non-halt on 1,01,001
+096. A1->B4 A2->B1 A3->B2 A4->B6 A5->B5 | non-halt on 1
+097. A1->B4 A2->B1 A3->B5 A4->B6 A5->B2 | non-halt on 1
+098. A1->B4 A2->B2 A3->B5 A4->B1 A5->B6 | non-halt on 01
+099. A1->B4 A2->B2 A3->B5 A4->B6 A5->B1 | non-halt on 01
+100. A1->B4 A2->B5 A3->B2 A4->B1 A5->B6 | non-halt on 01
+101. A1->B4 A2->B5 A3->B2 A4->B6 A5->B1 | non-halt on 01
+102. A1->B4 A2->B6 A3->B2 A4->B1 A5->B5 | non-halt on 1
+103. A1->B4 A2->B6 A3->B5 A4->B1 A5->B2 | non-halt on 1
+104. A1->B5 A2->B1 A3->B2 A4->B6 A5->B4 | non-halt on 1
+105. A1->B5 A2->B1 A3->B4 A4->B6 A5->B2 | non-halt on 1
+106. A1->B5 A2->B6 A3->B2 A4->B1 A5->B4 | non-halt on 1
+107. A1->B5 A2->B6 A3->B4 A4->B1 A5->B2 | non-halt on 1
+108. A1->B6 A2->B2 A3->B4 A4->B1 A5->B5 | non-halt on 0
+109. A1->B6 A2->B2 A3->B5 A4->B1 A5->B4 | non-halt on 0
+110. A1->B6 A2->B4 A3->B1 A4->B2 A5->B5 | non-halt on 111
+111. A1->B6 A2->B4 A3->B2 A4->B1 A5->B5 | non-halt on 0,111
+112. A1->B6 A2->B4 A3->B5 A4->B1 A5->B2 | non-halt on 0
+113. A1->B6 A2->B5 A3->B2 A4->B1 A5->B4 | non-halt on 0
+114. A1->B6 A2->B5 A3->B4 A4->B1 A5->B2 | non-halt on 0
+115. A1->B1 A2->B3 A3->B4 A4->B6 A5->B5 | non-halt on 0
+116. A1->B1 A2->B3 A3->B5 A4->B6 A5->B4 | non-halt on 0
+117. A1->B1 A2->B4 A3->B3 A4->B6 A5->B5 | non-halt on 0,111
+118. A1->B1 A2->B4 A3->B5 A4->B6 A5->B3 | non-halt on 0
+119. A1->B1 A2->B4 A3->B6 A4->B3 A5->B5 | non-halt on 111
+120. A1->B1 A2->B5 A3->B3 A4->B6 A5->B4 | non-halt on 0
+121. A1->B1 A2->B5 A3->B4 A4->B6 A5->B3 | non-halt on 0
+122. A1->B3 A2->B1 A3->B4 A4->B6 A5->B5 | non-halt on 1
+123. A1->B3 A2->B1 A3->B5 A4->B6 A5->B4 | non-halt on 1
+124. A1->B3 A2->B4 A3->B1 A4->B6 A5->B5 | non-halt on 111
+125. A1->B3 A2->B4 A3->B6 A4->B1 A5->B5 | non-halt on 111
+126. A1->B3 A2->B6 A3->B4 A4->B1 A5->B5 | non-halt on 1
+127. A1->B3 A2->B6 A3->B5 A4->B1 A5->B4 | non-halt on 1
+128. A1->B4 A2->B1 A3->B3 A4->B6 A5->B5 | non-halt on 1
+129. A1->B4 A2->B1 A3->B5 A4->B6 A5->B3 | non-halt on 1
+130. A1->B4 A2->B3 A3->B5 A4->B1 A5->B6 | non-halt on 01
+131. A1->B4 A2->B3 A3->B5 A4->B6 A5->B1 | non-halt on 01
+132. A1->B4 A2->B5 A3->B3 A4->B1 A5->B6 | non-halt on 01
+133. A1->B4 A2->B5 A3->B3 A4->B6 A5->B1 | non-halt on 01
+134. A1->B4 A2->B6 A3->B3 A4->B1 A5->B5 | non-halt on 1
+135. A1->B4 A2->B6 A3->B5 A4->B1 A5->B3 | non-halt on 1
+136. A1->B5 A2->B1 A3->B3 A4->B6 A5->B4 | non-halt on 1
+137. A1->B5 A2->B1 A3->B4 A4->B6 A5->B3 | non-halt on 1
+138. A1->B5 A2->B6 A3->B3 A4->B1 A5->B4 | non-halt on 1
+139. A1->B5 A2->B6 A3->B4 A4->B1 A5->B3 | non-halt on 1
+140. A1->B6 A2->B3 A3->B4 A4->B1 A5->B5 | non-halt on 0
+141. A1->B6 A2->B3 A3->B4 A4->B5 A5->B1 | non-halt on 001
+142. A1->B6 A2->B3 A3->B5 A4->B1 A5->B4 | non-halt on 0
+143. A1->B6 A2->B4 A3->B1 A4->B3 A5->B5 | non-halt on 111
+144. A1->B6 A2->B4 A3->B3 A4->B1 A5->B5 | non-halt on 0,111
+145. A1->B6 A2->B4 A3->B5 A4->B1 A5->B3 | non-halt on 0
+146. A1->B6 A2->B5 A3->B3 A4->B1 A5->B4 | non-halt on 0
+147. A1->B6 A2->B5 A3->B4 A4->B1 A5->B3 | non-halt on 0
+148. A1->B2 A2->B4 A3->B3 A4->B6 A5->B5 | non-halt on 111
+149. A1->B2 A2->B4 A3->B6 A4->B3 A5->B5 | non-halt on 111
+150. A1->B2 A2->B5 A3->B3 A4->B4 A5->B6 | non-halt on 01,001
+151. A1->B2 A2->B5 A3->B3 A4->B6 A5->B4 | non-halt on 01,001
+152. A1->B2 A2->B5 A3->B4 A4->B3 A5->B6 | non-halt on 01,001
+153. A1->B2 A2->B5 A3->B4 A4->B6 A5->B3 | non-halt on 01,001
+154. A1->B2 A2->B5 A3->B6 A4->B3 A5->B4 | non-halt on 01,001
+155. A1->B2 A2->B5 A3->B6 A4->B4 A5->B3 | non-halt on 01,001
+156. A1->B3 A2->B4 A3->B2 A4->B6 A5->B5 | non-halt on 111
+157. A1->B3 A2->B4 A3->B6 A4->B2 A5->B5 | non-halt on 111
+158. A1->B6 A2->B4 A3->B2 A4->B3 A5->B5 | non-halt on 111
+159. A1->B6 A2->B4 A3->B3 A4->B2 A5->B5 | non-halt on 111</pre>
+          </details>
+          Therefore, the 561 remaining matchings are exactly those that halt on every listed input.
+        </div>
+      </div>
+
+      <div class="question-card">
+        <div class="question-header">
+          <span class="q-badge">Q2</span>
+          <span class="q-title">Restricted Subset Matchings</span>
+        </div>
+        <div class="q-text">
+          Use only:
+          <br>
+          Column A: \(A1,A2,A3,A5\),
+          Column B: \(B1,B2,B4,B5\).
+          <ol>
+            <li>Construct all bijective matchings.</li>
+            <li>For which matchings does the machine enter a cycle on input \(01\)?</li>
+            <li>For which matchings does the head move unboundedly right on input \(111\)?</li>
+          </ol>
+        </div>
+        <button class="solution-toggle" onclick="toggleSolution(this)">Show Solution</button>
+        <div class="solution-block">
+          <span class="solution-title">Solution</span>
+          Number of bijections: \(4! = 24\).
+          <details>
+            <summary>All 24 bijective matchings</summary>
+            <pre class="code-block">1. A1->B1, A2->B2, A3->B4, A5->B5
+2. A1->B1, A2->B2, A3->B5, A5->B4
+3. A1->B1, A2->B4, A3->B2, A5->B5
+4. A1->B1, A2->B4, A3->B5, A5->B2
+5. A1->B1, A2->B5, A3->B2, A5->B4
+6. A1->B1, A2->B5, A3->B4, A5->B2
+7. A1->B2, A2->B1, A3->B4, A5->B5
+8. A1->B2, A2->B1, A3->B5, A5->B4
+9. A1->B2, A2->B4, A3->B1, A5->B5
+10. A1->B2, A2->B4, A3->B5, A5->B1
+11. A1->B2, A2->B5, A3->B1, A5->B4
+12. A1->B2, A2->B5, A3->B4, A5->B1
+13. A1->B4, A2->B1, A3->B2, A5->B5
+14. A1->B4, A2->B1, A3->B5, A5->B2
+15. A1->B4, A2->B2, A3->B1, A5->B5
+16. A1->B4, A2->B2, A3->B5, A5->B1
+17. A1->B4, A2->B5, A3->B1, A5->B2
+18. A1->B4, A2->B5, A3->B2, A5->B1
+19. A1->B5, A2->B1, A3->B2, A5->B4
+20. A1->B5, A2->B1, A3->B4, A5->B2
+21. A1->B5, A2->B2, A3->B1, A5->B4
+22. A1->B5, A2->B2, A3->B4, A5->B1
+23. A1->B5, A2->B4, A3->B1, A5->B2
+24. A1->B5, A2->B4, A3->B2, A5->B1</pre>
+          </details>
+          <strong>Cycle on input \(01\):</strong>
+          exactly matchings <strong>11</strong> and <strong>12</strong>.
+          <br><br>
+          <strong>Head moves unboundedly right on input \(111\):</strong>
+          <strong>none</strong> of the 24 matchings.
+          <br>
+          (All either halt or enter a finite cycle; no matching keeps pushing right forever.)
+        </div>
+      </div>
+
+      <div class="question-card">
+        <div class="question-header">
+          <span class="q-badge">Q3</span>
+          <span class="q-title">Matching on \(C1,C2,C3\) vs \(D1,D2,D3,D4\)</span>
+        </div>
+        <div class="q-text">
+          Use:
+          <div class="two-col">
+            <table>
+              <tr><th>Column A</th><th>Entry</th></tr>
+              <tr><td>C1</td><td>\((q_0,0)\)</td></tr>
+              <tr><td>C2</td><td>\((q_1,1)\)</td></tr>
+              <tr><td>C3</td><td>\((q_2,0)\)</td></tr>
+            </table>
+            <table>
+              <tr><th>Column B</th><th>Entry</th></tr>
+              <tr><td>D1</td><td>\((q_1,0,R)\)</td></tr>
+              <tr><td>D2</td><td>\((q_2,1,R)\)</td></tr>
+              <tr><td>D3</td><td>\((q_0,0,L)\)</td></tr>
+              <tr><td>D4</td><td>\((q_2,0,L)\)</td></tr>
+            </table>
+          </div>
+          Construct any one-to-one matching between Column A and any three entries from Column B.
+          <ol>
+            <li>Prove that for every possible matching, the resulting TM does not halt on at least one non-empty input over \(\{0,1\}\).</li>
+            <li>Give formal reasoning using configuration repetition or unbounded head motion.</li>
+          </ol>
+        </div>
+        <button class="solution-toggle" onclick="toggleSolution(this)">Show Solution</button>
+        <div class="solution-block">
+          <span class="solution-title">Solution</span>
+          It is a trick question to test whether you can say that the machine will halt in all matchings since there is no transition on blank \(B\) for any state in this restricted system.
+        </div>
+      </div>
+    </div>
+
+    <footer>
+      CS637 - Quiz 2 • Spring 2026<br>
+      Dr. Debasish Pattanayak • Department of Computer Science
+    </footer>
+  </div>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      renderMathInElement(document.body, {
+        delimiters: [
+          { left: "$$", right: "$$", display: true },
+          { left: "\\[", right: "\\]", display: true },
+          { left: "\\(", right: "\\)", display: false }
+        ]
+      });
+    });
+
+    function toggleSolution(button) {
+      const solutionBlock = button.nextElementSibling;
+      if (solutionBlock.classList.contains("visible")) {
+        solutionBlock.classList.remove("visible");
+        button.textContent = "Show Solution";
+      } else {
+        solutionBlock.classList.add("visible");
+        button.textContent = "Hide Solution";
+      }
+    }
+  </script>
+
+  <a href="index.html" class="fab-btn" title="Back to Index">🏠</a>
+</body>
+
+</html>

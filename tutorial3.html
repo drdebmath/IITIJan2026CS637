@@ -3,7 +3,7 @@
 
 <head>
   <meta charset="utf-8">
-  <title>CS 637 – Tutorial 3: Turing Machine design</title>
+  <title>CS 637 – Tutorial 3: Turing Machine Design</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
   <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
@@ -18,7 +18,7 @@
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       line-height: 1.6;
-      background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       min-height: 100vh;
       padding: 20px;
     }
@@ -28,12 +28,12 @@
       margin: 0 auto;
       background: white;
       border-radius: 16px;
-      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
       overflow: hidden;
     }
 
     header {
-      background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       color: white;
       padding: 40px;
       text-align: center;
@@ -52,8 +52,13 @@
       opacity: 0.95;
     }
 
+    .date-line {
+      font-size: 1.0em;
+      opacity: 0.9;
+    }
+
     .instructor {
-      margin-top: 15px;
+      margin-top: 12px;
       font-size: 1.05em;
       opacity: 0.9;
     }
@@ -79,13 +84,13 @@
       color: #1e293b;
       margin-bottom: 25px;
       padding-bottom: 10px;
-      border-bottom: 3px solid #3b82f6;
+      border-bottom: 3px solid #667eea;
       font-weight: 700;
     }
 
     .question-card {
       background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
-      border-left: 4px solid #3b82f6;
+      border-left: 4px solid #667eea;
       padding: 25px;
       margin-bottom: 30px;
       border-radius: 8px;
@@ -95,7 +100,7 @@
 
     .question-card:hover {
       transform: translateX(5px);
-      box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
     }
 
     .question-header {
@@ -105,7 +110,7 @@
     }
 
     .q-badge {
-      background: #3b82f6;
+      background: #667eea;
       color: white;
       padding: 5px 15px;
       border-radius: 20px;
@@ -132,13 +137,26 @@
       margin-right: 5px;
     }
 
-    code {
-      background: #f1f5f9;
-      padding: 2px 6px;
-      border-radius: 4px;
-      font-family: 'Courier New', monospace;
-      color: #dc2626;
-      font-size: 0.9em;
+    .solution {
+      margin-top: 10px;
+      background: #eff6ff;
+      border-left: 4px solid #3b82f6;
+      border-radius: 6px;
+      padding: 12px 14px;
+    }
+
+    .solution strong {
+      color: #1e3a8a;
+    }
+
+    ol,
+    ul {
+      margin-left: 22px;
+      margin-top: 8px;
+    }
+
+    li {
+      margin-bottom: 6px;
     }
 
     .katex {
@@ -192,43 +210,81 @@
 </head>
 
 <body>
-
   <div class="container">
     <header>
       <h1>CS 637: Mathematics-II</h1>
       <div class="subtitle">Tutorial 3: Turing Machine Design</div>
+      <div class="date-line">29 January 2026</div>
       <div class="instructor">
         <strong>Instructor:</strong> <a href="https://drdebmath.github.io" target="_blank">Dr. Debasish Pattanayak</a>
       </div>
     </header>
 
     <div class="content">
-
-      <!-- Topic 1: TM Design & Traces -->
-      <h2 class="section-title">Topic 1: Turing Machine Design & Traces</h2>
+      <h2 class="section-title">Tutorial Questions and Solutions</h2>
 
       <div class="question-card">
         <div class="question-header">
           <span class="q-badge">Q1</span>
           <span class="q-title">Design of a Turing Machine for Binary Addition</span>
         </div>
+
         <div class="sub-question">
           <span class="sub-label">(a)</span>
-          Design a Turing machine that accepts two binary numbers separated by a # symbol and computes their sum.
-          Describe the states, transitions, and tape alphabet clearly.
+          Design a Turing machine that accepts two binary numbers separated by a # symbol and computes their sum. Describe the states, transitions, and tape alphabet clearly.
+          <div class="solution">
+            <strong>Solution:</strong> Input format is \(x\#y\) where \(x,y\in\{0,1\}^*\).<br><br>
+            <strong>Tape alphabet:</strong> \(\Gamma=\{0,1,\#,\square\}\) (and optionally a marker symbol \(X\)).<br><br>
+            <strong>Goal/output convention:</strong> overwrite the tape so that, when the machine halts, the tape contains \(x\#(x+y)\) (sum written to the right of #).<br><br>
+            <strong>Small, well-defined steps (single-tape).</strong>
+            <ol>
+              <li><strong>Go to separator.</strong> From the left end, move right until reading #.</li>
+              <li><strong>Go to end of \(y\).</strong> Move right until reading \(\square\); step left (now on the least significant bit of \(y\)).</li>
+              <li><strong>Main loop (add one column).</strong> Keep the carry in the state (\(c\in\{0,1\}\)). Repeat:
+                <ol>
+                  <li><strong>Read \(y\)-bit.</strong> If on \(0\) or \(1\), remember it in the state and overwrite it with \(\square\) (consuming it). If you are already on # (i.e., no more \(y\) bits), treat the \(y\)-bit as \(0\).</li>
+                  <li><strong>Move to matching \(x\)-bit.</strong> Move left across # into \(x\); then move left until either (i) you reach \(\square\) (no more \(x\) bits) or (ii) you are on the rightmost remaining \(0/1\) of \(x\).</li>
+                  <li><strong>Read \(x\)-bit.</strong> If on \(0\) or \(1\), remember it and overwrite it with \(\square\) (consuming it). If on \(\square\) (past the left end of \(x\)), treat the \(x\)-bit as \(0\).</li>
+                  <li><strong>Compute sum bit.</strong> Compute \(s = x_i \oplus y_i \oplus c\) and new carry \(c'\in\{0,1\}\) (standard full-adder).</li>
+                  <li><strong>Write output bit.</strong> Move right to #, then move right until the first \(\square\) cell; write \(s\) there.</li>
+                  <li><strong>Return to next \(y\) position.</strong> Move left back to #, then move right to the rightmost remaining bit of \(y\) (i.e., move right until \(\square\), then step left).</li>
+                  <li>Set \(c\leftarrow c'\).</li>
+                </ol>
+              </li>
+              <li><strong>Stop condition.</strong> When both \(x\) and \(y\) are exhausted (you encounter \(\square\) to the left of # when searching for \(x\), and you are on # when searching for \(y\)), if \(c=1\) write a final \(1\) at the end of the output; then halt.</li>
+            </ol>
+          </div>
         </div>
+
         <div class="sub-question">
           <span class="sub-label">(b)</span>
-          Trace the computation of your Turing machine on the input $101\#110$. Show the tape configuration and state at
-          each step.
+          Trace the computation of your Turing machine on the input \(101\#110\). Show the tape configuration and state at each step.
+          <div class="solution">
+            <strong>Solution:</strong> The addition is performed from the least significant bits:
+            <ol>
+              <li>\(1+0+0=1\).</li>
+              <li>\(0+1+0=1\).</li>
+              <li>\(1+1+0=0\) with carry \(1\).</li>
+              <li>No bits left in \(x\): \(0+0+1=1\).</li>
+            </ol>
+            So the sum is \(1011\) (since \(5+6=11\)).
+          </div>
         </div>
+
         <div class="sub-question">
           <span class="sub-label">(c)</span>
           Prove that your Turing machine halts for all valid inputs consisting of two binary numbers.
+          <div class="solution">
+            <strong>Solution:</strong> Each main iteration marks at least one previously unmarked input symbol (in \(x\) or in \(y\)). Since there are finitely many symbols, only finitely many iterations occur. After both halves are exhausted and the final carry is handled, the machine transitions to \(q_{accept}\) and halts.
+          </div>
         </div>
+
         <div class="sub-question">
           <span class="sub-label">(d)</span>
           What is the time complexity of your Turing machine in terms of the length of the input string?
+          <div class="solution">
+            <strong>Solution:</strong> On a single tape, producing each output bit typically requires scanning back and forth across the input, giving \(O(n^2)\) time for input length \(n\).
+          </div>
         </div>
       </div>
 
@@ -237,51 +293,224 @@
           <span class="q-badge">Q2</span>
           <span class="q-title">Turing Machine for Palindrome Recognition</span>
         </div>
+
         <div class="sub-question">
           <span class="sub-label">(a)</span>
-          Design a single-tape Turing machine that accepts the language $L = \{w \in \{a,b\}^* \mid w = w^R\}$ where
-          $w^R$ denotes the reverse of string $w$.
+          Design a single-tape Turing machine that accepts the language \(L = \{w \in \{a,b\}^* \mid w = w^R\}\) where \(w^R\) denotes the reverse of string \(w\).
+          <div class="solution">
+            <strong>Solution:</strong> Use markers \(A\) (for "this \(a\) has been matched") and \(B\) (for "this \(b\) has been matched").<br><br>
+            <strong>Small, well-defined steps.</strong> Repeat the following procedure:
+            <ol>
+              <li><strong>Find leftmost unmarked symbol.</strong> Move the head to the left end of the input; scan right until you see an unmarked \(a\) or \(b\).</li>
+              <li><strong>If none found.</strong> If you reach \(\square\) without finding an unmarked symbol, <strong>accept</strong>.</li>
+              <li><strong>Mark it and remember which.</strong>
+                <ul>
+                  <li>If you see \(a\), overwrite it with \(A\) and enter a state "looking for matching \(a\)".</li>
+                  <li>If you see \(b\), overwrite it with \(B\) and enter a state "looking for matching \(b\)".</li>
+                </ul>
+              </li>
+              <li><strong>Go to right end.</strong> Move right until you see \(\square\); then move left (now on the rightmost symbol).</li>
+              <li><strong>Find rightmost unmarked symbol.</strong> Scan left skipping markers \(A,B\) until you see an unmarked \(a\) or \(b\) (or until you hit \(\square\) on the left).</li>
+              <li><strong>Compare and mark.</strong>
+                <ul>
+                  <li>If you are in "matching \(a\)" state: if symbol is \(a\), overwrite with \(A\); otherwise <strong>reject</strong>.</li>
+                  <li>If you are in "matching \(b\)" state: if symbol is \(b\), overwrite with \(B\); otherwise <strong>reject</strong>.</li>
+                </ul>
+              </li>
+              <li><strong>Return.</strong> Move left to the left end and repeat.</li>
+            </ol>
+          </div>
         </div>
+
         <div class="sub-question">
           <span class="sub-label">(b)</span>
-          Provide the formal 7-tuple representation of your Turing machine: $M = (Q, \Sigma, \Gamma, \delta, q_0,
-          q_{accept}, q_{reject})$.
+          Provide the formal 7-tuple representation of your Turing machine: \(M = (Q, \Sigma, \Gamma, \delta, q_0, q_{accept}, q_{reject})\).
+          <div class="solution">
+            <strong>Solution:</strong> One valid formalization is:
+            \[
+            M=(Q,\Sigma,\Gamma,\delta,q_0,q_{accept},q_{reject}),\qquad \Sigma=\{a,b\},\quad \Gamma=\{a,b,A,B,\square\}.
+            \]
+            Let
+            \[
+            Q=\{q_0,q_{seekR_a},q_{seekR_b},q_{match_a},q_{match_b},q_{back},q_{accept},q_{reject}\}.
+            \]
+            \(\delta\) implements the algorithm in part (a): from \(q_0\) it finds the leftmost unmarked symbol and branches to \(q_{seekR_a}\) or \(q_{seekR_b}\); those go right to \(\square\) then step left to \(q_{match_a}/q_{match_b}\); those verify/mark the rightmost symbol and go to \(q_{back}\); \(q_{back}\) returns to the left end and then to \(q_0\).
+          </div>
         </div>
+
         <div class="sub-question">
           <span class="sub-label">(c)</span>
-          Demonstrate the acceptance of the string $abaaba$ by showing all tape configurations during computation.
+          Demonstrate the acceptance of the string \(abaaba\) by showing all tape configurations during computation.
+          <div class="solution">
+            <strong>Solution:</strong> The machine marks outer pairs, then inner pairs:
+            <ol>
+              <li>Mark leftmost \(a\) and rightmost \(a\): \(AbaabA\).</li>
+              <li>Mark next leftmost \(b\) and next rightmost \(b\): \(ABaaBA\).</li>
+              <li>Mark next \(a\) and next \(a\): \(ABAABA\).</li>
+              <li>No unmarked symbols remain \(\Rightarrow\) accept.</li>
+            </ol>
+          </div>
         </div>
+
         <div class="sub-question">
           <span class="sub-label">(d)</span>
           How would you modify your design to work with a two-tape Turing machine? What advantage would this provide?
+          <div class="solution">
+            <strong>Solution:</strong> Copy the input onto tape 2 while moving right on tape 1; then move left on tape 2 and compare tape 1 (left-to-right) with tape 2 (right-to-left). This reduces repeated rescans and yields \(O(n)\) time (up to constant factors) on a 2-tape TM.
+          </div>
         </div>
       </div>
-
-      <!-- Topic 2: Multi-Tape & Variants -->
-      <h2 class="section-title">Topic 2: Multi-Tape & Variants</h2>
 
       <div class="question-card">
         <div class="question-header">
           <span class="q-badge">Q3</span>
           <span class="q-title">Multi-Tape Turing Machine Design</span>
         </div>
+
         <div class="sub-question">
           <span class="sub-label">(a)</span>
-          Design a 2-tape Turing machine that accepts the language $L = \{ww \mid w \in \{0,1\}^*\}$ (strings that are
-          concatenations of two identical substrings).
+          Design a 2-tape Turing machine that accepts the language \(L = \{ww \mid w \in \{0,1\}^*\}\) (strings that are concatenations of two identical substrings).
+          <div class="solution">
+            <strong>Solution:</strong> Let tape 1 start with input \(x\); tape 2 starts blank.<br><br>
+            <strong>Small, well-defined steps (2 tapes).</strong>
+            <ol>
+              <li><strong>Check even length (tape 1).</strong> Place head 1 at the left end and scan right, toggling a parity bit in the state for each symbol read. If you stop on \(\square\) with odd parity, <strong>reject</strong>.</li>
+              <li><strong>Copy first half to tape 2.</strong> Return head 1 to the left end. Move head 1 two steps right at a time; for each such 2-step, copy the <em>first</em> of the two symbols onto tape 2 (write it, then move head 2 right). When head 1 reaches \(\square\), tape 2 contains the first half \(w\).</li>
+              <li><strong>Position to start of second half.</strong> Return head 1 to the left end again; move head 1 right exactly \(|w|\) steps (this can be done by rewinding tape 2 to its left end, then for each symbol on tape 2, move head 1 right once).</li>
+              <li><strong>Compare.</strong> Rewind tape 2 to its left end. While head 2 reads \(0\) or \(1\):
+                <ol>
+                  <li>If the symbol under head 1 differs from the symbol under head 2, <strong>reject</strong>.</li>
+                  <li>Otherwise move both heads right by one.</li>
+                </ol>
+              </li>
+              <li><strong>Accept.</strong> If tape 2 ends exactly when head 1 also ends the string (hits \(\square\)), <strong>accept</strong>; otherwise <strong>reject</strong>.</li>
+            </ol>
+          </div>
         </div>
+
         <div class="sub-question">
           <span class="sub-label">(b)</span>
           Explain how your multi-tape design is more efficient than a single-tape implementation for this problem.
+          <div class="solution">
+            <strong>Solution:</strong> With tape 2 holding a clean copy of the first half, the comparison is a single pass. A single-tape TM typically needs many back-and-forth passes to "remember" positions, adding an extra linear factor.
+          </div>
         </div>
+
         <div class="sub-question">
           <span class="sub-label">(c)</span>
-          Provide a formal proof or argument showing that any $k$-tape Turing machine can be simulated by a single-tape
-          Turing machine.
+          Provide a formal proof or argument showing that any \(k\)-tape Turing machine can be simulated by a single-tape Turing machine.
+          <div class="solution">
+            <strong>Solution:</strong> Represent the \(k\) tapes on one tape separated by delimiters, and mark the simulated head positions (e.g. using dotted symbols). Each simulated step scans to collect the \(k\) symbols under the head markers, applies the \(k\)-tape transition, writes updated symbols, and moves the markers (shifting as needed when moving onto new blank cells).
+          </div>
         </div>
+
         <div class="sub-question">
           <span class="sub-label">(d)</span>
-          What is the time complexity overhead when converting a $k$-tape Turing machine to a single-tape machine?
+          What is the time complexity overhead when converting a \(k\)-tape Turing machine to a single-tape machine?
+          <div class="solution">
+            <strong>Solution:</strong> The standard simulation incurs at most a quadratic slowdown: if the \(k\)-tape machine runs in \(T(n)\) time, the 1-tape simulation runs in \(O(T(n)^2)\) time.
+          </div>
+        </div>
+      </div>
+
+      <div class="question-card">
+        <div class="question-header">
+          <span class="q-badge">Q4</span>
+          <span class="q-title">Decidability and Language Properties</span>
+        </div>
+
+        <div class="sub-question">
+          <span class="sub-label">(a)</span>
+          Define what it means for a language to be decidable, recognizable (recursively enumerable), and co-recognizable.
+          <div class="solution">
+            <strong>Solution:</strong>
+            <ul>
+              <li><em>Decidable (recursive):</em> some TM halts on every input and accepts exactly the strings in \(L\).</li>
+              <li><em>Recognizable (recursively enumerable, RE):</em> some TM accepts exactly the strings in \(L\) (it may loop forever on \(x\notin L\)).</li>
+              <li><em>Co-recognizable:</em> \(\overline{L}\) is recognizable.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="sub-question">
+          <span class="sub-label">(b)</span>
+          Give an example of a language that is recognizable but not decidable. Prove that it has these properties.
+          <div class="solution">
+            <strong>Solution:</strong> Example:
+            \[
+            HALT=\{\langle M,w\rangle \mid M\text{ halts on input }w\}.
+            \]
+            It is recognizable by simulating \(M\) on \(w\) and accepting if it halts.
+            It is not decidable by the standard halting problem argument (diagonalization/reduction).
+          </div>
+        </div>
+
+        <div class="sub-question">
+          <span class="sub-label">(c)</span>
+          Prove that if both a language \(L\) and its complement \(\overline{L}\) are recognizable, then \(L\) is decidable.
+          <div class="solution">
+            <strong>Solution:</strong> Let \(M_1\) recognize \(L\) and \(M_2\) recognize \(\overline{L}\). On input \(x\), dovetail simulations of \(M_1(x)\) and \(M_2(x)\) step-by-step in parallel. Exactly one of them must eventually accept; accept if \(M_1\) accepts, otherwise reject. This halts on all inputs and decides \(L\).
+          </div>
+        </div>
+
+        <div class="sub-question">
+          <span class="sub-label">(d)</span>
+          Determine whether the language \(L_{empty} = \{\langle M \rangle \mid M \text{ is a TM and } L(M) = \emptyset\}\) is decidable, recognizable, or neither. Justify your answer.
+          <div class="solution">
+            <strong>Solution:</strong>
+            \[
+            L_{empty}=\{\langle M\rangle\mid L(M)=\emptyset\}
+            \]
+            is undecidable by Rice's theorem ("emptiness" is a nontrivial semantic property). It is neither recognizable nor co-recognizable.
+          </div>
+        </div>
+      </div>
+
+      <div class="question-card">
+        <div class="question-header">
+          <span class="q-badge">Q5</span>
+          <span class="q-title">Non-Deterministic Turing Machines</span>
+        </div>
+
+        <div class="sub-question">
+          <span class="sub-label">(a)</span>
+          Define a non-deterministic Turing machine (NTM) formally. How does it differ from a deterministic Turing machine?
+          <div class="solution">
+            <strong>Solution:</strong> An NTM has a transition relation \(\delta:Q\times\Gamma\to \mathcal{P}(Q\times\Gamma\times\{L,R,S\})\); a string is accepted if some computation branch reaches \(q_{accept}\). A DTM has at most one move for each \((q,\gamma)\).
+          </div>
+        </div>
+
+        <div class="sub-question">
+          <span class="sub-label">(b)</span>
+          Design an NTM that accepts the language \(L = \{w \in \{0,1\}^* \mid w\) contains an equal number of 0s and 1s\(\}.\)
+          <div class="solution">
+            <strong>Solution:</strong> On input \(w\):
+            <ol>
+              <li>Repeatedly nondeterministically choose a pair consisting of one unmarked \(0\) and one unmarked \(1\) anywhere on the tape; mark both (e.g. \(0\mapsto X\), \(1\mapsto Y\)).</li>
+              <li>If no unmarked symbols remain, accept.</li>
+              <li>If one of \(\{0,1\}\) is exhausted while the other still has unmarked symbols, reject.</li>
+            </ol>
+          </div>
+        </div>
+
+        <div class="sub-question">
+          <span class="sub-label">(c)</span>
+          Prove that for every NTM, there exists an equivalent deterministic Turing machine that accepts the same language.
+          <div class="solution">
+            <strong>Solution:</strong> A DTM can simulate the NTM by exploring its computation tree in breadth-first order (dovetailing over all branches). If an accepting branch exists, the BFS simulation eventually reaches it and accepts.
+          </div>
+        </div>
+
+        <div class="sub-question">
+          <span class="sub-label">(d)</span>
+          Discuss the relationship between non-deterministic space complexity and deterministic space complexity (Savitch's theorem).
+          <div class="solution">
+            <strong>Solution:</strong> Savitch's theorem states that for space-constructible \(s(n)\ge \log n\),
+            \[
+            NSPACE(s(n))\subseteq SPACE(s(n)^2).
+            \]
+            So nondeterminism yields at most a quadratic savings in space.
+          </div>
         </div>
       </div>
 
@@ -290,153 +519,282 @@
           <span class="q-badge">Q6</span>
           <span class="q-title">Turing Machine Variants and Equivalence</span>
         </div>
+
         <div class="sub-question">
           <span class="sub-label">(a)</span>
-          Describe a Turing machine with a semi-infinite tape (infinite in only one direction). Prove that it is
-          equivalent in computational power to a standard Turing machine with a doubly-infinite tape.
+          Describe a Turing machine with a semi-infinite tape (infinite in only one direction). Prove that it is equivalent in computational power to a standard Turing machine with a doubly-infinite tape.
+          <div class="solution">
+            <strong>Solution:</strong> A semi-infinite tape TM can simulate a two-way-infinite tape by encoding the left and right halves on separate "tracks" (or separate regions) of its tape; cells left of the origin are stored reversed. Moves across the origin correspond to switching tracks. Conversely, a standard TM can simulate a semi-infinite tape TM by reserving a left-end marker and never moving left of it.
+          </div>
         </div>
+
         <div class="sub-question">
           <span class="sub-label">(b)</span>
-          Design an enumerator for the language $L = \{a^i b^j c^k \mid i \cdot j = k, i,j,k \geq 1\}$.
+          Design an enumerator for the language \(L = \{a^i b^j c^k \mid i \cdot j = k, i,j,k \geq 1\}\).
+          <div class="solution">
+            <strong>Solution:</strong> Dovetail over all \((i,j)\in\mathbb{N}_{\ge1}^2\): for \(s=2,3,4,\dots\) enumerate all pairs with \(i+j=s\), and for each output \(a^i b^j c^{ij}\). This enumerates exactly the language.
+          </div>
         </div>
+
         <div class="sub-question">
           <span class="sub-label">(c)</span>
           Prove that a language is Turing-recognizable if and only if some enumerator enumerates it.
+          <div class="solution">
+            <strong>Solution:</strong> (\(\Rightarrow\)) If \(L\) is recognizable by \(M\), enumerate all \(x\in\Sigma^*\) and dovetail simulations of \(M(x)\); whenever a simulation accepts, print \(x\).<br><br>
+            (\(\Leftarrow\)) If an enumerator prints exactly \(L\), then to recognize \(L\) on input \(w\), simulate the enumerator until it prints \(w\), then accept.
+          </div>
         </div>
+
         <div class="sub-question">
           <span class="sub-label">(d)</span>
-          Compare the computational models of Turing machines, RAM machines, and lambda calculus in terms of the
-          languages they can recognize.
-        </div>
-      </div>
-
-      <!-- Topic 3: Decidability & Languages -->
-      <h2 class="section-title">Topic 3: Decidability & Languages</h2>
-
-      <div class="question-card">
-        <div class="question-header">
-          <span class="q-badge">Q4</span>
-          <span class="q-title">Decidability and Language Properties</span>
-        </div>
-        <div class="sub-question">
-          <span class="sub-label">(a)</span>
-          Define what it means for a language to be decidable, recognizable (recursively enumerable), and
-          co-recognizable.
-        </div>
-        <div class="sub-question">
-          <span class="sub-label">(b)</span>
-          Give an example of a language that is recognizable but not decidable. Prove that it has these properties.
-        </div>
-        <div class="sub-question">
-          <span class="sub-label">(c)</span>
-          Prove that if both a language $L$ and its complement $\overline{L}$ are recognizable, then $L$ is decidable.
-        </div>
-        <div class="sub-question">
-          <span class="sub-label">(d)</span>
-          Determine whether the language $L_{empty} = \{\langle M \rangle \mid M \text{ is a TM and } L(M) =
-          \emptyset\}$ is decidable, recognizable, or neither. Justify your answer.
+          Compare the computational models of Turing machines, RAM machines, and lambda calculus in terms of the languages they can recognize.
+          <div class="solution">
+            <strong>Solution:</strong> All three are Turing-complete: they recognize/decide exactly the Turing-recognizable/decidable languages (under standard encodings).
+          </div>
         </div>
       </div>
 
       <div class="question-card">
         <div class="question-header">
           <span class="q-badge">Q7</span>
-          <span class="q-title">Closure Properties of RE Languages</span>
+          <span class="q-title">Closure Properties of Recursively Enumerable Languages</span>
         </div>
+
         <div class="sub-question">
           <span class="sub-label">(a)</span>
-          Prove that the class of recursively enumerable (RE) languages is closed under union. Provide a construction of
-          a Turing machine that recognizes $L_1 \cup L_2$ given machines that recognize $L_1$ and $L_2$.
+          Prove that the class of recursively enumerable (RE) languages is closed under union. Provide a construction of a Turing machine that recognizes \(L_1 \cup L_2\) given machines that recognize \(L_1\) and \(L_2\).
+          <div class="solution">
+            <strong>Solution:</strong> If \(M_1\) recognizes \(L_1\) and \(M_2\) recognizes \(L_2\), then on input \(x\) dovetail simulations of \(M_1(x)\) and \(M_2(x)\) in parallel; accept if either accepts. This recognizes \(L_1\cup L_2\).
+          </div>
         </div>
+
         <div class="sub-question">
           <span class="sub-label">(b)</span>
           Prove that the class of RE languages is closed under concatenation and Kleene star.
+          <div class="solution">
+            <strong>Solution:</strong> For concatenation, on input \(x\) enumerate all splits \(x=uv\) and dovetail runs of \(M_1(u)\) and \(M_2(v)\); accept if some split makes both accept.<br><br>
+            For Kleene star, enumerate all decompositions \(x=w_1\cdots w_m\) and dovetail runs of \(M\) on each \(w_i\); accept if some decomposition makes all pieces accept.
+          </div>
         </div>
+
         <div class="sub-question">
           <span class="sub-label">(c)</span>
           Show that the class of RE languages is NOT closed under complementation by providing a counterexample.
+          <div class="solution">
+            <strong>Solution:</strong> If RE were closed under complement, then for any RE language \(L\), both \(L\) and \(\overline{L}\) would be RE, implying \(L\) decidable (by dovetailing). But \(HALT\) is RE and not decidable, contradiction.
+          </div>
         </div>
+
         <div class="sub-question">
           <span class="sub-label">(d)</span>
-          Prove that the class of decidable (recursive) languages is closed under complementation, union, and
-          intersection.
+          Prove that the class of decidable (recursive) languages is closed under complementation, union, and intersection.
+          <div class="solution">
+            <strong>Solution:</strong> If \(M\) decides \(L\), swapping accept/reject decides \(\overline{L}\). If \(M_1,M_2\) decide \(L_1,L_2\), run both (they halt) and accept according to Boolean logic for union/intersection.
+          </div>
         </div>
       </div>
-
-      <!-- Topic 4: Non-Deterministic Turing Machines -->
-      <h2 class="section-title">Topic 4: Non-Deterministic Turing Machines</h2>
-
-      <div class="question-card">
-        <div class="question-header">
-          <span class="q-badge">Q5</span>
-          <span class="q-title">Non-Deterministic Turing Machines</span>
-        </div>
-        <div class="sub-question">
-          <span class="sub-label">(a)</span>
-          Define a non-deterministic Turing machine (NTM) formally. How does it differ from a deterministic Turing
-          machine?
-        </div>
-        <div class="sub-question">
-          <span class="sub-label">(b)</span>
-          Design an NTM that accepts the language $L = \{w \in \{0,1\}^* \mid w \text{ contains an equal number of 0s
-          and 1s}\}$.
-        </div>
-        <div class="sub-question">
-          <span class="sub-label">(c)</span>
-          Prove that for every NTM, there exists an equivalent deterministic Turing machine that accepts the same
-          language.
-        </div>
-        <div class="sub-question">
-          <span class="sub-label">(d)</span>
-          Discuss the relationship between non-deterministic space complexity and deterministic space complexity
-          (Savitch's theorem).
-        </div>
-      </div>
-
-      <!-- Topic 5: Complex Languages -->
-      <h2 class="section-title">Topic 5: Complex Language Recognition</h2>
 
       <div class="question-card">
         <div class="question-header">
           <span class="q-badge">Q8</span>
           <span class="q-title">Complex Language Recognition</span>
         </div>
+
         <div class="sub-question">
           <span class="sub-label">(a)</span>
-          Design a Turing machine that recognizes the language $L = \{a^{n^2} \mid n \geq 0\}$ (strings of $a$'s whose
-          length is a perfect square).
+          Design a Turing machine that recognizes the language \(L = \{a^{n^2} \mid n \geq 0\}\) (strings of \(a\)'s whose length is a perfect square).
+          <div class="solution">
+            <strong>Solution:</strong> Use \(1+3+5+\cdots+(2n-1)=n^2\).<br><br>
+            <strong>Tape symbols:</strong> \(a\) (unmarked), \(X\) (marked/removed \(a\)), \(|\) (unary counter in a work zone), and \(\square\).<br><br>
+            <strong>Small, well-defined steps (single tape).</strong>
+            <ol>
+              <li><strong>Initialize.</strong> If the first cell is \(\square\), <strong>accept</strong>. Otherwise, go to the first \(\square\) to the right of the input and write one \(|\) (this represents \(t=1\)).</li>
+              <li><strong>Subtract \(t\) from the number of \(a\)'s.</strong> Repeat the following until all \(|\)'s have been "used":
+                <ol>
+                  <li>Move right to the work zone; find the leftmost unused \(|\).</li>
+                  <li>Mark it temporarily (e.g. by deleting it and remembering in the state that one \(|\) was consumed).</li>
+                  <li>Move left into the input region; scan right to find the leftmost unmarked \(a\). If found, overwrite it with \(X\).</li>
+                  <li>If no unmarked \(a\) exists when you still need to consume some \(|\), <strong>reject</strong>.</li>
+                </ol>
+              </li>
+              <li><strong>Check for exact exhaustion.</strong> Scan the input region: if there is no unmarked \(a\), <strong>accept</strong>.</li>
+              <li><strong>Increase odd counter by 2.</strong> Move to the end of the work zone and append two \(|\) symbols (so \(t\leftarrow t+2\)).</li>
+              <li><strong>Repeat.</strong> Restore the used-marker convention for the \(|\)'s (so the next subtraction will use all \(|\)'s) and go back to step 2.</li>
+            </ol>
+          </div>
         </div>
+
         <div class="sub-question">
           <span class="sub-label">(b)</span>
           Provide a detailed state diagram or transition table for your Turing machine.
+          <div class="solution">
+            <strong>Solution:</strong> A compact state sketch:
+            <ul>
+              <li>\(q_{init}\): handle empty input / initialize counter.</li>
+              <li>\(q_{sub}\): perform one subtraction pass by marking \(t\) unmarked \(a\)'s.</li>
+              <li>\(q_{check}\): check whether any unmarked \(a\) remains.</li>
+              <li>\(q_{inc}\): increase the odd counter by \(2\) and return to \(q_{sub}\).</li>
+              <li>\(q_{accept},q_{reject}\).</li>
+            </ul>
+            Tape alphabet can be \(\{a,X,\square,|\}\) where \(|\) is the unary counter symbol.
+          </div>
         </div>
+
         <div class="sub-question">
           <span class="sub-label">(c)</span>
-          Trace the execution of your machine on the inputs $aaaa$ (which should be accepted) and $aaaaa$ (which should
-          be rejected).
+          Trace the execution of your machine on the inputs \(aaaa\) (which should be accepted) and \(aaaaa\) (which should be rejected).
+          <div class="solution">
+            <strong>Solution:</strong>
+            <ul>
+              <li>\(aaaa\) (\(m=4\)): subtract \(1\) \(\Rightarrow\) 3 left; subtract \(3\) \(\Rightarrow\) 0 left \(\Rightarrow\) accept.</li>
+              <li>\(aaaaa\) (\(m=5\)): subtract \(1\) \(\Rightarrow\) 4 left; subtract \(3\) \(\Rightarrow\) 1 left; next odd is \(5\) but only 1 remains \(\Rightarrow\) reject.</li>
+            </ul>
+          </div>
         </div>
+
         <div class="sub-question">
           <span class="sub-label">(d)</span>
           Analyze the time and space complexity of your Turing machine. Can you design a more efficient version?
+          <div class="solution">
+            <strong>Solution:</strong> There are \(\Theta(\sqrt{m})\) subtraction rounds, each costing \(\Theta(m)\) time due to scanning/marking, so the total time is \(\Theta(m^{3/2})\) (up to constant factors). Space is \(O(m)\) for the input plus \(O(\sqrt{m})\) for the counter.
+            A more efficient multi-tape design can approach \(O(m)\) time by keeping counters on separate tapes and avoiding full rescans.
+          </div>
         </div>
+
         <div class="sub-question">
           <span class="sub-label">(e)</span>
-          Design a Turing machine that recognizes $L_1 = \{a^{n^3} \mid n \geq 0\}$.
+          Design a Turing machine that recognizes \(L_1 = \{a^{n^3} \mid n \geq 0\}\).
+          <div class="solution">
+            <strong>Solution:</strong> Use the identity
+            \[
+            ( k+1 )^3 - k^3 = 3k^2 + 3k + 1.
+            \]
+            So starting at \(k=0\), we can repeatedly subtract the next "cube increment" \(3k^2+3k+1\); the input length is a perfect cube iff we reach exactly \(0\).<br><br>
+
+            <strong>Tape symbols:</strong> \(a\) (unmarked), \(X\) (marked/removed \(a\)), \(|\) (unary counter), separators \(\#\), and \(\square\).
+            We maintain three unary counters in a work zone to the right of the input:
+            \[
+            \#K\#S\#T\#
+            \]
+            where \(K\) encodes \(k\), \(S\) encodes \(k^2\) (so \(|S|=k^2\)), and \(T\) is a scratch area.<br><br>
+
+            <strong>Small, well-defined steps (single tape).</strong>
+            <ol>
+              <li><strong>Initialize work zone.</strong>
+                <ol>
+                  <li>Scan right to the first \(\square\) after the input and write the delimiters \(\#K\#S\#T\#\).</li>
+                  <li>Set \(K\) empty (so \(k=0\)) and set \(S\) empty (so \(k^2=0\)).</li>
+                </ol>
+              </li>
+
+              <li><strong>Main loop (subtract \(d=3k^2+3k+1\)).</strong> Repeat:
+                <ol>
+                  <li><strong>Build \(d\) in scratch area \(T\).</strong>
+                    <ol>
+                      <li>Erase all \(|\) in \(T\) (scan within \(T\) and write \(\square\)).</li>
+                      <li><strong>Copy \(S\) three times into \(T\).</strong> For \(i=1,2,3\) do:
+                        <ol>
+                          <li>Scan \(S\) left-to-right; for each \(|\) in \(S\), move to the end of \(T\) and append one \(|\); return to continue scanning \(S\).</li>
+                        </ol>
+                      </li>
+                      <li><strong>Copy \(K\) three times into \(T\).</strong> For \(i=1,2,3\) do:
+                        <ol>
+                          <li>Scan \(K\) left-to-right; for each \(|\) in \(K\), move to the end of \(T\) and append one \(|\); return to continue scanning \(K\).</li>
+                        </ol>
+                      </li>
+                      <li>Append one extra \(|\) to \(T\) (this is the "+1").</li>
+                    </ol>
+                  </li>
+
+                  <li><strong>Subtract \(|T|\) many \(a\)'s.</strong> For each \(|\) in \(T\) (scan \(T\) left-to-right):
+                    <ol>
+                      <li>Move left into the input region.</li>
+                      <li>Scan right to find the leftmost unmarked \(a\); if found, overwrite it by \(X\).</li>
+                      <li>If no unmarked \(a\) exists, <strong>reject</strong> (cannot subtract the next increment).</li>
+                      <li>Return right to the next \(|\) in \(T\).</li>
+                    </ol>
+                  </li>
+
+                  <li><strong>Check for exact exhaustion.</strong> Scan the input: if there is no unmarked \(a\), <strong>accept</strong>.</li>
+
+                  <li><strong>Update counters: \(k\leftarrow k+1\) and \(k^2\leftarrow (k+1)^2\).</strong>
+                    <ol>
+                      <li><strong>Increment \(K\).</strong> Move to the end of \(K\) and append one \(|\).</li>
+                      <li><strong>Update \(S\) by adding \(2k-1\) (using the new \(K\)).</strong>
+                        <ol>
+                          <li>Erase \(T\).</li>
+                          <li><strong>Copy \(K\) twice into \(T\)</strong> (same copy procedure as above), then delete one \(|\) from \(T\).</li>
+                          <li>For each \(|\) in \(T\), append one \(|\) to the end of \(S\).</li>
+                        </ol>
+                      </li>
+                    </ol>
+                  </li>
+                </ol>
+              </li>
+            </ol>
+          </div>
         </div>
+
         <div class="sub-question">
           <span class="sub-label">(f)</span>
-          Design a Turing machine that recognizes $L_2 = \{a^{2^n} \mid n \geq 0\}$.
+          Design a Turing machine that recognizes \(L_2 = \{a^{2^n} \mid n \geq 0\}\).
+          <div class="solution">
+            <strong>Solution:</strong> Use markers \(X\) for "paired/removed" \(a\) and \(Y\) for "kept representative" \(a\).<br><br>
+            <strong>Small, well-defined steps (single tape).</strong>
+            <ol>
+              <li>If input is empty, <strong>reject</strong>. (This language starts at \(a^{2^0}=a\).)</li>
+              <li><strong>Main loop (halve).</strong>
+                <ol>
+                  <li><strong>Check if exactly one \(a\) remains.</strong> Scan the tape: if there is exactly one unmarked \(a\) and no other unmarked \(a\)'s, <strong>accept</strong>.</li>
+                  <li><strong>Pairing pass.</strong> Return to the left end. While you can find two unmarked \(a\)'s:
+                    <ol>
+                      <li>Scan right to the first unmarked \(a\); change it to \(X\).</li>
+                      <li>Continue right to the next unmarked \(a\); change it to \(Y\) (this represents one \(a\) in the halved string).</li>
+                    </ol>
+                  </li>
+                  <li><strong>Oddness test.</strong> After the pairing pass, scan again: if there exists an unmarked \(a\) (unpaired) then <strong>reject</strong>.</li>
+                  <li><strong>Compress.</strong> Replace each \(Y\) by \(a\) (these are the new unmarked \(a\)'s for the next round) and erase all \(X\)'s (write \(\square\)). Then return to the left end.</li>
+                </ol>
+              </li>
+            </ol>
+          </div>
         </div>
+
         <div class="sub-question">
           <span class="sub-label">(g)</span>
-          Design a Turing machine that recognizes $L_3 = \{a^n b^{n^2} \mid n \geq 0\}$.
+          Design a Turing machine that recognizes \(L_3 = \{a^n b^{n^2} \mid n \geq 0\}\).
+          <div class="solution">
+            <strong>Solution:</strong> Use markers \(A\) for marked \(a\) and \(B\) for marked \(b\).<br><br>
+            <strong>Small, well-defined steps (single tape).</strong>
+            <ol>
+              <li><strong>Format check.</strong> Scan left-to-right: once you see a \(b\), if you later see an \(a\), <strong>reject</strong>. (So the string is \(a^*b^*\).)</li>
+              <li><strong>Special case \(n=0\).</strong> If the tape is empty, <strong>accept</strong>.</li>
+              <li><strong>Outer loop (do \(n\) rounds).</strong> Repeat until all \(a\)'s are marked:
+                <ol>
+                  <li><strong>Mark one \(a\).</strong> Move to the left end; scan right to the first unmarked \(a\); overwrite it with \(A\). If none exists, stop the outer loop.</li>
+                  <li><strong>Inner loop (mark \(n\) many \(b\)'s).</strong> To mark exactly \(n\) \(b\)'s, do the following "counting by the \(a\)-block":
+                    <ol>
+                      <li>Move to the left end.</li>
+                      <li>Scan right over the \(a\)-block; for each \(a\) or \(A\) encountered, do:
+                        <ol>
+                          <li>Move right into the \(b\)-block; scan right to the first unmarked \(b\); overwrite it with \(B\).</li>
+                          <li>If no unmarked \(b\) exists when one is required, <strong>reject</strong>.</li>
+                          <li>Return left to the start of the tape to continue scanning the \(a\)-block.</li>
+                        </ol>
+                      </li>
+                    </ol>
+                  </li>
+                </ol>
+              </li>
+              <li><strong>Final check.</strong> After the outer loop, scan the \(b\)-block: if any unmarked \(b\) remains, <strong>reject</strong>; otherwise <strong>accept</strong>.</li>
+            </ol>
+          </div>
         </div>
       </div>
-
     </div>
 
     <footer>
-      CS 637 – Tutorial 3: Turing Machines & Models of Computation • Spring 2026<br>
+      CS 637 – Tutorial 3: Turing Machine Design • Spring 2026<br>
       © Dr. Debasish Pattanayak • Department of Computer Science
     </footer>
   </div>
@@ -455,7 +813,6 @@
   </script>
 
   <a href="index.html" class="fab-btn" title="Back to Index">🏠</a>
-
 </body>
 
 </html>
