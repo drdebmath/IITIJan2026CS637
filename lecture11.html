@@ -1,117 +1,987 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="utf-8">
-  <title>CS 637 – Lecture 11 Definitions</title>
+  <title>CS 637 – Lecture 11: Complexity on Turing Machines</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+  <!-- Math Rendering -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
   <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
   <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
 
   <style>
+    :root {
+      --primary: #1a2a6c;
+      --secondary: #b21f1f;
+      --accent: #fdbb2d;
+      --accent-hover: #f59e0b;
+      --success: #10b981;
+      --danger: #ef4444;
+      --warning: #f59e0b;
+      --bg-light: #f8fafc;
+      --text-dark: #1e293b;
+      --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.08);
+      --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.12);
+      --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.15);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
     body {
-      font-family: "Times New Roman", serif;
-      margin: 40px;
-      line-height: 1.5;
-      background-color: #ffffff;
-      color: #000000;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      line-height: 1.7;
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%);
+      min-height: 100vh;
+      padding: 20px;
+      position: relative;
+      overflow-x: hidden;
     }
-    h1, h2 {
+
+    /* Animated background particles */
+    .particles {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 25px 80px rgba(0, 0, 0, 0.4);
+      overflow: hidden;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Header with gradient animation */
+    header {
+      background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
+      background-size: 200% 200%;
+      animation: gradientShift 15s ease infinite;
+      color: white;
+      padding: 50px 40px;
       text-align: center;
+      position: relative;
+      overflow: hidden;
     }
+
+    @keyframes gradientShift {
+      0% {
+        background-position: 0% 50%;
+      }
+
+      50% {
+        background-position: 100% 50%;
+      }
+
+      100% {
+        background-position: 0% 50%;
+      }
+    }
+
     h1 {
-      font-size: 1.8em;
-      margin-bottom: 0.2em;
+      font-size: 2.8em;
+      margin-bottom: 12px;
+      font-weight: 800;
+      position: relative;
+      z-index: 1;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+      letter-spacing: -0.5px;
     }
-    h2 {
-      font-size: 1.2em;
-      margin-top: 2em;
-      margin-bottom: 0.5em;
-    }
-    .definition {
-      margin-bottom: 1em;
-    }
-    .term {
-      font-weight: bold;
-    }
-    .number {
-      font-weight: bold;
-    }
-    .instructor {
-      margin-top: 8px;
-      font-size: 0.95rem;
-      color: #64748b;
-    }
-    .instructor a {
-      color: #0ea5e9;
-      text-decoration: none;
+
+    .subtitle {
+      font-size: 1.4em;
+      margin-bottom: 20px;
+      opacity: 0.95;
+      position: relative;
+      z-index: 1;
       font-weight: 500;
     }
+
+    .instructor {
+      margin-top: 20px;
+      font-size: 1.1em;
+      opacity: 0.95;
+      position: relative;
+      z-index: 1;
+    }
+
+    .instructor a {
+      color: #ffd700;
+      text-decoration: none;
+      font-weight: 600;
+      transition: all 0.3s;
+      padding: 4px 8px;
+      border-radius: 4px;
+    }
+
     .instructor a:hover {
+      background: rgba(255, 215, 0, 0.2);
       text-decoration: underline;
     }
+
+    /* Progress indicator */
+    .progress-bar {
+      position: sticky;
+      top: 0;
+      height: 4px;
+      background: #e2e8f0;
+      z-index: 101;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--primary), var(--secondary), var(--accent));
+      width: 0%;
+      transition: width 0.3s ease;
+    }
+
+    /* Navigation */
+    .nav-wrapper {
+      background: #fff;
+      position: sticky;
+      top: 4px;
+      z-index: 100;
+      border-bottom: 2px solid #e2e8f0;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    }
+
+    .nav-tabs {
+      display: flex;
+      gap: 0;
+      overflow-x: auto;
+      padding: 0 20px;
+      scrollbar-width: thin;
+      scrollbar-color: var(--primary) #f1f5f9;
+    }
+
+    .nav-tabs::-webkit-scrollbar {
+      height: 6px;
+    }
+
+    .nav-tabs::-webkit-scrollbar-track {
+      background: #f1f5f9;
+      border-radius: 3px;
+    }
+
+    .nav-tabs::-webkit-scrollbar-thumb {
+      background: var(--primary);
+      border-radius: 3px;
+    }
+
+    .tab-btn {
+      padding: 15px 24px;
+      background: none;
+      border: none;
+      font-size: 1em;
+      cursor: pointer;
+      color: #64748b;
+      font-weight: 600;
+      border-bottom: 3px solid transparent;
+      transition: all 0.3s;
+      white-space: nowrap;
+      position: relative;
+    }
+
+    .tab-btn::before {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%) scaleX(0);
+      width: 80%;
+      height: 3px;
+      background: var(--primary);
+      transition: transform 0.3s;
+    }
+
+    .tab-btn:hover {
+      color: var(--primary);
+      background: #f8fafc;
+    }
+
+    .tab-btn.active {
+      color: var(--primary);
+    }
+
+    .tab-btn.active::before {
+      transform: translateX(-50%) scaleX(1);
+    }
+
+    /* Content Area */
+    .content {
+      padding: 50px 40px;
+      min-height: 600px;
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+      animation: slideIn 0.5s ease-out;
+    }
+
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Typography */
+    .section-title {
+      font-size: 2em;
+      color: var(--text-dark);
+      margin-bottom: 30px;
+      padding-bottom: 12px;
+      border-bottom: 4px solid var(--secondary);
+      position: relative;
+      font-weight: 700;
+    }
+
+    .section-title::after {
+      content: '';
+      position: absolute;
+      bottom: -4px;
+      left: 0;
+      width: 100px;
+      height: 4px;
+      background: var(--accent);
+    }
+
+    /* Card components with enhanced styling */
+    .definition-card {
+      background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
+      border-left: 5px solid var(--primary);
+      padding: 25px;
+      margin-bottom: 25px;
+      border-radius: 12px;
+      box-shadow: var(--shadow-sm);
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .definition-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 5px;
+      height: 100%;
+      background: linear-gradient(180deg, var(--primary), var(--accent));
+      opacity: 0;
+      transition: opacity 0.4s;
+    }
+
+    .definition-card:hover {
+      transform: translateX(8px) translateY(-4px);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .definition-card:hover::before {
+      opacity: 1;
+    }
+
+    .example-card {
+      background: linear-gradient(135deg, #fef3c7 0%, #fef9c3 100%);
+      border-left: 5px solid var(--warning);
+      padding: 25px;
+      border-radius: 12px;
+      margin-bottom: 25px;
+      box-shadow: var(--shadow-sm);
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+    }
+
+    .example-card::before {
+      content: '💡';
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      font-size: 2em;
+      opacity: 0.2;
+      transition: all 0.4s;
+    }
+
+    .example-card:hover {
+      transform: translateX(8px) translateY(-4px);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .example-card:hover::before {
+      opacity: 0.4;
+      transform: rotate(15deg) scale(1.1);
+    }
+
+    .theorem-card {
+      background: linear-gradient(135deg, #dfe9f3 0%, #ffffff 100%);
+      border-left: 5px solid #3b82f6;
+      padding: 25px;
+      border-radius: 12px;
+      margin-bottom: 25px;
+      box-shadow: var(--shadow-sm);
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+    }
+
+    .theorem-card::before {
+      content: '📐';
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      font-size: 2em;
+      opacity: 0.2;
+      transition: all 0.4s;
+    }
+
+    .theorem-card:hover {
+      transform: translateX(8px) translateY(-4px);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .theorem-card:hover::before {
+      opacity: 0.4;
+      transform: rotate(-15deg) scale(1.1);
+    }
+
+    .card-title {
+      font-size: 1.3em;
+      font-weight: 700;
+      margin-bottom: 15px;
+      color: var(--text-dark);
+    }
+
+    /* Lists */
+    ul,
+    ol {
+      margin-left: 25px;
+      margin-top: 15px;
+    }
+
+    li {
+      margin-bottom: 10px;
+      line-height: 1.8;
+    }
+
+    /* Code blocks */
+    code {
+      background: #f1f5f9;
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 0.95em;
+      color: #e11d48;
+      font-weight: 600;
+    }
+
+    .key-point {
+      background: linear-gradient(135deg, #e0f2fe 0%, #ffffff 100%);
+      border-left: 5px solid #0ea5e9;
+      padding: 25px;
+      border-radius: 12px;
+      margin-bottom: 25px;
+      box-shadow: var(--shadow-sm);
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+    }
+
+    .key-point::before {
+      content: '📝';
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      font-size: 2em;
+      opacity: 0.2;
+      transition: all 0.4s;
+    }
+
+    .key-point:hover {
+      transform: translateX(8px) translateY(-4px);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .key-point:hover::before {
+      opacity: 0.4;
+      transform: rotate(5deg) scale(1.1);
+    }
+
+    /* Footer */
     footer {
-      margin-top: 3em;
+      background: linear-gradient(135deg, var(--primary), #0f172a);
+      color: white;
       text-align: center;
+      padding: 30px;
+      font-size: 1.05em;
+    }
+
+    /* Responsive design */
+    @media (max-width: 768px) {
+      body {
+        padding: 10px;
+      }
+
+      h1 {
+        font-size: 2em;
+      }
+
+      .subtitle {
+        font-size: 1.1em;
+      }
+
+      .content {
+        padding: 30px 20px;
+      }
+
+      .section-title {
+        font-size: 1.5em;
+      }
+
+      .nav-tabs {
+        padding: 0 10px;
+      }
+
+      .tab-btn {
+        padding: 12px 16px;
+        font-size: 0.9em;
+      }
+
+      header {
+        padding: 30px 20px;
+      }
+    }
+
+    .fab-btn {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      color: white;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+      z-index: 1000;
+      border: none;
+      font-size: 28px;
+      transition: all 0.3s;
+      cursor: pointer;
+    }
+
+    .fab-btn:hover {
+      transform: translateY(-4px) scale(1.05);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+    }
+
+    .scroll-top {
+      position: fixed;
+      bottom: 100px;
+      right: 30px;
+      width: 52px;
+      height: 52px;
+      border: none;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent), var(--accent-hover));
+      color: white;
+      font-size: 1.3em;
+      cursor: pointer;
+      box-shadow: var(--shadow-lg);
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s;
+      z-index: 120;
+    }
+
+    .scroll-top.visible {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    @media (max-width: 768px) {
+      .fab-btn {
+        width: 52px;
+        height: 52px;
+        bottom: 20px;
+        right: 20px;
+        font-size: 24px;
+      }
+
+      .scroll-top {
+        width: 46px;
+        height: 46px;
+        bottom: 85px;
+        right: 22px;
+      }
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+      font-size: 1em;
+      background: white;
+      box-shadow: var(--shadow-sm);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    th,
+    td {
+      padding: 15px 20px;
+      text-align: left;
+      border-bottom: 1px solid #e2e8f0;
+    }
+
+    th {
+      background: #f1f5f9;
+      font-weight: 700;
+      color: var(--primary);
+      text-transform: uppercase;
       font-size: 0.85em;
-      color: #333;
+      letter-spacing: 0.5px;
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    tr:hover {
+      background-color: #f8fafc;
     }
   </style>
-
-<style>
-.fab-btn {
-  position: fixed;
-  bottom: 24px;
-  right: 24px;
-  width: 56px;
-  height: 56px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #3b82f6, #2563eb);
-  color: white;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-  cursor: pointer;
-  z-index: 1000;
-  border: none;
-  font-size: 24px;
-  transition: transform 0.2s, box-shadow 0.2s;
-  text-decoration: none;
-}
-.fab-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(0,0,0,0.3);
-}
-</style>
-
 </head>
 
 <body>
+  <!-- Background particles -->
+  <div class="particles" id="particles"></div>
 
-<h1>CS 637: Mathematics-II</h1>
-<div class="instructor">
-  <strong>Instructor:</strong> <a href="https://drdebmath.github.io" target="_blank">Dr. Debasish Pattanayak</a>
-</div>
-<h2>Lecture 11 – Reductions and Undecidability Proof Techniques</h2>
+  <div class="container">
+    <!-- Progress bar -->
+    <div class="progress-bar">
+      <div class="progress-fill" id="progressFill"></div>
+    </div>
 
-<footer>
-  
-</footer>
+    <header>
+      <h1>CS 637: Mathematics-II</h1>
+      <div class="subtitle">Lecture 11: Complexity on Turing Machines and Variants</div>
+      <div class="instructor">
+        <strong>Instructor:</strong> <a href="https://drdebmath.github.io/" target="_blank">Dr. Debasish Pattanayak</a>
+      </div>
+    </header>
 
-<script>
-document.addEventListener("DOMContentLoaded", function() {
-    renderMathInElement(document.body, {
+    <div class="nav-wrapper">
+      <div class="nav-tabs">
+        <button class="tab-btn active" onclick="switchTab('problem')">Problem & Setup</button>
+        <button class="tab-btn" onclick="switchTab('singletape')">Single-Tape TM</button>
+        <button class="tab-btn" onclick="switchTab('twotape')">Two-Tape TM</button>
+        <button class="tab-btn" onclick="switchTab('twohead')">Two-Head TM</button>
+        <button class="tab-btn" onclick="switchTab('comparison')">Complexity Comparison</button>
+        <button class="tab-btn" onclick="switchTab('advanced')">Advanced Examples</button>
+      </div>
+    </div>
+
+    <div class="content">
+
+      <!-- 1. Problem & Setup -->
+      <div id="problem" class="tab-content active">
+        <h2 class="section-title">The Challenge: Recognizing $\{a^n b^n c^n\}$</h2>
+
+        <div class="definition-card">
+          <h3 class="card-title">Problem Statement</h3>
+          <p>We want to design a Turing Machine that decides the language:</p>
+          \[ L = \{ a^n b^n c^n \mid n \ge 1 \} \]
+          <p>Where \(\Sigma = \{a, b, c\}\). An input string is in \(L\) if and only if it consists of \(n\) 'a's,
+            followed by \(n\) 'b's, followed by \(n\) 'c's.</p>
+        </div>
+
+        <div class="theorem-card">
+          <h3 class="card-title">Time Complexity Definition</h3>
+          <p>Let \(M\) be a deterministic Turing machine that halts on all inputs.</p>
+          <p>The <strong>time complexity</strong> (or running time) of \(M\) is the function \(f: \mathbb{N} \rightarrow
+            \mathbb{N}\), where \(f(n)\) is the maximum number of steps that \(M\) uses on any input of length \(n\).
+          </p>
+          <p>If \(f(n)\) is the running time of \(M\), we say that \(M\) runs in time \(f(n)\) and that \(M\) is an
+            \(O(f(n))\) time Turing machine.</p>
+        </div>
+
+        <div class="example-card">
+          <h3 class="card-title">Why this Example?</h3>
+          <p>This language is a classic example of something that is <strong>Context-Sensitive</strong> but not
+            Context-Free. While a Pushdown Automaton (PDA) can recognize \(\{a^n b^n\}\) using its stack, it cannot
+            handle three balanced distinct groups like \(\{a^n b^n c^n\}\).</p>
+          <p>Moreover, implementing this on different variants of Turing Machines reveals striking differences in
+            efficiency, highlighting the power of additional tapes and heads.</p>
+        </div>
+      </div>
+
+      <!-- 2. Single-Tape TM -->
+      <div id="singletape" class="tab-content">
+        <h2 class="section-title">Standard Single-Tape Turing Machine</h2>
+
+        <div class="definition-card">
+          <h3 class="card-title">Design Strategy</h3>
+          <p>On a single tape, we must repeatedly scan back and forth across the input to match symbols one by one.</p>
+          <ol>
+            <li><strong>Mark first unmarked 'a':</strong> Scan right to find the first unmarked \(a\). Mark it (e.g.,
+              replace with \(X\)).</li>
+            <li><strong>Match with 'b':</strong> Scan right past any \(a\)'s and marked \(b\)'s to find the first
+              unmarked \(b\). Mark it (replace with \(Y\)). If no \(b\) is found before a \(c\) or blank, reject.</li>
+            <li><strong>Match with 'c':</strong> Scan right past any \(b\)'s and marked \(c\)'s to find the first
+              unmarked \(c\). Mark it (replace with \(Z\)). If no \(c\) is found before blank, reject.</li>
+            <li><strong>Return to start:</strong> Scan left all the way to the beginning of the tape.</li>
+            <li><strong>Repeat:</strong> Repeat steps 1-4 until no unmarked \(a\)'s are left.</li>
+            <li><strong>Verify:</strong> Ensure no extra unmarked \(b\)'s or \(c\)'s remain. If clean, accept.</li>
+          </ol>
+        </div>
+
+        <div class="theorem-card">
+          <h3 class="card-title">Complexity Analysis</h3>
+          <p>Let \(n\) be the length of the input string \(w\).</p>
+          <ul>
+            <li>In each complete round, we mark one \(a\), one \(b\), and one \(c\).</li>
+            <li>Therefore, there are exactly \(n/3\) rounds (if \(w \in L\)).</li>
+            <li><strong>Round 1:</strong> Scan requires moving across the string ~ \(n\) steps and returning ~ \(n\)
+              steps. Total \(\approx 2n\) steps.</li>
+            <li><strong>Round \(i\):</strong> Still requires scanning across the relevant portion of the tape. Even as
+              symbols are marked, we traverse them. Cost is proportional to \(n\).</li>
+            <li><strong>Total Time:</strong> Sum of costs for \(n/3\) rounds.</li>
+          </ul>
+          \[ \text{Time} \approx \sum_{i=1}^{n/3} O(n) = \frac{n}{3} \times O(n) = O(n^2) \]
+          <p>Thus, a single-tape TM decides \(L\) in <strong>\(O(n^2)\)</strong> time.</p>
+        </div>
+      </div>
+
+      <!-- 3. Two-Tape TM -->
+      <div id="twotape" class="tab-content">
+        <h2 class="section-title">Two-Tape Turing Machine</h2>
+
+        <div class="definition-card">
+          <h3 class="card-title">Design Strategy</h3>
+          <p>With an extra tape, we can copy information to avoid re-scanning.</p>
+          <ol>
+            <li><strong>Copy 'a's:</strong> Scan Tape 1. Copy all \(a\)'s onto Tape 2. When a \(b\) is encountered on
+              Tape 1, stop copying.</li>
+            <li><strong>Rewind Tape 2:</strong> Move Tape 2 head back to the beginning of the copied \(a\)'s.</li>
+            <li><strong>Match 'b's:</strong> Continue scanning \(b\)'s on Tape 1 while simultaneously scanning \(a\)'s
+              on Tape 2. For every \(b\) on Tape 1, move right on Tape 2. If Tape 1 sees a \(c\) or Tape 2 runs out of
+              \(a\)'s prematurely (or vice versa), reject.</li>
+            <li><strong>Rewind Tape 2 again:</strong> Move Tape 2 head back to the beginning of the \(a\)'s.
+              (Alternatively, if we can read backwards, just scan left).</li>
+            <li><strong>Match 'c's:</strong> Continue scanning \(c\)'s on Tape 1 while re-scanning \(a\)'s on Tape 2.
+              Verify counts match.</li>
+            <li><strong>Verify Completion:</strong> Ensure both tapes finish reading their respective segments
+              simultaneously.</li>
+          </ol>
+        </div>
+
+        <div class="theorem-card">
+          <h3 class="card-title">Complexity Analysis</h3>
+          <p>Let's count the steps for input of length \(n\):</p>
+          <ul>
+            <li><strong>Phase 1 (Copy \(a\)'s):</strong> Scan \(a\)'s on Tape 1. \(O(n)\) steps.</li>
+            <li><strong>Phase 2 (Match \(b\)'s):</strong> Scan \(b\)'s on Tape 1 and \(a\)'s on Tape 2. \(O(n)\) steps.
+              Tape 2 rewind takes \(O(n)\).</li>
+            <li><strong>Phase 3 (Match \(c\)'s):</strong> Scan \(c\)'s on Tape 1 and \(a\)'s on Tape 2. \(O(n)\) steps.
+              Tape 2 rewind takes \(O(n)\).</li>
+          </ul>
+          <p>We never re-scan the input on Tape 1. We verify each segment essentially once. The rewind operations are
+            linear.</p>
+          \[ \text{Total Time} = O(n) + O(n) + O(n) = O(n) \]
+          <p>The 2-tape TM is significantly faster, running in <strong>linear time</strong>.</p>
+        </div>
+      </div>
+
+      <!-- 4. Two-Head TM -->
+      <div id="twohead" class="tab-content">
+        <h2 class="section-title">Two-Head Turing Machine</h2>
+
+        <div class="definition-card">
+          <h3 class="card-title">Design Strategy</h3>
+          <p>A 2-head machine has one tape, but two independent heads that can move separately.</p>
+          <ol>
+            <li><strong>Position Heads:</strong> Keep Head 1 at the start. Move Head 2 forward to find the first \(b\).
+              This validates the \(a^n\) block and effectively "measures" \(n\) by the distance between Head 1 and Head
+              2.</li>
+            <li><strong>Match 'a' vs 'b':</strong> Move both Head 1 and Head 2 right simultaneously step-by-step.
+              <ul>
+                <li>Head 1 reads \(a\), Head 2 reads \(b\).</li>
+                <li>Continue until Head 1 hits the first \(b\) (where Head 2 started).</li>
+                <li>At this point, Head 2 must have hit the first \(c\) (or something else if malformed).</li>
+              </ul>
+            </li>
+            <li><strong>Match 'b' vs 'c':</strong> Now Head 1 is at the start of \(b\)'s, and Head 2 is at the start of
+              \(c\)'s. Move both right simultaneously.
+              <ul>
+                <li>Head 1 reads \(b\), Head 2 reads \(c\).</li>
+                <li>Verify they hit the boundary (first \(c\) for Head 1, blank for Head 2) simultaneously.</li>
+              </ul>
+            </li>
+          </ol>
+        </div>
+
+        <div class="theorem-card">
+          <h3 class="card-title">Complexity Analysis</h3>
+          <p>Analysis of head movements:</p>
+          <ul>
+            <li><strong>Find first 'b':</strong> Head 2 scans forward. \(O(n)\) steps.</li>
+            <li><strong>Compare 'a' and 'b':</strong> Both heads move forward \(n/3\) steps. \(O(n)\).</li>
+            <li><strong>Compare 'b' and 'c':</strong> Both heads move forward \(n/3\) steps. \(O(n)\).</li>
+          </ul>
+          <p>We perform a constant number of linear sweeps across the input.</p>
+          \[ \text{Total Time} = O(n) \]
+          <p>Unlike the single-tape machine, we don't need to zag-zag back to the beginning for every symbol. The second
+            head acts as a "finger" to keep our place.</p>
+        </div>
+      </div>
+
+      <!-- 5. Comparison -->
+      <div id="comparison" class="tab-content">
+        <h2 class="section-title">Model Comparison Summary</h2>
+
+        <div class="key-point">
+          <strong>Key Insight:</strong> Adding capabilities (tapes, heads) does not change <em>what</em> can be computed
+          (decidability), but it drastically changes <em>how efficiently</em> it can be computed (complexity).
+        </div>
+
+        <table>
+          <thead>
+            <tr>
+              <th>Model</th>
+              <th>Time Complexity for \(L\)</th>
+              <th>Space Used</th>
+              <th>Mechanism</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Single-Tape TM</strong></td>
+              <td>\(O(n^2)\)</td>
+              <td>\(O(n)\)</td>
+              <td>Repeated back-and-forth scanning (Zig-zag)</td>
+            </tr>
+            <tr>
+              <td><strong>Two-Tape TM</strong></td>
+              <td>\(O(n)\)</td>
+              <td>\(O(n)\)</td>
+              <td>Copy and compare in parallel</td>
+            </tr>
+            <tr>
+              <td><strong>Two-Head TM</strong></td>
+              <td>\(O(n)\)</td>
+              <td>\(O(n)\)</td>
+              <td>Simultaneous scanning of different segments</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="key-point" style="margin: 25px 0;">
+          <strong>Why not faster than \(O(n)\)?</strong>
+          <p>For any Turing Machine to decide a non-trivial language property that depends on the entire input, it must
+            read
+            all \(n\) symbols at least once. Thus, the time complexity can never be less than \(O(n)\), regardless of
+            the
+            number of tapes or heads.</p>
+        </div>
+
+        <div class="theorem-card">
+          <h3 class="card-title">Theorem (<a
+              href="https://www.ams.org/journals/tran/1965-117-00/S0002-9947-1965-0170805-7/S0002-9947-1965-0170805-7.pdf"
+              target="_blank" style="color: inherit; text-decoration: underline;">Hartmanis & Stearns, 1965</a>)</h3>
+          <p>If a language is decidable in \(T(n)\) time on a \(k\)-tape Turing machine, it is decidable in
+            \(O(T(n)^2)\) time on a single-tape Turing machine.</p>
+          <p>Our example confirms this relationship: \(O(n)\) on 2-tape vs \(O(n^2)\) on single-tape.</p>
+        </div>
+      </div>
+
+      <!-- 6. Advanced Examples -->
+      <div id="advanced" class="tab-content">
+        <h2 class="section-title">Advanced Complexity Examples</h2>
+
+        <div class="example-card">
+          <h3 class="card-title">Example 1: \(L = \{ a^n b^{n^2} \mid n \ge 1 \}\)</h3>
+          <p><strong>The Problem:</strong> Checking if the number of \(b\)'s is the square of the number of \(a\)'s.</p>
+          <ul>
+            <li><strong>Single-Tape TM:</strong> \(O(N^{1.5})\)
+              <ul>
+                <li>We iterate through each \(a\) (total \(n\) times).</li>
+                <li>For the \(k\)-th \(a\), we mark \(2k-1\) \(b\)'s (since \(n^2 = \sum_{k=1}^n (2k-1)\)).</li>
+                <li>Input length \(N \approx n^2\). So \(n \approx \sqrt{N}\).</li>
+                <li>In each of the \(n\) passes, we scan the full tape of length \(N\).</li>
+                <li>Total time \(\approx n \times N \approx \sqrt{N} \times N = N^{1.5}\).</li>
+              </ul>
+            </li>
+            <li><strong>Two-Tape TM:</strong> \(O(N)\)
+              <ul>
+                <li>Copy \(a^n\) to Tape 2.</li>
+                <li>Use Tape 2 to generate \(n^2\) markers on Tape 3 or compare directly by repeating the scan of Tape 2
+                  \(n\) times while scanning Tape 1.</li>
+                <li>Wait! Standard multiplication approach: To scan \(n^2\) items on Tape 1, we can loop through Tape 2
+                  (\(n\) items) exactly \(n\) times (using a third counter or destructive read/restore).</li>
+                <li>The time taken is proportional to the number of steps, which is exactly \(N\) (the length of the
+                  input).</li>
+              </ul>
+            </li>
+          </ul>
+        </div>
+
+        <div class="theorem-card" style="margin-bottom: 25px;">
+          <h3 class="card-title">Example 2: \(L = \{ ww \mid w \in \{0,1\}^* \}\)</h3>
+          <p><strong>The Problem:</strong> Checking if the first half of the string is identical to the second half.</p>
+          <table>
+            <thead>
+              <tr>
+                <th>Model</th>
+                <th>Complexity</th>
+                <th>Reason</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Single-Tape</td>
+                <td>\(O(N^2)\)</td>
+                <td>Must zigzag between the corresponding characters of the two halves. Each character match costs
+                  \(O(N)\) movement.</td>
+              </tr>
+              <tr>
+                <td>Two-Tape</td>
+                <td>\(O(N)\)</td>
+                <td>Copy the first half to Tape 2. Rewind. Compare Tape 1 and Tape 2 in a single linear pass.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="definition-card">
+          <h3 class="card-title">Example 3: \(L = \{ a^{2^n} \mid n \ge 0 \}\)</h3>
+          <p><strong>The Problem:</strong> Checking if the length of the string is a power of 2.</p>
+          <ul>
+            <li><strong>Single-Tape TM:</strong> \(O(N \log N)\)
+              <ul>
+                <li><strong>Pass 1:</strong> Scan left-to-right, marking every second \(a\). Reject if odd remainder.
+                  (Cost \(N\)).</li>
+                <li><strong>Pass 2:</strong> Return to start and repeat on remaining unmarked \(a\)'s (length \(N/2\)).
+                  (Cost \(N/2\) scans, but we traverse the whole tape of length \(N\) to find them). So cost is \(N\).
+                </li>
+                <li><strong>Total:</strong> We perform \(\log N\) passes, each taking \(O(N)\) time to traverse the
+                  tape. Total \(O(N \log N)\).</li>
+              </ul>
+            </li>
+            <li><strong>Two-Tape TM:</strong> \(O(N)\)
+              <ul>
+                <li>Write \(1\) on Tape 2. Repeatedly double the number of \(1\)'s ($1 \to 2 \to 4 \dots$) until the
+                  length matches or exceeds the input on Tape 1.</li>
+                <li>Copying/doubling \(k\) items takes \(O(k)\). Total sum \(1 + 2 + 4 + \dots + N = 2N = O(N)\).</li>
+              </ul>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+    </div>
+
+    <footer>
+      CS 637 – Lecture 11: Complexity on Turing Machines • Spring 2026<br>
+      © Dr. Debasish Pattanayak • Department of Computer Science
+    </footer>
+  </div>
+
+  <a href="index.html" class="fab-btn" title="Back to Course Home">🏠</a>
+  <button class="scroll-top" id="scrollTop" onclick="scrollToTop()">↑</button>
+
+  <script>
+    // Tab switching logic
+    function switchTab(tabId) {
+      // Hide all tabs
+      document.querySelectorAll('.tab-content').forEach(tab => {
+        tab.classList.remove('active');
+        tab.style.display = 'none';
+      });
+
+      // Remove active class from buttons
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.remove('active');
+      });
+
+      // Show selected tab
+      const selectedTab = document.getElementById(tabId);
+      selectedTab.style.display = 'block';
+      setTimeout(() => {
+        selectedTab.classList.add('active');
+      }, 10);
+
+      // Add active class to clicked button
+      // Find the button with the onclick matching the tabId
+      const buttons = Array.from(document.querySelectorAll('.tab-btn'));
+      const activeBtn = buttons.find(btn => btn.getAttribute('onclick').includes(tabId));
+      if (activeBtn) {
+        activeBtn.classList.add('active');
+      }
+
+      // Re-render Math using Katex when tab becomes visible
+      renderMathInElement(selectedTab, {
         delimiters: [
-            {left: "31952", right: "31952", display: true},
-            {left: "\[", right: "\]", display: true},
-            {left: "\(", right: "\)", display: false}
+          { left: "$$", right: "$$", display: true },
+          { left: "\\[", right: "\\]", display: true },
+          { left: "$", right: "$", display: false },
+          { left: "\\(", right: "\\)", display: false }
         ]
-    });
-});
-</script>
+      });
+    }
 
-<a href="index.html" class="fab-btn" title="Back to Index">🏠</a>
+    // Initialize Math rendering
+    document.addEventListener("DOMContentLoaded", function () {
+      renderMathInElement(document.body, {
+        delimiters: [
+          { left: "$$", right: "$$", display: true },
+          { left: "\\[", right: "\\]", display: true },
+          { left: "$", right: "$", display: false },
+          { left: "\\(", right: "\\)", display: false }
+        ]
+      });
+
+      // Initialize progress bar
+      window.addEventListener('scroll', function () {
+        let winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+        let height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+        let scrolled = (winScroll / (height || 1)) * 100;
+        document.getElementById("progressFill").style.width = scrolled + "%";
+
+        const scrollTop = document.getElementById('scrollTop');
+        if (window.pageYOffset > 300) {
+          scrollTop.classList.add('visible');
+        } else {
+          scrollTop.classList.remove('visible');
+        }
+      });
+    });
+
+    function scrollToTop() {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  </script>
 </body>
+
 </html>

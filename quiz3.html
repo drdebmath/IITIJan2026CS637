@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <title>CS637 - Quiz 3</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      line-height: 1.6;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 1050px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      overflow: hidden;
+    }
+
+    header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 40px;
+      text-align: center;
+    }
+
+    h1 {
+      font-size: 2.4em;
+      margin-bottom: 10px;
+      font-weight: 700;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+    }
+
+    .subtitle {
+      font-size: 1.2em;
+      margin-bottom: 10px;
+      opacity: 0.95;
+    }
+
+    .instructor {
+      margin-top: 10px;
+      font-size: 1.02em;
+      opacity: 0.9;
+    }
+
+    .content {
+      padding: 40px;
+    }
+
+    .instructions-box {
+      background: #f8fafc;
+      border: 2px solid #667eea;
+      padding: 20px;
+      margin-bottom: 30px;
+      border-radius: 12px;
+    }
+
+    .instructions-title {
+      font-weight: 700;
+      color: #1e293b;
+      margin-bottom: 10px;
+      display: block;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      font-size: 0.9em;
+    }
+
+    .instructions-list {
+      list-style-type: none;
+      padding-left: 0;
+    }
+
+    .instructions-list li {
+      margin-bottom: 8px;
+      padding-left: 20px;
+      position: relative;
+    }
+
+    .instructions-list li::before {
+      content: "•";
+      color: #667eea;
+      position: absolute;
+      left: 0;
+      font-weight: bold;
+    }
+
+    .primitive-list {
+      margin-top: 12px;
+      padding-left: 20px;
+      color: #334155;
+    }
+
+    .question-card {
+      background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
+      border-left: 4px solid #667eea;
+      padding: 25px;
+      margin-bottom: 30px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    }
+
+    .question-header {
+      display: flex;
+      align-items: center;
+      margin-bottom: 15px;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .q-badge {
+      background: #667eea;
+      color: white;
+      padding: 5px 15px;
+      border-radius: 20px;
+      font-weight: 700;
+      font-size: 0.9em;
+    }
+
+    .q-title {
+      font-size: 1.18em;
+      font-weight: 700;
+      color: #1e293b;
+    }
+
+    .q-text {
+      margin-bottom: 18px;
+      color: #334155;
+    }
+
+    .q-points {
+      margin-left: auto;
+      background: #e2e8f0;
+      color: #475569;
+      padding: 2px 10px;
+      border-radius: 12px;
+      font-size: 0.8em;
+      font-weight: 600;
+    }
+
+    .solution-toggle {
+      background: #667eea;
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 0.9em;
+    }
+
+    .solution-toggle:hover {
+      background: #5a67d8;
+    }
+
+    .solution-block {
+      display: none;
+      margin-top: 15px;
+      padding: 15px;
+      background: #f1f5f9;
+      border-radius: 8px;
+      border-left: 4px solid #3b82f6;
+      color: #0f172a;
+    }
+
+    .solution-block.visible {
+      display: block;
+    }
+
+    .solution-title {
+      font-weight: 700;
+      color: #1e293b;
+      margin-bottom: 8px;
+      display: block;
+    }
+
+    .code-block {
+      margin-top: 10px;
+      background: #0f172a;
+      color: #e2e8f0;
+      border-radius: 8px;
+      padding: 14px;
+      overflow-x: auto;
+      white-space: pre;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 0.86em;
+      line-height: 1.35;
+    }
+
+    ul,
+    ol {
+      margin-left: 20px;
+      margin-top: 8px;
+    }
+
+    footer {
+      background: #1e293b;
+      color: white;
+      text-align: center;
+      padding: 25px;
+      font-size: 0.9em;
+    }
+
+    .fab-btn {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #3b82f6, #2563eb);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      cursor: pointer;
+      z-index: 1000;
+      border: none;
+      font-size: 24px;
+      text-decoration: none;
+    }
+
+    @media (max-width: 768px) {
+      .content {
+        padding: 20px;
+      }
+
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <header>
+      <h1>CS637 - Quiz 3</h1>
+      <div class="subtitle">Turing Machine Design and Rice's Theorem</div>
+      <div class="instructor"><strong>Instructor:</strong> Dr. Debasish Pattanayak</div>
+    </header>
+
+    <div class="content">
+      <div class="instructions-box">
+        <span class="instructions-title">Instructions</span>
+        <ul class="instructions-list">
+          <li>Attempt all questions.</li>
+          <li>For Q1 and Q2, use only the given primitive TM operations.</li>
+          <li>For Q3 and all Rice-theorem questions, explicitly justify semanticity and non-triviality.</li>
+        </ul>
+        <ul class="primitive-list">
+          <li><strong>Primitive P1:</strong> <code>MOVE_LEFT</code> (move one cell left)</li>
+          <li><strong>Primitive P2:</strong> <code>MOVE_RIGHT_UNTIL_END</code> (move right until first blank symbol
+            <code>B</code>)
+          </li>
+          <li><strong>Primitive P3:</strong> <code>REPLACE_CURRENT_SYMBOL(s)</code> (overwrite current cell with symbol
+            <code>s</code>)
+          </li>
+          <li><strong>Primitive P4:</strong> <code>IS_CURRENT_SYMBOL(s)</code> (boolean test for current tape symbol)
+          </li>
+          <li><strong>Primitive P5:</strong> <code>IS_CURRENT_BLANK</code> (boolean test; true iff current symbol is
+            <code>B</code>)
+          </li>
+          <li><strong>Primitive P6:</strong> <code>READ_CURRENT_SYMBOL</code> (returns current symbol for branching)
+          </li>
+          <li><strong>Primitive P7:</strong> <code>IF &lt;condition&gt; THEN ... ELSE ...</code></li>
+          <li><strong>Primitive P8:</strong> <code>WHILE &lt;condition&gt; DO ...</code></li>
+        </ul>
+        <div class="code-block">Example (primitive style):
+          MOVE_RIGHT_UNTIL_END
+          MOVE_LEFT
+          WHILE IS_CURRENT_SYMBOL(0) OR IS_CURRENT_SYMBOL(1) DO
+          IF IS_CURRENT_SYMBOL(0) THEN REPLACE_CURRENT_SYMBOL(1)
+          ELSE REPLACE_CURRENT_SYMBOL(0)
+          MOVE_LEFT</div>
+      </div>
+
+      <div class="question-card">
+        <div class="question-header">
+          <span class="q-badge">Q1</span>
+          <span class="q-title">TM Design Using Only Primitives: Bitwise Complement</span>
+          <span class="q-points">10 pts</span>
+        </div>
+        <div class="q-text">
+          Design a single-tape TM that transforms a non-empty binary string \(w\in\{0,1\}^+\) into its bitwise
+          complement in-place
+          (every \(0\) becomes \(1\), every \(1\) becomes \(0\)).
+          The head starts on the leftmost symbol of \(w\).
+          Use only the primitives listed above.
+        </div>
+        <button class="solution-toggle" onclick="toggleSolution(this)">Show Solution</button>
+        <div class="solution-block">
+          <span class="solution-title">Solution</span>
+          Idea: jump to the right end once, then sweep left and flip symbols.
+          <div class="code-block">Algorithm Complement(w)
+            1. P2 // now on first blank B after input
+            2. P1 // now on rightmost symbol of w
+            3. While current symbol is 0 or 1:
+            If current symbol = 0: P3(1)
+            Else (current symbol = 1): P3(0)
+            P1
+            4. Halt (head has moved left of the original string onto B).</div>
+          Why correct: each symbol is visited exactly once in the right-to-left sweep and is replaced by its complement.
+          Why halts: finite string length; loop executes exactly \(|w|\) times.
+        </div>
+      </div>
+
+      <div class="question-card">
+        <div class="question-header">
+          <span class="q-badge">Q2</span>
+          <span class="q-title">TM Design Using Only Primitives: First Symbol Equals Last Symbol</span>
+          <span class="q-points">10 pts</span>
+        </div>
+        <div class="q-text">
+          Design a TM for language
+          \[
+          L=\{w\in\{0,1\}^+\mid \text{the first symbol of }w\text{ equals the last symbol of }w\}.
+          \]
+          Use only the primitives listed above.
+        </div>
+        <button class="solution-toggle" onclick="toggleSolution(this)">Show Solution</button>
+        <div class="solution-block">
+          <span class="solution-title">Solution</span>
+          Save the first symbol in the state, then jump to the end and compare with the last symbol.
+          <div class="code-block">Algorithm FirstEqualsLast(w)
+            1. Read first symbol:
+            If 0, go to state qFirst0.
+            If 1, go to state qFirst1.
+            2. P2 // go to first blank after input
+            3. P1 // step to last symbol of w
+            4. If in qFirst0 and current symbol is 0: ACCEPT else REJECT.
+            5. If in qFirst1 and current symbol is 1: ACCEPT else REJECT.</div>
+          Correctness: machine compares exactly the first and last symbols, so it accepts iff they are equal.
+          Halting: fixed finite sequence of operations with one comparison at the end.
+        </div>
+      </div>
+
+      <div class="question-card">
+        <div class="question-header">
+          <span class="q-badge">Q3</span>
+          <span class="q-title">Lamport-Style Fill in the Blanks (Rice's Theorem)</span>
+          <span class="q-points">5 pts</span>
+        </div>
+        <div class="q-text">
+          Complete the following Lamport-style proof outline to show undecidability of
+          \[
+          L_{\text{prefix}}=\{\langle M\rangle \mid \exists x,y\in L(M),\ x \text{ is a proper prefix of } y\}.
+          \]
+          Fill each blank.
+          <ol>
+            <li>Define property \(\mathcal{P}(L)\): <strong>[Blank A]</strong>.</li>
+            <li>\(\mathcal{P}\) is semantic because <strong>[Blank B]</strong>.</li>
+            <li>Witness language in \(\mathcal{P}\): <strong>[Blank C]</strong>.</li>
+            <li>Witness language not in \(\mathcal{P}\): <strong>[Blank D]</strong>.</li>
+            <li>Therefore \(\mathcal{P}\) is <strong>[Blank E]</strong>.</li>
+            <li>By Rice's theorem, \(L_{\text{prefix}}\) is <strong>[Blank F]</strong>.</li>
+          </ol>
+        </div>
+        <button class="solution-toggle" onclick="toggleSolution(this)">Show Solution</button>
+        <div class="solution-block">
+          <span class="solution-title">Solution</span>
+          <ul>
+            <li><strong>Blank A:</strong> “\(L\) contains two strings where one is a proper prefix of the other.”</li>
+            <li><strong>Blank B:</strong> it depends only on \(L(M)\), not on the encoding/syntax of \(M\).</li>
+            <li><strong>Blank C:</strong> \(\{0,01\}\) (since \(0\) is a proper prefix of \(01\)).</li>
+            <li><strong>Blank D:</strong> \(\{00,11\}\) (neither is a proper prefix of the other).</li>
+            <li><strong>Blank E:</strong> non-trivial semantic property of RE languages.</li>
+            <li><strong>Blank F:</strong> undecidable.</li>
+          </ul>
+        </div>
+      </div>
+
+
+
+      <div class="question-card">
+        <div class="question-header">
+          <span class="q-badge">Q4</span>
+          <span class="q-title">Undecidability via Rice: Language Has Exactly Two Strings</span>
+          <span class="q-points">5 pts</span>
+        </div>
+        <div class="q-text">
+          Prove that
+          \[
+          L_{=2}=\{\langle M\rangle\mid |L(M)|=2\}
+          \]
+          is undecidable.
+        </div>
+        <button class="solution-toggle" onclick="toggleSolution(this)">Show Solution</button>
+        <div class="solution-block">
+          <span class="solution-title">Solution</span>
+          Let \(\mathcal{Q}(L)\) be property “\(|L|=2\)”.
+          <ol>
+            <li><strong>Semantic:</strong> truth of \(\mathcal{Q}\) depends only on the set \(L(M)\).</li>
+            <li><strong>Non-trivial:</strong>
+              <ul>
+                <li>Witness in property: TM accepting exactly \(\{0,1\}\) (size 2).</li>
+                <li>Witness out of property: TM accepting exactly \(\{0\}\) (size 1).</li>
+              </ul>
+            </li>
+            <li>Hence \(\mathcal{Q}\) is a non-trivial semantic property of RE languages.</li>
+            <li>By Rice's theorem, \(L_{=2}\) is undecidable.</li>
+          </ol>
+          So deciding whether an arbitrary TM recognizes exactly two strings is impossible.
+        </div>
+      </div>
+
+      <div class="question-card">
+        <div class="question-header">
+          <span class="q-badge">Q5</span>
+          <span class="q-title">Undecidability via Rice: Language is Closed Under Reversal</span>
+          <span class="q-points">5 pts</span>
+        </div>
+        <div class="q-text">
+          Prove that
+          \[
+          L_{\text{rev}}=\{\langle M\rangle\mid \forall x\ (x\in L(M)\Rightarrow x^R\in L(M))\}
+          \]
+          is undecidable.
+        </div>
+        <button class="solution-toggle" onclick="toggleSolution(this)">Show Solution</button>
+        <div class="solution-block">
+          <span class="solution-title">Solution</span>
+          Let \(\mathcal{R}(L)\) be: “\(L\) is closed under reversal”.
+          <ol>
+            <li><strong>Semantic:</strong> depends only on \(L(M)\).</li>
+            <li><strong>Non-trivial:</strong>
+              <ul>
+                <li>In property: \(L=\Sigma^*\) is closed under reversal.</li>
+                <li>Out of property: \(L=\{01\}\) is not closed under reversal since \(10\notin L\).</li>
+              </ul>
+            </li>
+            <li>So \(\mathcal{R}\) is a non-trivial semantic property of RE languages.</li>
+            <li>By Rice's theorem, \(L_{\text{rev}}\) is undecidable.</li>
+          </ol>
+        </div>
+      </div>
+
+      <div class="question-card">
+        <div class="question-header">
+          <span class="q-badge">Q6</span>
+          <span class="q-title">Undecidability via Rice: Contains Exactly One Palindrome</span>
+          <span class="q-points">5 pts</span>
+        </div>
+        <div class="q-text">
+          Prove that
+          \[
+          L_{\text{1pal}}=\{\langle M\rangle\mid L(M)\text{ contains exactly one palindrome}\}
+          \]
+          is undecidable.
+        </div>
+        <button class="solution-toggle" onclick="toggleSolution(this)">Show Solution</button>
+        <div class="solution-block">
+          <span class="solution-title">Solution</span>
+          Define \(\mathcal{S}(L)\): “\(L\) contains exactly one palindrome”.
+          <ol>
+            <li><strong>Semantic:</strong> determined solely by \(L\).</li>
+            <li><strong>Non-trivial:</strong>
+              <ul>
+                <li>In property: \(L=\{00,01\}\) has exactly one palindrome (\(00\)).</li>
+                <li>Out of property: \(L=\{00,11\}\) has two palindromes.</li>
+              </ul>
+            </li>
+            <li>Hence \(\mathcal{S}\) is non-trivial and semantic over RE languages.</li>
+            <li>By Rice's theorem, \(L_{\text{1pal}}\) is undecidable.</li>
+          </ol>
+        </div>
+      </div>
+
+      <div class="question-card">
+        <div class="question-header">
+          <span class="q-badge">Q7</span>
+          <span class="q-title">Undecidability by Reduction: Non-Empty Intersection</span>
+          <span class="q-points">10 pts</span>
+        </div>
+        <div class="q-text">
+          Prove that
+          \[
+          INTERSECT_{TM}=\{\langle M_1,M_2\rangle\mid L(M_1)\cap L(M_2)\neq\emptyset\}
+          \]
+          is undecidable by reducing \(HALT_{TM}\) to it.
+        </div>
+        <button class="solution-toggle" onclick="toggleSolution(this)">Show Solution</button>
+        <div class="solution-block">
+          <span class="solution-title">Solution</span>
+          Reduce from \(HALT_{TM}=\{\langle M,w\rangle\mid M\text{ halts on }w\}\).
+          Given \(\langle M,w\rangle\), build \(\langle M_1,M_2\rangle\):
+          <ol>
+            <li>\(M_1\): accepts exactly one fixed string, say \(0\).</li>
+            <li>\(M_2\) on input \(x\): ignore \(x\), simulate \(M(w)\); if \(M\) halts on \(w\), accept; otherwise
+              loop.
+            </li>
+          </ol>
+          Then:
+          <ul>
+            <li>If \(M\) halts on \(w\), \(M_2\) accepts every input, so \(0\in L(M_1)\cap L(M_2)\), intersection
+              non-empty.</li>
+            <li>If \(M\) does not halt on \(w\), \(M_2\) accepts nothing, so intersection is empty.</li>
+          </ul>
+          Therefore
+          \[
+          \langle M,w\rangle\in HALT_{TM}\iff \langle M_1,M_2\rangle\in INTERSECT_{TM}.
+          \]
+          So \(HALT_{TM}\le_m INTERSECT_{TM}\). Since \(HALT_{TM}\) is undecidable, \(INTERSECT_{TM}\) is undecidable.
+        </div>
+      </div>
+    </div>
+
+    <footer>
+      CS637 - Quiz 3 • Spring 2026<br>
+      Dr. Debasish Pattanayak • Department of Computer Science
+    </footer>
+  </div>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      renderMathInElement(document.body, {
+        delimiters: [
+          { left: "$$", right: "$$", display: true },
+          { left: "\\[", right: "\\]", display: true },
+          { left: "\\(", right: "\\)", display: false }
+        ]
+      });
+    });
+
+    function toggleSolution(button) {
+      const solutionBlock = button.nextElementSibling;
+      solutionBlock.classList.toggle("visible");
+      button.textContent = solutionBlock.classList.contains("visible")
+        ? "Hide Solution"
+        : "Show Solution";
+    }
+  </script>
+
+  <a href="index.html" class="fab-btn" title="Back to Index">🏠</a>
+</body>
+
+</html>

@@ -1,117 +1,703 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="utf-8">
-  <title>CS 637 – Lecture 12 Definitions</title>
+  <title>CS 637 – Lecture 12: Evolution of Complexity Classes</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+  <!-- Math Rendering -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
   <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
   <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
 
   <style>
+    :root {
+      --primary: #1e3a8a;
+      --secondary: #991b1b;
+      --accent: #d97706;
+      --accent-hover: #b45309;
+      --success: #059669;
+      --danger: #dc2626;
+      --warning: #d97706;
+      --bg-light: #f8fafc;
+      --text-dark: #1e293b;
+      --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.08);
+      --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.12);
+      --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.15);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
     body {
-      font-family: "Times New Roman", serif;
-      margin: 40px;
-      line-height: 1.5;
-      background-color: #ffffff;
-      color: #000000;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      line-height: 1.7;
+      background: linear-gradient(135deg, #0f172a 0%, #172554 100%);
+      min-height: 100vh;
+      padding: 20px;
+      position: relative;
+      overflow-x: hidden;
     }
-    h1, h2 {
+
+    .particles {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 25px 80px rgba(0, 0, 0, 0.4);
+      overflow: hidden;
+      position: relative;
+      z-index: 1;
+    }
+
+    header {
+      background: linear-gradient(135deg, #1e3a8a, #991b1b, #d97706);
+      background-size: 200% 200%;
+      animation: gradientShift 15s ease infinite;
+      color: white;
+      padding: 50px 40px;
       text-align: center;
+      position: relative;
+      overflow: hidden;
     }
+
+    @keyframes gradientShift {
+      0% {
+        background-position: 0% 50%;
+      }
+
+      50% {
+        background-position: 100% 50%;
+      }
+
+      100% {
+        background-position: 0% 50%;
+      }
+    }
+
     h1 {
-      font-size: 1.8em;
-      margin-bottom: 0.2em;
+      font-size: 2.8em;
+      margin-bottom: 12px;
+      font-weight: 800;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
     }
-    h2 {
-      font-size: 1.2em;
-      margin-top: 2em;
-      margin-bottom: 0.5em;
-    }
-    .definition {
-      margin-bottom: 1em;
-    }
-    .term {
-      font-weight: bold;
-    }
-    .number {
-      font-weight: bold;
-    }
-    .instructor {
-      margin-top: 8px;
-      font-size: 0.95rem;
-      color: #64748b;
-    }
-    .instructor a {
-      color: #0ea5e9;
-      text-decoration: none;
+
+    .subtitle {
+      font-size: 1.4em;
+      margin-bottom: 20px;
+      opacity: 0.95;
       font-weight: 500;
     }
-    .instructor a:hover {
-      text-decoration: underline;
+
+    .instructor {
+      margin-top: 20px;
+      font-size: 1.1em;
+      opacity: 0.95;
     }
+
+    .instructor a {
+      color: #ffd700;
+      text-decoration: none;
+      font-weight: 600;
+      padding: 4px 8px;
+    }
+
+    .progress-bar {
+      position: sticky;
+      top: 0;
+      height: 4px;
+      background: #e2e8f0;
+      z-index: 101;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--primary), var(--secondary), var(--accent));
+      width: 0%;
+      transition: width 0.3s ease;
+    }
+
+    .nav-wrapper {
+      background: #fff;
+      position: sticky;
+      top: 4px;
+      z-index: 100;
+      border-bottom: 2px solid #e2e8f0;
+    }
+
+    .nav-tabs {
+      display: flex;
+      overflow-x: auto;
+      padding: 0 20px;
+      scrollbar-width: thin;
+    }
+
+    .tab-btn {
+      padding: 15px 24px;
+      background: none;
+      border: none;
+      font-size: 1em;
+      cursor: pointer;
+      color: #64748b;
+      font-weight: 600;
+      border-bottom: 3px solid transparent;
+      transition: all 0.3s;
+      white-space: nowrap;
+    }
+
+    .tab-btn.active {
+      color: var(--primary);
+      border-bottom-color: var(--primary);
+    }
+
+    .content {
+      padding: 50px 40px;
+      min-height: 600px;
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+      animation: slideIn 0.5s ease-out;
+    }
+
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .section-title {
+      font-size: 2em;
+      color: var(--text-dark);
+      margin-bottom: 30px;
+      padding-bottom: 12px;
+      border-bottom: 4px solid var(--secondary);
+      position: relative;
+    }
+
+    .definition-card,
+    .example-card,
+    .theorem-card,
+    .key-point {
+      padding: 25px;
+      margin-bottom: 25px;
+      border-radius: 12px;
+      box-shadow: var(--shadow-sm);
+      transition: all 0.4s;
+    }
+
+    .definition-card {
+      background: #f8fafc;
+      border-left: 5px solid var(--primary);
+    }
+
+    .example-card {
+      background: #fffbeb;
+      border-left: 5px solid var(--warning);
+    }
+
+    .theorem-card {
+      background: #f0f9ff;
+      border-left: 5px solid #0ea5e9;
+    }
+
+    .key-point {
+      background: #fdf2f8;
+      border-left: 5px solid #db2777;
+    }
+
+    .card-title {
+      font-size: 1.3em;
+      font-weight: 700;
+      margin-bottom: 15px;
+      color: var(--text-dark);
+    }
+
+    ul,
+    ol {
+      margin-left: 25px;
+      margin-top: 15px;
+    }
+
+    li {
+      margin-bottom: 10px;
+    }
+
+    code {
+      background: #f1f5f9;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-family: monospace;
+      color: #e11d48;
+    }
+
     footer {
-      margin-top: 3em;
+      background: #0f172a;
+      color: white;
       text-align: center;
-      font-size: 0.85em;
-      color: #333;
+      padding: 30px;
+    }
+
+    .fab-btn {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      color: white;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+      z-index: 1000;
+      border: none;
+      font-size: 28px;
+      transition: all 0.3s;
+      cursor: pointer;
+    }
+
+    .fab-btn:hover {
+      transform: translateY(-4px) scale(1.05);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+    }
+
+    .scroll-top {
+      position: fixed;
+      bottom: 100px;
+      right: 30px;
+      width: 52px;
+      height: 52px;
+      border: none;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent), var(--accent-hover));
+      color: white;
+      font-size: 1.3em;
+      cursor: pointer;
+      box-shadow: var(--shadow-lg);
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s;
+      z-index: 120;
+    }
+
+    .scroll-top.visible {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    @media (max-width: 768px) {
+      .content {
+        padding: 30px 20px;
+      }
+
+      h1 {
+        font-size: 2em;
+      }
+
+      .fab-btn {
+        width: 52px;
+        height: 52px;
+        bottom: 20px;
+        right: 20px;
+        font-size: 24px;
+      }
+
+      .scroll-top {
+        width: 46px;
+        height: 46px;
+        bottom: 85px;
+        right: 22px;
+      }
     }
   </style>
-
-<style>
-.fab-btn {
-  position: fixed;
-  bottom: 24px;
-  right: 24px;
-  width: 56px;
-  height: 56px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #3b82f6, #2563eb);
-  color: white;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-  cursor: pointer;
-  z-index: 1000;
-  border: none;
-  font-size: 24px;
-  transition: transform 0.2s, box-shadow 0.2s;
-  text-decoration: none;
-}
-.fab-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(0,0,0,0.3);
-}
-</style>
-
 </head>
 
 <body>
+  <div class="particles" id="particles"></div>
 
-<h1>CS 637: Mathematics-II</h1>
-<div class="instructor">
-  <strong>Instructor:</strong> <a href="https://drdebmath.github.io" target="_blank">Dr. Debasish Pattanayak</a>
-</div>
-<h2>Lecture 12 – The Halting Problem</h2>
+  <div class="container">
+    <div class="progress-bar">
+      <div class="progress-fill" id="progressFill"></div>
+    </div>
 
-<footer>
-  
-</footer>
+    <header>
+      <h1>CS 637: Mathematics-II</h1>
+      <div class="subtitle">Lecture 12: Evolution of Complexity Classes (P and NP)</div>
+      <div class="instructor">
+        <strong>Instructor:</strong> <a href="https://drdebmath.github.io/" target="_blank">Dr. Debasish Pattanayak</a>
+      </div>
+    </header>
 
-<script>
-document.addEventListener("DOMContentLoaded", function() {
-    renderMathInElement(document.body, {
+    <div class="nav-wrapper">
+      <div class="nav-tabs">
+        <button class="tab-btn active" onclick="switchTab('evolution')">Evolution</button>
+        <button class="tab-btn" onclick="switchTab('p-class')">The Class P</button>
+        <button class="tab-btn" onclick="switchTab('np-class')">The Class NP</button>
+        <button class="tab-btn" onclick="switchTab('verifier')">Prover-Verifier</button>
+        <button class="tab-btn" onclick="switchTab('examples')">NP Examples</button>
+      </div>
+    </div>
+
+    <div class="content">
+      <!-- Tab 1: Evolution -->
+      <div id="evolution" class="tab-content active">
+        <h2 class="section-title">From Decidability to Complexity</h2>
+        <div class="definition-card">
+          <p>Early computer science (Turing, Church) focused on <strong>Decidability</strong>: Can a problem be solved
+            by a machine at all? However, as computers became real, a new question emerged: <strong>Can it be solved
+              efficiently?</strong></p>
+        </div>
+        <div class="key-point">
+          <h3 class="card-title">The Complexity Shift</h3>
+          <p>In the 1960s and 70s, researchers like Hartmanis, Stearns, Cook, and Karp began classifying problems not
+            just by "computability" but by the "resources" required (Time and Space).</p>
+          <ul>
+            <li><strong>Turing Machines:</strong> Provided the foundation, but standard TMs were too slow for some
+              tasks.</li>
+            <li><strong>The Question:</strong> What is the limit of "reasonable" computation?</li>
+          </ul>
+        </div>
+        <div class="theorem-card">
+          <h3 class="card-title">The Cobham-Edmonds Thesis</h3>
+          <p>Computational efficiency is often equated with <strong>Polynomial Time</strong>. A problem is considered
+            "tractable" or "efficiently solvable" if it can be solved in \(O(n^k)\) time for some constant \(k\).</p>
+        </div>
+      </div>
+
+      <!-- Tab 2: The Class P -->
+      <div id="p-class" class="tab-content">
+        <h2 class="section-title">The Class P: Deterministic Efficiency</h2>
+        <div class="definition-card">
+          <h3 class="card-title">Formal Definition of P</h3>
+          <p>The class <strong>P</strong> (Polynomial Time) is the set of all languages that are decidable in polynomial
+            time on a deterministic single-tape Turing machine.</p>
+          \[ P = \bigcup_{k \ge 1} \text{TIME}(n^k) \]
+          <p>A language \(L \in P\) if there exists a deterministic TM \(M\) such that for any input \(w\) of length
+            \(n\):</p>
+          <ol>
+            <li>\(M\) decides \(L\).</li>
+            <li>\(M\) runs in \(O(n^k)\) steps for some constant \(k\).</li>
+          </ol>
+        </div>
+        <div class="key-point">
+          <h3 class="card-title">Properties of P</h3>
+          <ul>
+            <li><strong>Robustness:</strong> The class P is invariant across different models of deterministic
+              computation (Multi-tape TMs, RAM machines, etc.). Changing the model only changes the polynomial degree.
+            </li>
+            <li><strong>Closure:</strong> P is closed under complement, union, and intersection.</li>
+          </ul>
+        </div>
+        <div class="example-card">
+          <h3 class="card-title">Examples in P</h3>
+          <ul>
+            <li>Path Finding (Is there a path from \(s\) to \(t\) in a graph \(G\)?).</li>
+            <li>Greatest Common Divisor (Euclidean Algorithm).</li>
+            <li>Primality Testing (AKS Primality Test - proven to be in P in 2002).</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Tab 3: The Class NP -->
+      <div id="np-class" class="tab-content">
+        <h2 class="section-title">The Class NP: Nondeterministic Power</h2>
+        <div class="definition-card">
+          <h3 class="card-title">Formal Definition of NP</h3>
+          <p>The class <strong>NP</strong> (Nondeterministic Polynomial Time) is the set of all languages that are
+            decidable in polynomial time on a <strong>nondeterministic</strong> Turing machine.</p>
+          \[ NP = \bigcup_{k \ge 1} \text{NTIME}(n^k) \]
+          <p>A language \(L \in NP\) if there exists a nondeterministic TM \(N\) such that:</p>
+          <ol>
+            <li>\(N\) decides \(L\).</li>
+            <li>For every \(w \in L\), there exists at least one computation path of length \(O(n^k)\) that results in
+              acceptance.</li>
+            <li>For every \(w \notin L\), all possible computation paths reject.</li>
+          </ol>
+        </div>
+        <div class="theorem-card">
+          <h3 class="card-title">NTM as "Guessing"</h3>
+          <p>Think of an NTM as having two stages:</p>
+          <ol>
+            <li><strong>Nondeterministic stage:</strong> The machine "guesses" a potential solution (e.g., a path, a
+              certificate).</li>
+            <li><strong>Deterministic stage:</strong> The machine "verifies" if the guess is correct in polynomial time.
+            </li>
+          </ol>
+        </div>
+      </div>
+
+      <!-- Tab 4: Verifier -->
+      <div id="verifier" class="tab-content">
+        <h2 class="section-title">The Prover-Verifier Gap</h2>
+        <div class="definition-card">
+          <h3 class="card-title">The Verifier Definition</h3>
+          <p>A language \(L\) is in NP if and only if it has a <strong>Polynomial-Time Verifier</strong>.</p>
+          <p>A verifier \(V\) for \(L\) is a deterministic TM where:</p>
+          \[ L = \{ w \mid \exists c, V(w, c) \text{ accepts} \} \]
+          <ul>
+            <li>\(w\) is the input string.</li>
+            <li>\(c\) is a <strong>certificate</strong> (or witness) whose length is polynomial in \(|w|\).</li>
+            <li>\(V\) must run in time polynomial in \(|w|\).</li>
+          </ul>
+        </div>
+        <div class="key-point">
+          <h3 class="card-title">The Role of the Prover</h3>
+          <p>We imagine two entities:</p>
+          <ul>
+            <li><strong>The Prover:</strong> An all-powerful entity that provides the certificate \(c\). It doesn't care
+              how long it takes to find \(c\).</li>
+            <li><strong>The Verifier:</strong> A resource-constrained entity (Polynomial time) that checks if \(c\) is a
+              valid proof for \(w\).</li>
+          </ul>
+          <p><strong>The Gap:</strong> It is much easier to <em>verify</em> a solution than it is to <em>find</em> one.
+            This is the heart of the P vs NP mystery.</p>
+        </div>
+      </div>
+
+      <!-- Tab 5: Examples -->
+      <div id="examples" class="tab-content">
+        <h2 class="section-title">NP Examples and NTM Designs</h2>
+
+        <div class="example-card">
+          <h3 class="card-title">1. Boolean Satisfiability (SAT)</h3>
+          <p><strong>Problem:</strong> Given a boolean formula \(\phi\) with variables \(x_1, \dots, x_m\), is there an
+            assignment of truth values to variables that makes \(\phi\) evaluate to TRUE?</p>
+          <div
+            style="background: white; padding: 15px; border-radius: 8px; margin-top: 15px; border: 1px solid #e2e8f0;">
+            <p><strong>NTM Design Strategy:</strong></p>
+            <ol>
+              <li><strong>Guessing Phase:</strong>
+                <ul>
+                  <li>The NTM scans the input string to determine the number of variables \(m\).</li>
+                  <li>It nondeterministically writes a string \(s \in \{0, 1\}^m\) on the tape. Each bit represents a
+                    truth assignment (0 for False, 1 for True).</li>
+                  <li>This step takes \(O(m)\) time.</li>
+                </ul>
+              </li>
+              <li><strong>Verification Phase:</strong>
+                <ul>
+                  <li>The machine evaluates the formula \(\phi\) by substituting the guessed values from \(s\) into the
+                    variables.</li>
+                  <li>Evaluation of a boolean formula can be done in time polynomial in the length of the formula (e.g.,
+                    using a stack or recursive parsing).</li>
+                </ul>
+              </li>
+              <li><strong>Acceptance:</strong>
+                <ul>
+                  <li>If the evaluation results in TRUE (1), the NTM enters the <em>accept</em> state.</li>
+                  <li>If the evaluation results in FALSE (0), this branch of computation rejects.</li>
+                </ul>
+              </li>
+            </ol>
+            <p>Since the guess is polynomial in size and verification is polynomial in time, SAT \(\in\) NP.</p>
+          </div>
+        </div>
+
+        <div class="example-card">
+          <h3 class="card-title">2. CLIQUE Problem</h3>
+          <p><strong>Problem:</strong> Given a graph \(G=(V,E)\) and an integer \(k\), does \(G\) contain a clique
+            (complete subgraph) of size \(k\)?</p>
+          <div
+            style="background: white; padding: 15px; border-radius: 8px; margin-top: 15px; border: 1px solid #e2e8f0;">
+            <p><strong>NTM Design Strategy:</strong></p>
+            <ol>
+              <li><strong>Guessing Phase:</strong>
+                <ul>
+                  <li>The NTM nondeterministically selects a subset of vertices \(V' \subseteq V\).</li>
+                  <li>It can do this by scanning the list of vertices and for each vertex, nondeterministically choosing
+                    to mark it or not.</li>
+                  <li>This takes \(O(|V|)\) time.</li>
+                </ul>
+              </li>
+              <li><strong>Verification Phase:</strong>
+                <ul>
+                  <li><strong>Step 1:</strong> Count the size of \(V'\). If \(|V'| \neq k\), reject.</li>
+                  <li><strong>Step 2:</strong> Check if \(V'\) forms a clique. Loop through every pair of distinct
+                    vertices \(u, v \in V'\).</li>
+                  <li>For each pair, scan the edge list \(E\) to verify that \((u,v) \in E\).</li>
+                  <li>Checking all pairs takes \(O(k^2 \cdot |E|)\) time, which is polynomial.</li>
+                </ul>
+              </li>
+              <li><strong>Acceptance:</strong>
+                <ul>
+                  <li>If the subset size is correct AND all edges exist, accept.</li>
+                </ul>
+              </li>
+            </ol>
+          </div>
+        </div>
+
+        <div class="example-card">
+          <h3 class="card-title">3. SUBSET-SUM</h3>
+          <p><strong>Problem:</strong> Given a set of integers \(S = \{x_1, \dots, x_n\}\) and a target \(t\), is there
+            a subset \(S' \subseteq S\) that sums to exactly \(t\)?</p>
+          <div
+            style="background: white; padding: 15px; border-radius: 8px; margin-top: 15px; border: 1px solid #e2e8f0;">
+            <p><strong>NTM Design Strategy:</strong></p>
+            <ol>
+              <li><strong>Guessing Phase:</strong>
+                <ul>
+                  <li>The NTM scans the input set \(S\).</li>
+                  <li>For each number \(x_i\), it nondeterministically chooses to either "select" it or "ignore" it.
+                  </li>
+                  <li>Effectively, it guesses a binary vector of length \(n\). Time: \(O(n)\).</li>
+                </ul>
+              </li>
+              <li><strong>Verification Phase:</strong>
+                <ul>
+                  <li>The machine computes the sum of all selected numbers.</li>
+                  <li>It adds them up one by one. Addition of standard binary integers is efficient.</li>
+                  <li>Finally, it compares the computed sum to the target \(t\).</li>
+                </ul>
+              </li>
+              <li><strong>Acceptance:</strong>
+                <ul>
+                  <li>If the sum equals \(t\), accept. Otherwise, reject.</li>
+                </ul>
+              </li>
+            </ol>
+          </div>
+        </div>
+
+        <div class="key-point">
+          <strong>Key Takeaway:</strong> In all these NTM designs, the "magic" happens in the first phase where the
+          machine guesses the right solution. The rest is just a deterministic check (verification) that runs quickly.
+          This aligns perfectly with the definition \(NP = \bigcup \text{NTIME}(n^k)\).
+        </div>
+      </div>
+    </div>
+
+    <footer>
+      <p>&copy; 2026 Dr. Debasish Pattanayak | CS 637 Mathematics-II</p>
+    </footer>
+  </div>
+
+  <a href="index.html" class="fab-btn" title="Back to Course Home">🏠</a>
+  <button class="scroll-top" id="scrollTop" onclick="scrollToTop()">↑</button>
+
+  <script>
+    // Tab switching logic
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-content').forEach(tab => {
+        tab.classList.remove('active');
+      });
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.remove('active');
+      });
+      document.getElementById(tabId).classList.add('active');
+      const buttons = document.querySelectorAll('.tab-btn');
+      for (const btn of buttons) {
+        if (btn.getAttribute('onclick').includes(tabId)) {
+          btn.classList.add('active');
+          break;
+        }
+      }
+
+      // Reset scroll to top of content
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+
+      // Re-render Math using Katex when tab becomes visible
+      renderMathInElement(document.getElementById(tabId), {
         delimiters: [
-            {left: "31952", right: "31952", display: true},
-            {left: "\[", right: "\]", display: true},
-            {left: "\(", right: "\)", display: false}
-        ]
-    });
-});
-</script>
+          { left: "$$", right: "$$", display: true },
+          { left: "\\[", right: "\\]", display: true },
+          { left: "$", right: "$", display: false },
+          { left: "\\(", right: "\\)", display: false }
+        ],
+        throwOnError: false
+      });
+    }
 
-<a href="index.html" class="fab-btn" title="Back to Index">🏠</a>
+    // Scroll handlers
+    window.addEventListener('scroll', function () {
+      updateProgress();
+
+      const scrollTop = document.getElementById('scrollTop');
+      if (window.pageYOffset > 300) {
+        scrollTop.classList.add('visible');
+      } else {
+        scrollTop.classList.remove('visible');
+      }
+    });
+
+    function scrollToTop() {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // Progress bar logic
+    function updateProgress() {
+      const scrollTotal = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+      const scrollPos = document.documentElement.scrollTop;
+      const progress = (scrollPos / (scrollTotal || 1)) * 100;
+      document.getElementById('progressFill').style.width = progress + '%';
+    }
+
+    // Initialize MathJax/KaTeX
+    document.addEventListener("DOMContentLoaded", function () {
+      renderMathInElement(document.body, {
+        delimiters: [
+          { left: "$$", right: "$$", display: true },
+          { left: "\\[", right: "\\]", display: true },
+          { left: "$", right: "$", display: false },
+          { left: "\\(", right: "\\)", display: false }
+        ],
+        throwOnError: false
+      });
+      updateProgress();
+    });
+
+    // Simple particle effect
+    const particlesContainer = document.getElementById('particles');
+    for (let i = 0; i < 20; i++) {
+      const p = document.createElement('div');
+      p.style.position = 'absolute';
+      p.style.width = Math.random() * 5 + 'px';
+      p.style.height = p.style.width;
+      p.style.background = 'rgba(255, 255, 255, 0.1)';
+      p.style.borderRadius = '50%';
+      p.style.top = Math.random() * 100 + '%';
+      p.style.left = Math.random() * 100 + '%';
+      p.style.animation = `float ${Math.random() * 10 + 5}s linear infinite`;
+      particlesContainer.appendChild(p);
+    }
+
+    const style = document.createElement('style');
+    style.textContent = `
+      @keyframes float {
+        0% { transform: translateY(0); opacity: 0; }
+        50% { opacity: 0.5; }
+        100% { transform: translateY(-100vh); opacity: 0; }
+      }
+    `;
+    document.head.appendChild(style);
+  </script>
 </body>
+
 </html>
