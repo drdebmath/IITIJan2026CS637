@@ -1,8 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="utf-8">
-  <title>CS 637 – Lecture 13 Definitions</title>
+  <title>CS 637 - Lecture 13: Boolean Functions, DTIME, and 3SAT to INDSET</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
@@ -10,108 +11,1145 @@
   <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
 
   <style>
+    :root {
+      --primary: #0f766e;
+      --secondary: #1d4ed8;
+      --accent: #ea580c;
+      --accent-hover: #c2410c;
+      --success: #059669;
+      --warning: #d97706;
+      --text-dark: #1e293b;
+      --bg-light: #f8fafc;
+      --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.08);
+      --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.12);
+      --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.15);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
     body {
-      font-family: "Times New Roman", serif;
-      margin: 40px;
-      line-height: 1.5;
-      background-color: #ffffff;
-      color: #000000;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      line-height: 1.7;
+      background: linear-gradient(135deg, #082f49 0%, #0f172a 55%, #1e293b 100%);
+      min-height: 100vh;
+      padding: 20px;
+      position: relative;
+      overflow-x: hidden;
     }
-    h1, h2 {
+
+    .particles {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 25px 80px rgba(0, 0, 0, 0.4);
+      overflow: hidden;
+      position: relative;
+      z-index: 1;
+    }
+
+    header {
+      background: linear-gradient(135deg, #0f766e, #1d4ed8, #ea580c);
+      background-size: 200% 200%;
+      animation: gradientShift 15s ease infinite;
+      color: white;
+      padding: 50px 40px;
       text-align: center;
+      position: relative;
+      overflow: hidden;
     }
+
+    @keyframes gradientShift {
+      0% {
+        background-position: 0% 50%;
+      }
+
+      50% {
+        background-position: 100% 50%;
+      }
+
+      100% {
+        background-position: 0% 50%;
+      }
+    }
+
     h1 {
-      font-size: 1.8em;
-      margin-bottom: 0.2em;
+      font-size: 2.8em;
+      margin-bottom: 12px;
+      font-weight: 800;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
     }
-    h2 {
-      font-size: 1.2em;
-      margin-top: 2em;
-      margin-bottom: 0.5em;
-    }
-    .definition {
-      margin-bottom: 1em;
-    }
-    .term {
-      font-weight: bold;
-    }
-    .number {
-      font-weight: bold;
-    }
-    .instructor {
-      margin-top: 8px;
-      font-size: 0.95rem;
-      color: #64748b;
-    }
-    .instructor a {
-      color: #0ea5e9;
-      text-decoration: none;
+
+    .subtitle {
+      font-size: 1.35em;
+      margin-bottom: 20px;
+      opacity: 0.96;
       font-weight: 500;
     }
-    .instructor a:hover {
-      text-decoration: underline;
+
+    .instructor {
+      margin-top: 20px;
+      font-size: 1.08em;
+      opacity: 0.96;
     }
+
+    .instructor a {
+      color: #fde68a;
+      text-decoration: none;
+      font-weight: 600;
+      padding: 4px 8px;
+    }
+
+    .progress-bar {
+      position: sticky;
+      top: 0;
+      height: 4px;
+      background: #e2e8f0;
+      z-index: 101;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--primary), var(--secondary), var(--accent));
+      width: 0%;
+      transition: width 0.3s ease;
+    }
+
+    .nav-wrapper {
+      background: #fff;
+      position: sticky;
+      top: 4px;
+      z-index: 100;
+      border-bottom: 2px solid #e2e8f0;
+    }
+
+    .nav-tabs {
+      display: flex;
+      overflow-x: auto;
+      padding: 0 20px;
+      scrollbar-width: thin;
+    }
+
+    .tab-btn {
+      padding: 15px 22px;
+      background: none;
+      border: none;
+      font-size: 1em;
+      cursor: pointer;
+      color: #64748b;
+      font-weight: 600;
+      border-bottom: 3px solid transparent;
+      transition: all 0.3s;
+      white-space: nowrap;
+    }
+
+    .tab-btn.active {
+      color: var(--primary);
+      border-bottom-color: var(--primary);
+    }
+
+    .content {
+      padding: 50px 40px;
+      min-height: 600px;
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+      animation: slideIn 0.5s ease-out;
+    }
+
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .section-title {
+      font-size: 2em;
+      color: var(--text-dark);
+      margin-bottom: 30px;
+      padding-bottom: 12px;
+      border-bottom: 4px solid var(--secondary);
+      position: relative;
+    }
+
+    .definition-card,
+    .example-card,
+    .theorem-card,
+    .key-point,
+    .remark-card {
+      padding: 25px;
+      margin-bottom: 25px;
+      border-radius: 12px;
+      box-shadow: var(--shadow-sm);
+      transition: all 0.4s;
+    }
+
+    .definition-card {
+      background: #f8fafc;
+      border-left: 5px solid var(--primary);
+    }
+
+    .example-card {
+      background: #fff7ed;
+      border-left: 5px solid var(--warning);
+    }
+
+    .theorem-card {
+      background: #eff6ff;
+      border-left: 5px solid #0ea5e9;
+    }
+
+    .key-point {
+      background: #ecfdf5;
+      border-left: 5px solid var(--success);
+    }
+
+    .remark-card {
+      background: #f5f3ff;
+      border-left: 5px solid #7c3aed;
+    }
+
+    .card-title {
+      font-size: 1.3em;
+      font-weight: 700;
+      margin-bottom: 15px;
+      color: var(--text-dark);
+    }
+
+    .formula-box {
+      background: white;
+      border: 1px solid #dbeafe;
+      border-radius: 10px;
+      padding: 16px 18px;
+      margin-top: 15px;
+      overflow-x: auto;
+    }
+
+    .figure-box {
+      background: white;
+      border: 1px solid #dbeafe;
+      border-radius: 10px;
+      padding: 16px 18px;
+      margin: 18px 0;
+      overflow-x: auto;
+    }
+
+    .figure-caption {
+      margin-top: 12px;
+      color: #475569;
+      font-size: 0.95em;
+    }
+
+    .diagram-legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 18px;
+      margin-top: 12px;
+      color: #334155;
+      font-size: 0.92em;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .legend-line {
+      width: 28px;
+      height: 0;
+      border-top: 3px solid #2563eb;
+    }
+
+    .legend-line.dashed {
+      border-top-style: dashed;
+      border-top-color: #dc2626;
+    }
+
+    .legend-node {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: #bbf7d0;
+      border: 2px solid #047857;
+    }
+
+    .mini-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 16px;
+      font-size: 0.96em;
+      background: white;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    .mini-table th,
+    .mini-table td {
+      border: 1px solid #e2e8f0;
+      padding: 12px 14px;
+      vertical-align: top;
+      text-align: left;
+    }
+
+    .mini-table th {
+      background: #eff6ff;
+      color: var(--text-dark);
+      font-weight: 700;
+    }
+
+    .step-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 18px;
+      margin-top: 18px;
+    }
+
+    .step-box {
+      background: white;
+      border: 1px solid #e2e8f0;
+      border-radius: 10px;
+      padding: 18px;
+    }
+
+    .step-label {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: #dbeafe;
+      color: #1d4ed8;
+      font-size: 0.86em;
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+
+    .inline-highlight {
+      display: inline-block;
+      padding: 3px 8px;
+      border-radius: 999px;
+      background: #e0f2fe;
+      color: #075985;
+      font-weight: 700;
+    }
+
+    ul,
+    ol {
+      margin-left: 25px;
+      margin-top: 15px;
+    }
+
+    li {
+      margin-bottom: 10px;
+    }
+
+    p + p {
+      margin-top: 12px;
+    }
+
+    code {
+      background: #f1f5f9;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-family: monospace;
+      color: #e11d48;
+    }
+
     footer {
-      margin-top: 3em;
+      background: #0f172a;
+      color: white;
       text-align: center;
-      font-size: 0.85em;
-      color: #333;
+      padding: 30px;
+    }
+
+    .fab-btn {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      color: white;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+      z-index: 1000;
+      border: none;
+      font-size: 28px;
+      transition: all 0.3s;
+      cursor: pointer;
+    }
+
+    .fab-btn:hover {
+      transform: translateY(-4px) scale(1.05);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+    }
+
+    .scroll-top {
+      position: fixed;
+      bottom: 100px;
+      right: 30px;
+      width: 52px;
+      height: 52px;
+      border: none;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent), var(--accent-hover));
+      color: white;
+      font-size: 1.3em;
+      cursor: pointer;
+      box-shadow: var(--shadow-lg);
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s;
+      z-index: 120;
+    }
+
+    .scroll-top.visible {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    @media (max-width: 768px) {
+      .content {
+        padding: 30px 20px;
+      }
+
+      h1 {
+        font-size: 2.1em;
+      }
+
+      .subtitle {
+        font-size: 1.15em;
+      }
+
+      .fab-btn {
+        width: 52px;
+        height: 52px;
+        bottom: 20px;
+        right: 20px;
+        font-size: 24px;
+      }
+
+      .scroll-top {
+        width: 46px;
+        height: 46px;
+        bottom: 85px;
+        right: 22px;
+      }
     }
   </style>
-
-<style>
-.fab-btn {
-  position: fixed;
-  bottom: 24px;
-  right: 24px;
-  width: 56px;
-  height: 56px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #3b82f6, #2563eb);
-  color: white;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-  cursor: pointer;
-  z-index: 1000;
-  border: none;
-  font-size: 24px;
-  transition: transform 0.2s, box-shadow 0.2s;
-  text-decoration: none;
-}
-.fab-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(0,0,0,0.3);
-}
-</style>
-
 </head>
 
 <body>
+  <div class="particles" id="particles"></div>
 
-<h1>CS 637: Mathematics-II</h1>
-<div class="instructor">
-  <strong>Instructor:</strong> <a href="https://drdebmath.github.io" target="_blank">Dr. Debasish Pattanayak</a>
-</div>
-<h2>Lecture 13 – Rice’s Theorem and Structural Undecidability</h2>
+  <div class="container">
+    <div class="progress-bar">
+      <div class="progress-fill" id="progressFill"></div>
+    </div>
 
-<footer>
-  
-</footer>
+    <header>
+      <h1>CS 637: Mathematics-II</h1>
+      <div class="subtitle">Lecture 13: Boolean Functions, DTIME, and 3SAT to INDSET</div>
+      <div class="instructor">
+        <strong>Instructor:</strong> <a href="https://drdebmath.github.io/" target="_blank">Dr. Debasish Pattanayak</a>
+      </div>
+    </header>
 
-<script>
-document.addEventListener("DOMContentLoaded", function() {
-    renderMathInElement(document.body, {
+    <div class="nav-wrapper">
+      <div class="nav-tabs">
+        <button class="tab-btn active" onclick="switchTab('functions')">Functions</button>
+        <button class="tab-btn" onclick="switchTab('certificates')">Certificates</button>
+        <button class="tab-btn" onclick="switchTab('alphabet')">Alphabet</button>
+        <button class="tab-btn" onclick="switchTab('dtime')">DTIME</button>
+        <button class="tab-btn" onclick="switchTab('classes')">P and NP</button>
+        <button class="tab-btn" onclick="switchTab('reduction')">3SAT to INDSET</button>
+      </div>
+    </div>
+
+    <div class="content">
+      <div id="functions" class="tab-content active">
+        <h2 class="section-title">From Languages to Functions</h2>
+
+        <div class="definition-card">
+          <h3 class="card-title">Encoding a Computational Problem</h3>
+          <p>A mathematical problem is first encoded as a binary string. If an instance \(I\) is encoded as
+            \(\operatorname{enc}(I) \in \{0,1\}^*\), then the problem itself can be viewed as a function</p>
+          <div class="formula-box">
+            \[
+            F_{\Pi} : \{0,1\}^* \to \{0,1\}^*
+            \]
+            <p>whose input is the encoding of an instance and whose output is the required answer.</p>
+          </div>
+          <p>Decision problems are the special case where the output is just one bit. Then \(F_{\Pi}\) is a Boolean
+            function.</p>
+        </div>
+
+        <div class="theorem-card">
+          <h3 class="card-title">What It Means for a TM to Compute an Arbitrary Function</h3>
+          <p>Let \(f : \{0,1\}^* \to \{0,1\}^*\). A Turing machine \(M\) <strong>computes</strong> \(f\) if for every
+            input \(x \in \{0,1\}^*\):</p>
+          <ol>
+            <li>\(M\) starts with \(x\) written on its input tape.</li>
+            <li>\(M\) halts after finitely many steps.</li>
+            <li>At halting, the designated output tape contains exactly \(f(x)\).</li>
+          </ol>
+          <div class="formula-box">
+            \[
+            M(x) \downarrow \quad \text{and} \quad \operatorname{out}_M(x)=f(x)
+            \quad \text{for every } x \in \{0,1\}^*.
+            \]
+          </div>
+          <p>When \(f\) has range \(\{0,1\}\), the machine is solving a yes/no problem.</p>
+        </div>
+
+        <div class="example-card">
+          <h3 class="card-title">Example: Palindrome as a Boolean Function</h3>
+          <p>Define the Boolean function</p>
+          <div class="formula-box">
+            \[
+            \operatorname{PAL}(x)=
+            \begin{cases}
+            1 & \text{if } x=x^R, \\
+            0 & \text{otherwise}.
+            \end{cases}
+            \]
+          </div>
+          <p>This is the function version of the language</p>
+          <div class="formula-box">
+            \[
+            L_{\operatorname{PAL}} = \{x \in \{0,1\}^* : \operatorname{PAL}(x)=1\}.
+            \]
+          </div>
+          <p>So a language \(L\) and its characteristic function \(\chi_L\) carry the same information:</p>
+          <div class="formula-box">
+            \[
+            \chi_L(x)=1 \iff x \in L,
+            \qquad
+            L_f=\{x \in \{0,1\}^* : f(x)=1\}.
+            \]
+          </div>
+        </div>
+
+        <div class="key-point">
+          <h3 class="card-title">Why Revisit Problems as Functions?</h3>
+          <ul>
+            <li>Decision problems become Boolean functions \(f:\{0,1\}^* \to \{0,1\}\).</li>
+            <li>Search problems and optimization problems naturally need outputs in \(\{0,1\}^*\), not just one bit.
+            </li>
+            <li>Complexity theory often states classes using languages, but the function viewpoint helps us talk about
+              output and simulation directly.</li>
+          </ul>
+        </div>
+
+        <div class="remark-card">
+          <h3 class="card-title">Remark: Common Set Notation</h3>
+          <table class="mini-table">
+            <thead>
+              <tr>
+                <th>Notation</th>
+                <th>Meaning</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>\(\mathbb{N}\), \(\mathbb{Z}\)</td>
+                <td>Natural numbers and integers</td>
+              </tr>
+              <tr>
+                <td>\([n]\)</td>
+                <td>\(\{1,2,\dots,n\}\)</td>
+              </tr>
+              <tr>
+                <td>\(A \subseteq B\), \(A \subsetneq B\)</td>
+                <td>\(A\) is a subset, or a proper subset, of \(B\)</td>
+              </tr>
+              <tr>
+                <td>\(|A|\)</td>
+                <td>Cardinality of the set \(A\)</td>
+              </tr>
+              <tr>
+                <td>\(A \cup B\), \(A \cap B\)</td>
+                <td>Union and intersection</td>
+              </tr>
+              <tr>
+                <td>\(A \setminus B\)</td>
+                <td>Elements of \(A\) not in \(B\)</td>
+              </tr>
+              <tr>
+                <td>\(A \times B\)</td>
+                <td>Cartesian product</td>
+              </tr>
+              <tr>
+                <td>\(\varnothing\), \(2^A\)</td>
+                <td>Empty set and power set</td>
+              </tr>
+              <tr>
+                <td>\(\Sigma^*\), \(\Sigma^{\le n}\)</td>
+                <td>All strings over \(\Sigma\), and all strings of length at most \(n\)</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div id="certificates" class="tab-content">
+        <h2 class="section-title">Certificates and Verifiers</h2>
+
+        <div class="definition-card">
+          <h3 class="card-title">Mathematical Definition of a Certificate</h3>
+          <p>Let \(f : \{0,1\}^* \to \{0,1\}\) be a decision problem. A <strong>certificate system</strong> for \(f\)
+            consists of:</p>
+          <ol>
+            <li>a polynomial \(p\), and</li>
+            <li>a verifier \(V : \{0,1\}^* \times \{0,1\}^* \to \{0,1\}\)</li>
+          </ol>
+          <p>such that for every input \(x\),</p>
+          <div class="formula-box">
+            \[
+            f(x)=1 \iff \exists y \in \{0,1\}^{\le p(|x|)} \text{ such that } V(x,y)=1.
+            \]
+          </div>
+          <p>Any string \(y\) satisfying this condition for a particular yes-instance \(x\) is called a
+            <strong>certificate</strong> (or witness) for \(x\).</p>
+        </div>
+
+        <div class="key-point">
+          <h3 class="card-title">Interpretation</h3>
+          <ul>
+            <li>The instance \(x\) is the question.</li>
+            <li>The certificate \(y\) is the proposed proof.</li>
+            <li>The verifier \(V\) checks the proof quickly.</li>
+            <li>No certificate is required when \(f(x)=0\); all certificates must fail in that case.</li>
+          </ul>
+        </div>
+
+        <div class="example-card">
+          <h3 class="card-title">Example Certificates</h3>
+          <table class="mini-table">
+            <thead>
+              <tr>
+                <th>Problem</th>
+                <th>Certificate</th>
+                <th>Verifier Check</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>\(\operatorname{3SAT}(\varphi)\)</td>
+                <td>An assignment \(a \in \{0,1\}^m\)</td>
+                <td>Evaluate \(\varphi(a)\) and accept iff every clause is satisfied</td>
+              </tr>
+              <tr>
+                <td>\(\operatorname{INDSET}(G,k)\)</td>
+                <td>A list of \(k\) vertices</td>
+                <td>Check all chosen vertices are distinct and no chosen pair forms an edge</td>
+              </tr>
+              <tr>
+                <td>\(\operatorname{PAL}(x)\)</td>
+                <td>No helpful certificate is needed</td>
+                <td>The verifier can check directly in polynomial time</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="theorem-card">
+          <h3 class="card-title">Verifier View of NP</h3>
+          <p>The class \(NP\) can be described in terms of polynomial-size certificates:</p>
+          <div class="formula-box">
+            \[
+            x \in L
+            \iff
+            \exists y \in \{0,1\}^{\le |x|^{O(1)}} \text{ such that } V(x,y)=1,
+            \]
+          </div>
+          <p>where \(V\) is a deterministic polynomial-time algorithm. This is equivalent to the nondeterministic
+            definition of \(NP\).</p>
+        </div>
+      </div>
+
+      <div id="alphabet" class="tab-content">
+        <h2 class="section-title">Alphabet Reduction and Binary Simulation</h2>
+
+        <div class="definition-card">
+          <h3 class="card-title">Time-Constructible Functions</h3>
+          <p>A function \(T : \mathbb{N} \to \mathbb{N}\) is <strong>time-constructible</strong> if there is a Turing
+            machine that, on input \(1^n\), writes \(1^{T(n)}\) and halts in \(O(T(n))\) time.</p>
+          <p>This condition lets a simulator budget its work in a controlled way.</p>
+        </div>
+
+        <div class="theorem-card">
+          <h3 class="card-title">Binary Alphabet Simulation Theorem</h3>
+          <p>For every \(f : \{0,1\}^* \to \{0,1\}\) and time-constructible \(T : \mathbb{N} \to \mathbb{N}\), if
+            \(f\) is computable in time \(T(n)\) by a Turing machine \(M\) using alphabet \(\Gamma\), then \(f\) is
+            computable in time \(4 \log |\Gamma| \, T(n)\) by a Turing machine \(\widetilde{M}\) using the alphabet
+            \(\{0,1,\sqcup,B\}\).</p>
+          <p>Here \(\sqcup\) is the blank symbol and \(B\) is used as a block marker.</p>
+        </div>
+
+        <div class="example-card">
+          <h3 class="card-title">Idea of the Simulation</h3>
+          <div class="step-grid">
+            <div class="step-box">
+              <div class="step-label">Step 1</div>
+              <p>Choose a fixed-length binary encoding for each symbol of \(\Gamma\). Let
+                \(\ell=\lceil \log |\Gamma| \rceil\).</p>
+            </div>
+            <div class="step-box">
+              <div class="step-label">Step 2</div>
+              <p>Represent one tape cell of \(M\) by a block \(B\,b_1b_2\dots b_{\ell}\) on \(\widetilde{M}\).</p>
+            </div>
+            <div class="step-box">
+              <div class="step-label">Step 3</div>
+              <p>To simulate one transition, decode the current block, compute the next move, rewrite the block, and
+                move to the adjacent block.</p>
+            </div>
+            <div class="step-box">
+              <div class="step-label">Step 4</div>
+              <p>One simulated step costs \(O(\ell)\) time, giving total time \(O(\log |\Gamma| \cdot T(n))\).</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="key-point">
+          <h3 class="card-title">Precision About the Constant</h3>
+          <p>The lecture statement writes \(4 \log |\Gamma| \, T(n)\). A precise block-length argument often gives
+            \(4 \lceil \log |\Gamma| \rceil T(n)\). The important message is that changing from any finite alphabet to
+            a binary-style alphabet costs only a constant-factor slowdown.</p>
+        </div>
+      </div>
+
+      <div id="dtime" class="tab-content">
+        <h2 class="section-title">Oblivious TMs and DTIME</h2>
+
+        <div class="definition-card">
+          <h3 class="card-title">Oblivious Turing Machine</h3>
+          <p>A multi-tape Turing machine is <strong>oblivious</strong> if the head position on each tape depends only
+            on the input length and the time step, not on the actual contents of the input.</p>
+          <div class="formula-box">
+            \[
+            \text{For tape } i,\ \text{head position at time } t = h_i(n,t)
+            \]
+            <p>for some fixed function \(h_i\), where \(n=|x|\).</p>
+          </div>
+          <p>So the movement schedule is predetermined; only the symbols written and the branch decisions depend on the
+            input.</p>
+        </div>
+
+        <div class="key-point">
+          <h3 class="card-title">Why Obliviousness Matters</h3>
+          <ul>
+            <li>It separates <strong>where the head goes</strong> from <strong>what data is stored there</strong>.</li>
+            <li>It is useful in uniform circuit constructions and simulation theorems.</li>
+            <li>Obliviousness does not change what is computable; it only changes the schedule of the computation.</li>
+          </ul>
+        </div>
+
+        <div class="theorem-card">
+          <h3 class="card-title">Definition of \(DTIME(T(n))\)</h3>
+          <p>In the Boolean-function viewpoint,</p>
+          <div class="formula-box">
+            \[
+            DTIME(T(n)) =
+            \left\{
+            f : \{0,1\}^* \to \{0,1\}
+            \;\middle|\;
+            \begin{array}{l}
+            \text{there exists a deterministic TM } M \\
+            \text{computing } f \text{ in time } O(T(|x|))
+            \end{array}
+            \right\}.
+            \]
+          </div>
+          <p>For languages, the equivalent definition is</p>
+          <div class="formula-box">
+            \[
+            DTIME(T(n)) =
+            \{L \subseteq \{0,1\}^* : \chi_L \in DTIME(T(n))\}.
+            \]
+          </div>
+        </div>
+
+        <div class="remark-card">
+          <h3 class="card-title">Matching Language and Function Viewpoints</h3>
+          <p>The language view and the Boolean-function view agree perfectly for decision problems. We simply move
+            between \(L\) and \(\chi_L\).</p>
+          <p><span class="inline-highlight">Decision problem = Boolean function = language characteristic function.</span>
+          </p>
+        </div>
+      </div>
+
+      <div id="classes" class="tab-content">
+        <h2 class="section-title">Defining P and NP</h2>
+
+        <div class="definition-card">
+          <h3 class="card-title">Arora-Barak Style Definitions</h3>
+          <p>Using standard complexity-class notation,</p>
+          <div class="formula-box">
+            \[
+            P = \bigcup_{c \ge 1} DTIME(n^c),
+            \qquad
+            NP = \bigcup_{c \ge 1} NTIME(n^c).
+            \]
+          </div>
+          <p>Here</p>
+          <div class="formula-box">
+            \[
+            NTIME(T(n)) =
+            \{L \subseteq \{0,1\}^* : \text{some nondeterministic TM decides } L
+            \text{ in time } O(T(n))\}.
+            \]
+          </div>
+        </div>
+
+        <div class="key-point">
+          <h3 class="card-title">How the Two Classes Differ</h3>
+          <ul>
+            <li>\(P\): deterministic polynomial-time solvability.</li>
+            <li>\(NP\): nondeterministic polynomial-time solvability, or equivalently, polynomial-time verifiability.
+            </li>
+            <li>\(P \subseteq NP\) because a deterministic machine is a special case of a nondeterministic one.</li>
+          </ul>
+        </div>
+
+        <div class="example-card">
+          <h3 class="card-title">Examples to Keep in Mind</h3>
+          <ul>
+            <li>\(\operatorname{PAL} \in P\): compare the string with its reverse using a polynomial-time algorithm.
+            </li>
+            <li>\(\operatorname{3SAT} \in NP\): a satisfying assignment is a polynomial-size certificate.</li>
+            <li>\(\operatorname{INDSET} \in NP\): a chosen vertex set is a polynomial-size certificate.</li>
+          </ul>
+        </div>
+
+        <div class="theorem-card">
+          <h3 class="card-title">Verifier Form of NP</h3>
+          <p>A language \(L\) is in \(NP\) iff there exist a polynomial \(p\) and a deterministic polynomial-time
+            verifier \(V\) such that</p>
+          <div class="formula-box">
+            \[
+            x \in L \iff \exists y \in \{0,1\}^{\le p(|x|)} \text{ with } V(x,y)=1.
+            \]
+          </div>
+          <p>This is exactly the certificate definition from the previous tab.</p>
+        </div>
+      </div>
+
+      <div id="reduction" class="tab-content">
+        <h2 class="section-title">Detailed Reduction: \(\operatorname{3SAT} \le_p \operatorname{INDSET}\)</h2>
+
+        <div class="definition-card">
+          <h3 class="card-title">The Two Problems</h3>
+          <div class="formula-box">
+            \[
+            \operatorname{3SAT} = \{\varphi : \varphi \text{ is a satisfiable CNF formula with 3 literals per clause}\}
+            \]
+            \[
+            \operatorname{INDSET} = \{\langle G,k \rangle : G \text{ has an independent set of size at least } k\}.
+            \]
+          </div>
+          <p>We reduce a formula \(\varphi\) with clauses \(C_1,\dots,C_m\) to a graph \(G_{\varphi}\) and choose
+            \(k=m\).</p>
+        </div>
+
+        <div class="example-card">
+          <h3 class="card-title">Construction of \(G_{\varphi}\)</h3>
+          <p>Suppose each clause has the form</p>
+          <div class="formula-box">
+            \[
+            C_i = (\ell_{i1} \vee \ell_{i2} \vee \ell_{i3}).
+            \]
+          </div>
+          <ol>
+            <li>Create one vertex \(v_{ij}\) for each literal occurrence \(\ell_{ij}\). So the graph has \(3m\)
+              vertices.</li>
+            <li>Within each clause \(C_i\), connect the three vertices \(v_{i1},v_{i2},v_{i3}\) to form a triangle.
+            </li>
+            <li>If two vertices correspond to contradictory literals, such as \(x\) and \(\neg x\), connect them by an
+              edge even if they belong to different clauses.</li>
+            <li>Set \(k=m\).</li>
+          </ol>
+          <div class="formula-box">
+            \[
+            R(\varphi)=\langle G_{\varphi},m\rangle .
+            \]
+          </div>
+        </div>
+
+        <div class="theorem-card">
+          <h3 class="card-title">Why the Reduction Works</h3>
+          <table class="mini-table">
+            <thead>
+              <tr>
+                <th>If \(\varphi\) is satisfiable</th>
+                <th>If \(G_{\varphi}\) has an independent set of size \(m\)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>
+                  Choose one true literal from each clause. This gives \(m\) vertices, one per triangle. Two chosen
+                  vertices cannot be adjacent:
+                  <ul>
+                    <li>they are from different clauses, so no triangle edge applies;</li>
+                    <li>they cannot be contradictory, because a satisfying assignment never makes both \(x\) and \(\neg
+                      x\) true.</li>
+                  </ul>
+                  Hence these \(m\) vertices form an independent set.
+                </td>
+                <td>
+                  Any independent set can contain at most one vertex from each clause triangle. Since there are \(m\)
+                  clauses and the set has size \(m\), it must contain exactly one vertex from each clause. Because no
+                  two chosen vertices are joined by contradiction edges, the chosen literals are mutually consistent.
+                  Assign them all to be true, extend the remaining variables arbitrarily, and every clause is
+                  satisfied.
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="key-point">
+          <h3 class="card-title">Polynomial-Time Bound</h3>
+          <p>The graph has \(3m\) vertices. Adding all clause edges and contradiction edges can be done by checking
+            pairs of literal occurrences, so the reduction runs in polynomial time in \(|\varphi|\).</p>
+          <p>Therefore \(\operatorname{3SAT} \le_p \operatorname{INDSET}\).</p>
+        </div>
+
+        <div class="remark-card">
+          <h3 class="card-title">Worked Example</h3>
+          <p>Take</p>
+          <div class="formula-box">
+            \[
+            \varphi =
+            (x_1 \vee \neg x_2 \vee x_3)
+            \wedge
+            (\neg x_1 \vee x_2 \vee x_4)
+            \wedge
+            (\neg x_3 \vee \neg x_4 \vee x_2).
+            \]
+          </div>
+          <p>Then \(G_{\varphi}\) has three triangles:</p>
+          <ul>
+            <li>\(T_1 = \{x_1,\neg x_2,x_3\}\)</li>
+            <li>\(T_2 = \{\neg x_1,x_2,x_4\}\)</li>
+            <li>\(T_3 = \{\neg x_3,\neg x_4,x_2\}\)</li>
+          </ul>
+          <div class="figure-box">
+            <svg viewBox="0 0 960 520" width="100%" role="img"
+              aria-label="Clause-to-triangle graph representation for the 3SAT to INDSET reduction">
+              <defs>
+                <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+                  <polygon points="0 0, 10 3.5, 0 7" fill="#64748b"></polygon>
+                </marker>
+              </defs>
+
+              <rect x="30" y="48" width="230" height="74" rx="14" fill="#f8fafc" stroke="#94a3b8" stroke-width="2"></rect>
+              <rect x="30" y="198" width="230" height="74" rx="14" fill="#f8fafc" stroke="#94a3b8" stroke-width="2"></rect>
+              <rect x="30" y="348" width="230" height="74" rx="14" fill="#f8fafc" stroke="#94a3b8" stroke-width="2"></rect>
+
+              <text x="52" y="78" font-size="20" font-weight="700" fill="#0f172a">C1</text>
+              <text x="52" y="104" font-size="18" fill="#334155">(x1 v ~x2 v x3)</text>
+
+              <text x="52" y="228" font-size="20" font-weight="700" fill="#0f172a">C2</text>
+              <text x="52" y="254" font-size="18" fill="#334155">(~x1 v x2 v x4)</text>
+
+              <text x="52" y="378" font-size="20" font-weight="700" fill="#0f172a">C3</text>
+              <text x="52" y="404" font-size="18" fill="#334155">(~x3 v ~x4 v x2)</text>
+
+              <line x1="260" y1="86" x2="360" y2="122" stroke="#64748b" stroke-width="3" marker-end="url(#arrowhead)"></line>
+              <line x1="260" y1="236" x2="610" y2="122" stroke="#64748b" stroke-width="3" marker-end="url(#arrowhead)"></line>
+              <line x1="260" y1="386" x2="480" y2="350" stroke="#64748b" stroke-width="3" marker-end="url(#arrowhead)"></line>
+
+              <text x="345" y="42" font-size="21" font-weight="700" fill="#1d4ed8">T1</text>
+              <text x="615" y="42" font-size="21" font-weight="700" fill="#1d4ed8">T2</text>
+              <text x="455" y="270" font-size="21" font-weight="700" fill="#1d4ed8">T3</text>
+
+              <line x1="380" y1="80" x2="310" y2="170" stroke="#2563eb" stroke-width="4"></line>
+              <line x1="380" y1="80" x2="450" y2="170" stroke="#2563eb" stroke-width="4"></line>
+              <line x1="310" y1="170" x2="450" y2="170" stroke="#2563eb" stroke-width="4"></line>
+
+              <line x1="650" y1="80" x2="580" y2="170" stroke="#2563eb" stroke-width="4"></line>
+              <line x1="650" y1="80" x2="720" y2="170" stroke="#2563eb" stroke-width="4"></line>
+              <line x1="580" y1="170" x2="720" y2="170" stroke="#2563eb" stroke-width="4"></line>
+
+              <line x1="500" y1="310" x2="430" y2="400" stroke="#2563eb" stroke-width="4"></line>
+              <line x1="500" y1="310" x2="570" y2="400" stroke="#2563eb" stroke-width="4"></line>
+              <line x1="430" y1="400" x2="570" y2="400" stroke="#2563eb" stroke-width="4"></line>
+
+              <line x1="380" y1="80" x2="650" y2="80" stroke="#dc2626" stroke-width="3.5" stroke-dasharray="10 8"></line>
+              <line x1="310" y1="170" x2="580" y2="170" stroke="#dc2626" stroke-width="3.5" stroke-dasharray="10 8"></line>
+              <line x1="310" y1="170" x2="570" y2="400" stroke="#dc2626" stroke-width="3.5" stroke-dasharray="10 8"></line>
+              <line x1="450" y1="170" x2="500" y2="310" stroke="#dc2626" stroke-width="3.5" stroke-dasharray="10 8"></line>
+              <line x1="720" y1="170" x2="430" y2="400" stroke="#dc2626" stroke-width="3.5" stroke-dasharray="10 8"></line>
+
+              <circle cx="380" cy="80" r="24" fill="#bbf7d0" stroke="#047857" stroke-width="3"></circle>
+              <circle cx="310" cy="170" r="24" fill="#ffffff" stroke="#0f172a" stroke-width="2.5"></circle>
+              <circle cx="450" cy="170" r="24" fill="#ffffff" stroke="#0f172a" stroke-width="2.5"></circle>
+
+              <circle cx="650" cy="80" r="24" fill="#ffffff" stroke="#0f172a" stroke-width="2.5"></circle>
+              <circle cx="580" cy="170" r="24" fill="#bbf7d0" stroke="#047857" stroke-width="3"></circle>
+              <circle cx="720" cy="170" r="24" fill="#ffffff" stroke="#0f172a" stroke-width="2.5"></circle>
+
+              <circle cx="500" cy="310" r="24" fill="#ffffff" stroke="#0f172a" stroke-width="2.5"></circle>
+              <circle cx="430" cy="400" r="24" fill="#bbf7d0" stroke="#047857" stroke-width="3"></circle>
+              <circle cx="570" cy="400" r="24" fill="#ffffff" stroke="#0f172a" stroke-width="2.5"></circle>
+
+              <text x="365" y="87" font-size="18" font-weight="700" fill="#0f172a">x1</text>
+              <text x="291" y="177" font-size="16" font-weight="700" fill="#0f172a">~x2</text>
+              <text x="438" y="177" font-size="18" font-weight="700" fill="#0f172a">x3</text>
+
+              <text x="633" y="87" font-size="16" font-weight="700" fill="#0f172a">~x1</text>
+              <text x="568" y="177" font-size="18" font-weight="700" fill="#0f172a">x2</text>
+              <text x="708" y="177" font-size="18" font-weight="700" fill="#0f172a">x4</text>
+
+              <text x="482" y="317" font-size="16" font-weight="700" fill="#0f172a">~x3</text>
+              <text x="412" y="407" font-size="16" font-weight="700" fill="#0f172a">~x4</text>
+              <text x="558" y="407" font-size="18" font-weight="700" fill="#0f172a">x2</text>
+            </svg>
+            <div class="figure-caption">
+              Each clause becomes a triangle, and every pair of contradictory literals gets a dashed red edge.
+              The green nodes show one independent set of size \(3\): \(x_1\), \(x_2\), and \(\neg x_4\).
+            </div>
+            <div class="diagram-legend">
+              <div class="legend-item"><span class="legend-line"></span><span>Clause edges inside a triangle</span></div>
+              <div class="legend-item"><span class="legend-line dashed"></span><span>Contradiction edges</span></div>
+              <div class="legend-item"><span class="legend-node"></span><span>Chosen independent-set vertices</span></div>
+            </div>
+          </div>
+          <p>Add contradiction edges between \(x_1\) and \(\neg x_1\), between \(\neg x_2\) and each occurrence of
+            \(x_2\), between \(x_3\) and \(\neg x_3\), and between \(x_4\) and \(\neg x_4\).</p>
+          <p>The assignment \(x_1=1, x_2=1, x_3=1, x_4=0\) satisfies \(\varphi\). Picking vertices
+            \(x_1 \in T_1\), \(x_2 \in T_2\), and \(\neg x_4 \in T_3\) gives an independent set of size \(3\).</p>
+        </div>
+      </div>
+    </div>
+
+    <footer>
+      <p>&copy; 2026 Dr. Debasish Pattanayak | CS 637 Mathematics-II</p>
+    </footer>
+  </div>
+
+  <a href="index.html" class="fab-btn" title="Back to Course Home">🏠</a>
+  <button class="scroll-top" id="scrollTop" onclick="scrollToTop()">↑</button>
+
+  <script>
+    function switchTab(tabId) {
+      document.querySelectorAll(".tab-content").forEach((tab) => {
+        tab.classList.remove("active");
+      });
+      document.querySelectorAll(".tab-btn").forEach((btn) => {
+        btn.classList.remove("active");
+      });
+      document.getElementById(tabId).classList.add("active");
+      const buttons = document.querySelectorAll(".tab-btn");
+      for (const btn of buttons) {
+        if (btn.getAttribute("onclick").includes(tabId)) {
+          btn.classList.add("active");
+          break;
+        }
+      }
+
+      window.scrollTo({ top: 0, behavior: "smooth" });
+
+      renderMathInElement(document.getElementById(tabId), {
         delimiters: [
-            {left: "31952", right: "31952", display: true},
-            {left: "\[", right: "\]", display: true},
-            {left: "\(", right: "\)", display: false}
-        ]
-    });
-});
-</script>
+          { left: "$$", right: "$$", display: true },
+          { left: "\\[", right: "\\]", display: true },
+          { left: "$", right: "$", display: false },
+          { left: "\\(", right: "\\)", display: false }
+        ],
+        throwOnError: false
+      });
+    }
 
-<a href="index.html" class="fab-btn" title="Back to Index">🏠</a>
+    window.addEventListener("scroll", function () {
+      updateProgress();
+
+      const scrollTop = document.getElementById("scrollTop");
+      if (window.pageYOffset > 300) {
+        scrollTop.classList.add("visible");
+      } else {
+        scrollTop.classList.remove("visible");
+      }
+    });
+
+    function scrollToTop() {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function updateProgress() {
+      const scrollTotal = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+      const scrollPos = document.documentElement.scrollTop;
+      const progress = (scrollPos / (scrollTotal || 1)) * 100;
+      document.getElementById("progressFill").style.width = progress + "%";
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+      renderMathInElement(document.body, {
+        delimiters: [
+          { left: "$$", right: "$$", display: true },
+          { left: "\\[", right: "\\]", display: true },
+          { left: "$", right: "$", display: false },
+          { left: "\\(", right: "\\)", display: false }
+        ],
+        throwOnError: false
+      });
+      updateProgress();
+    });
+
+    const particlesContainer = document.getElementById("particles");
+    for (let i = 0; i < 20; i++) {
+      const p = document.createElement("div");
+      p.style.position = "absolute";
+      p.style.width = Math.random() * 5 + "px";
+      p.style.height = p.style.width;
+      p.style.background = "rgba(255, 255, 255, 0.1)";
+      p.style.borderRadius = "50%";
+      p.style.top = Math.random() * 100 + "%";
+      p.style.left = Math.random() * 100 + "%";
+      p.style.animation = "float " + (Math.random() * 10 + 5) + "s linear infinite";
+      particlesContainer.appendChild(p);
+    }
+
+    const style = document.createElement("style");
+    style.textContent = `
+      @keyframes float {
+        0% { transform: translateY(0); opacity: 0; }
+        50% { opacity: 0.5; }
+        100% { transform: translateY(-100vh); opacity: 0; }
+      }
+    `;
+    document.head.appendChild(style);
+  </script>
 </body>
+
 </html>

@@ -1,117 +1,606 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="utf-8">
-  <title>CS 637 – Tutorial 4 Definitions</title>
+  <title>CS 637 – Tutorial: NP Reductions</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
   <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
   <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
-
   <style>
-    body {
-      font-family: "Times New Roman", serif;
-      margin: 40px;
-      line-height: 1.5;
-      background-color: #ffffff;
-      color: #000000;
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
     }
-    h1, h2 {
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      line-height: 1.6;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      overflow: hidden;
+    }
+
+    header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 40px;
       text-align: center;
     }
+
     h1 {
-      font-size: 1.8em;
-      margin-bottom: 0.2em;
+      font-size: 2.5em;
+      margin-bottom: 10px;
+      font-weight: 700;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
     }
-    h2 {
-      font-size: 1.2em;
-      margin-top: 2em;
-      margin-bottom: 0.5em;
+
+    .subtitle {
+      font-size: 1.3em;
+      margin-bottom: 15px;
+      opacity: 0.95;
     }
-    .definition {
-      margin-bottom: 1em;
+
+    .date-line {
+      font-size: 1.0em;
+      opacity: 0.9;
     }
-    .term {
-      font-weight: bold;
-    }
-    .number {
-      font-weight: bold;
-    }
+
     .instructor {
-      margin-top: 8px;
-      font-size: 0.95rem;
-      color: #64748b;
+      margin-top: 12px;
+      font-size: 1.05em;
+      opacity: 0.9;
     }
+
     .instructor a {
-      color: #0ea5e9;
+      color: #ffd700;
       text-decoration: none;
-      font-weight: 500;
+      font-weight: 600;
+      transition: opacity 0.3s;
     }
+
     .instructor a:hover {
+      opacity: 0.8;
       text-decoration: underline;
     }
+
+    .content {
+      padding: 40px;
+    }
+
+    .section-title {
+      font-size: 1.8em;
+      color: #1e293b;
+      margin-bottom: 25px;
+      padding-bottom: 10px;
+      border-bottom: 3px solid #667eea;
+      font-weight: 700;
+    }
+
+    .question-card {
+      background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
+      border-left: 4px solid #667eea;
+      padding: 25px;
+      margin-bottom: 30px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+      transition: all 0.3s;
+    }
+
+    .question-card:hover {
+      transform: translateX(5px);
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+    }
+
+    .question-header {
+      display: flex;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+
+    .q-badge {
+      background: #667eea;
+      color: white;
+      padding: 5px 15px;
+      border-radius: 20px;
+      font-weight: 700;
+      font-size: 0.9em;
+      margin-right: 15px;
+    }
+
+    .q-title {
+      font-size: 1.2em;
+      font-weight: 700;
+      color: #1e293b;
+    }
+
+    .sub-question {
+      margin-top: 15px;
+      padding-top: 15px;
+      border-top: 1px dashed #cbd5e1;
+    }
+
+    .sub-label {
+      font-weight: 700;
+      color: #475569;
+      margin-right: 5px;
+    }
+
+    .solution {
+      margin-top: 12px;
+      background: #eff6ff;
+      border-left: 4px solid #3b82f6;
+      border-radius: 6px;
+      padding: 12px 14px;
+    }
+
+    .solution strong {
+      color: #1e3a8a;
+    }
+
+    ol,
+    ul {
+      margin-left: 22px;
+      margin-top: 8px;
+    }
+
+    li {
+      margin-bottom: 6px;
+    }
+
+    .katex {
+      font-size: 1.05em;
+    }
+
     footer {
-      margin-top: 3em;
+      background: #1e293b;
+      color: white;
       text-align: center;
-      font-size: 0.85em;
-      color: #333;
+      padding: 25px;
+      font-size: 0.9em;
+    }
+
+    .fab-btn {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #3b82f6, #2563eb);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      cursor: pointer;
+      z-index: 1000;
+      border: none;
+      font-size: 24px;
+      transition: transform 0.2s, box-shadow 0.2s;
+      text-decoration: none;
+    }
+
+    .fab-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+    }
+
+    @media (max-width: 768px) {
+      .content {
+        padding: 20px;
+      }
+
+      h1 {
+        font-size: 1.8em;
+      }
     }
   </style>
-
-<style>
-.fab-btn {
-  position: fixed;
-  bottom: 24px;
-  right: 24px;
-  width: 56px;
-  height: 56px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #3b82f6, #2563eb);
-  color: white;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-  cursor: pointer;
-  z-index: 1000;
-  border: none;
-  font-size: 24px;
-  transition: transform 0.2s, box-shadow 0.2s;
-  text-decoration: none;
-}
-.fab-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(0,0,0,0.3);
-}
-</style>
-
 </head>
 
 <body>
+  <div class="container">
+    <header>
+      <h1>CS 637: Mathematics-II</h1>
+      <div class="subtitle">Tutorial: NP Reductions</div>
+      <div class="date-line">12 March 2026</div>
+      <div class="instructor">
+        <strong>Instructor:</strong> <a href="https://drdebmath.github.io" target="_blank">Dr. Debasish Pattanayak</a>
+      </div>
+    </header>
 
-<h1>CS 637: Mathematics-II</h1>
-<div class="instructor">
-  <strong>Instructor:</strong> <a href="https://drdebmath.github.io" target="_blank">Dr. Debasish Pattanayak</a>
-</div>
-<h2>Tutorial 4: Problems from Models of Computation</h2>
+    <div class="content">
+      <h2 class="section-title">Tutorial Questions</h2>
 
-<footer>
-  
-</footer>
+      <div class="question-card">
+        <div class="question-header">
+          <span class="q-badge">Q1</span>
+          <span class="q-title">Polynomial-Time Reduction</span>
+        </div>
 
-<script>
-document.addEventListener("DOMContentLoaded", function() {
-    renderMathInElement(document.body, {
+        <div class="sub-question">
+          <span class="sub-label">(a)</span>
+          Define what it means for a language \(A\) to reduce to a language \(B\) in polynomial time. State the meaning of
+          \(A \leq_p B\), and explain why such a reduction is useful in complexity theory.
+          <div class="solution">
+            <strong>Solution:</strong> We say \(A \leq_p B\) if there is a function \(f : \Sigma^* \to \Sigma^*\) such that
+            \(f\) is computable in polynomial time and, for every input \(x\),
+            \[
+            x \in A \iff f(x) \in B.
+            \]
+            The function \(f\) converts each instance of problem \(A\) into an equivalent instance of problem \(B\). This is
+            useful because it compares problem difficulty. In particular, if \(A \leq_p B\) and \(B \in P\), then \(A \in P\).
+            Also, if \(A\) is already known to be hard and \(A \leq_p B\), then \(B\) is at least as hard as \(A\).
+          </div>
+        </div>
+      </div>
+
+      <div class="question-card">
+        <div class="question-header">
+          <span class="q-badge">Q2</span>
+          <span class="q-title">Transitivity of Reductions</span>
+        </div>
+
+        <div class="sub-question">
+          <span class="sub-label">(a)</span>
+          Prove that polynomial-time reductions are transitive. That is, if \(A \leq_p B\) and \(B \leq_p C\), then
+          \(A \leq_p C\).
+          <div class="solution">
+            <strong>Solution:</strong> Since \(A \leq_p B\), there is a polynomial-time computable function \(f\) such that
+            \[
+            x \in A \iff f(x) \in B.
+            \]
+            Since \(B \leq_p C\), there is a polynomial-time computable function \(g\) such that
+            \[
+            y \in B \iff g(y) \in C.
+            \]
+            Define \(h(x) = g(f(x))\). The composition of two polynomial-time computable functions is also polynomial-time
+            computable. Moreover,
+            \[
+            x \in A \iff f(x) \in B \iff g(f(x)) \in C \iff h(x) \in C.
+            \]
+            Therefore \(h\) is a polynomial-time reduction from \(A\) to \(C\), so \(A \leq_p C\).
+          </div>
+        </div>
+      </div>
+
+      <div class="question-card">
+        <div class="question-header">
+          <span class="q-badge">Q3</span>
+          <span class="q-title">Clique to Independent Set</span>
+        </div>
+
+        <div class="sub-question">
+          <span class="sub-label">(a)</span>
+          Describe a polynomial-time reduction from Clique to Independent Set. Given an instance \((G, k)\) of Clique,
+          how do you construct an equivalent instance of Independent Set?
+          <div class="solution">
+            <strong>Solution:</strong> Let \(G = (V, E)\). Construct the complement graph
+            \(\overline{G} = (V, \overline{E})\), where for distinct vertices \(u, v \in V\),
+            \[
+            (u,v) \in \overline{E} \iff (u,v) \notin E.
+            \]
+            Keep the same target value, so the new instance is \((\overline{G}, k)\).
+          </div>
+        </div>
+
+        <div class="sub-question">
+          <span class="sub-label">(b)</span>
+          Prove the forward direction: if \(G\) has a clique of size \(k\), then \(\overline{G}\) has an independent
+          set of size \(k\).
+          <div class="solution">
+            <strong>Solution:</strong> Suppose \(S \subseteq V\) is a clique of size \(k\) in \(G\). Then every pair of
+            distinct vertices in \(S\) is connected by an edge in \(G\). By the definition of the complement graph,
+            none of those pairs is connected by an edge in \(\overline{G}\). Therefore no two vertices of \(S\) are
+            adjacent in \(\overline{G}\), so \(S\) is an independent set of size \(k\) in \(\overline{G}\).
+          </div>
+        </div>
+
+        <div class="sub-question">
+          <span class="sub-label">(c)</span>
+          Prove the backward direction: if \(\overline{G}\) has an independent set of size \(k\), then \(G\) has a
+          clique of size \(k\).
+          <div class="solution">
+            <strong>Solution:</strong> Suppose \(S \subseteq V\) is an independent set of size \(k\) in
+            \(\overline{G}\). Then no two distinct vertices of \(S\) are adjacent in \(\overline{G}\). Hence every
+            pair of distinct vertices of \(S\) must be adjacent in \(G\). So all vertices in \(S\) are pairwise
+            connected in \(G\), which means \(S\) is a clique of size \(k\) in \(G\).
+          </div>
+        </div>
+
+        <div class="sub-question">
+          <span class="sub-label">(d)</span>
+          Verify that the reduction runs in polynomial time and conclude the reduction result.
+          <div class="solution">
+            <strong>Solution:</strong> The graph \(\overline{G}\) has the same vertex set as \(G\), and its edges can be
+            computed by checking each pair of vertices, which takes polynomial time. Since
+            \[
+            (G,k) \in \operatorname{CLIQUE} \iff (\overline{G},k) \in \operatorname{INDSET}.
+            \]
+            we have a valid polynomial-time reduction from Clique to Independent Set. Therefore
+            \(\operatorname{CLIQUE} \leq_p \operatorname{INDSET}\).
+          </div>
+        </div>
+      </div>
+
+      <div class="question-card">
+        <div class="question-header">
+          <span class="q-badge">Q4</span>
+          <span class="q-title">3-SAT to Clique</span>
+        </div>
+
+        <div class="sub-question">
+          <span class="sub-label">(a)</span>
+          Describe the polynomial-time reduction from 3-SAT to Clique. Given a 3-CNF formula with \(k\) clauses, how do you construct a graph \(G\) and target size \(t\) such that the formula is satisfiable if and only if \(G\) has a clique of size \(t\)?
+        </div>
+
+        <div class="sub-question">
+          <span class="sub-label">(b)</span>
+          Prove the forward direction: if \(\varphi\) is satisfiable, then \(G\) has a clique of size \(k\).
+        </div>
+
+        <div class="sub-question">
+          <span class="sub-label">(c)</span>
+          Prove the backward direction: if \(G\) has a clique of size \(k\), then \(\varphi\) is satisfiable.
+        </div>
+
+        <div class="sub-question">
+          <span class="sub-label">(d)</span>
+          Verify the reduction runs in polynomial time and conclude NP-completeness of Clique.
+        </div>
+      </div>
+
+      <div class="question-card">
+        <div class="question-header">
+          <span class="q-badge">Q5</span>
+          <span class="q-title">3-SAT to Graph 3-Colorability</span>
+        </div>
+
+        <div class="sub-question">
+          <span class="sub-label">(a)</span>
+          Describe the polynomial-time reduction from 3-SAT to Graph 3-Colorability. How do you build variable gadgets and clause gadgets in the graph?
+        </div>
+
+        <div class="sub-question">
+          <span class="sub-label">(b)</span>
+          Prove that a valid 3-coloring of \(G\) exists if and only if \(\varphi\) is satisfiable.
+        </div>
+
+        <div class="sub-question">
+          <span class="sub-label">(c)</span>
+          Verify the reduction is polynomial-time and conclude NP-completeness of 3-Colorability.
+        </div>
+      </div>
+
+      <div class="question-card">
+        <div class="question-header">
+          <span class="q-badge">Q6</span>
+          <span class="q-title">3-SAT to Vertex Cover</span>
+        </div>
+
+        <div class="sub-question">
+          <span class="sub-label">(a)</span>
+          Describe the polynomial-time reduction from 3-SAT to Vertex Cover. For each variable and each clause in the formula, what subgraph do you construct?
+        </div>
+
+        <div class="sub-question">
+          <span class="sub-label">(b)</span>
+          Prove: if \(\varphi\) is satisfiable, then \(G\) has a vertex cover of size \(n + 2k\).
+        </div>
+
+        <div class="sub-question">
+          <span class="sub-label">(c)</span>
+          Prove: if \(G\) has a vertex cover of size \(n + 2k\), then \(\varphi\) is satisfiable.
+        </div>
+
+        <div class="sub-question">
+          <span class="sub-label">(d)</span>
+          Conclude that Vertex Cover is NP-complete.
+        </div>
+      </div>
+
+      <div class="question-card">
+        <div class="question-header">
+          <span class="q-badge">Q7</span>
+          <span class="q-title">3-SAT to Subset Sum</span>
+        </div>
+
+        <div class="sub-question">
+          <span class="sub-label">(a)</span>
+          Describe the polynomial-time reduction from 3-SAT to Subset Sum. Given a 3-CNF formula with \(n\) variables and \(m\) clauses, how do you construct a set of integers and a target \(t\)?
+        </div>
+
+        <div class="sub-question">
+          <span class="sub-label">(b)</span>
+          Prove: if \(\varphi\) is satisfiable, then some subset sums to \(t\).
+        </div>
+
+        <div class="sub-question">
+          <span class="sub-label">(c)</span>
+          Prove: if some subset sums to \(t\), then \(\varphi\) is satisfiable.
+        </div>
+
+        <div class="sub-question">
+          <span class="sub-label">(d)</span>
+          Verify the reduction is polynomial-time and conclude NP-completeness of Subset Sum.
+        </div>
+      </div>
+
+      <div class="question-card">
+        <div class="question-header">
+          <span class="q-badge">Q8</span>
+          <span class="q-title">3-SAT to Hamiltonian Path</span>
+        </div>
+
+        <div class="sub-question">
+          <span class="sub-label">(a)</span>
+          Describe the polynomial-time reduction from 3-SAT to Hamiltonian Path. How do you construct the directed graph with variable gadgets and clause nodes?
+        </div>
+
+        <div class="sub-question">
+          <span class="sub-label">(b)</span>
+          Prove: if \(\varphi\) is satisfiable, then \(G\) has a Hamiltonian path from \(s\) to \(t\).
+        </div>
+
+        <div class="sub-question">
+          <span class="sub-label">(c)</span>
+          Prove: if \(G\) has a Hamiltonian path from \(s\) to \(t\), then \(\varphi\) is satisfiable.
+        </div>
+
+        <div class="sub-question">
+          <span class="sub-label">(d)</span>
+          Conclude that Hamiltonian Path is NP-complete.
+        </div>
+      </div>
+
+      <div class="question-card">
+        <div class="question-header">
+          <span class="q-badge">Q9</span>
+          <span class="q-title">Independent Set to Vertex Cover</span>
+        </div>
+
+        <div class="sub-question">
+          <span class="sub-label">(a)</span>
+          Describe the polynomial-time reduction from Independent Set to Vertex Cover. Given \(G=(V,E)\) and integer \(k\), how do you produce an instance of Vertex Cover directly?
+        </div>
+
+        <div class="sub-question">
+          <span class="sub-label">(b)</span>
+          Prove: \(G\) has an independent set of size \(k\) if and only if \(G\) has a vertex cover of size \(|V|-k\).
+        </div>
+
+        <div class="sub-question">
+          <span class="sub-label">(c)</span>
+          Verify the reduction is polynomial-time and state what it implies about the complexity of Vertex Cover.
+        </div>
+      </div>
+
+      <div class="question-card">
+        <div class="question-header">
+          <span class="q-badge">Q10</span>
+          <span class="q-title">Vertex Cover to Set Cover</span>
+        </div>
+
+        <div class="sub-question">
+          <span class="sub-label">(a)</span>
+          Describe the polynomial-time reduction from Vertex Cover to Set Cover. Given graph \(G=(V,E)\) and integer \(k\), how do you define the universe \(U\), the collection of sets \(\mathcal{S}\), and the budget \(b\)?
+        </div>
+
+        <div class="sub-question">
+          <span class="sub-label">(b)</span>
+          Prove: \(G\) has a vertex cover of size \(k\) if and only if the Set Cover instance has a cover of size \(k\).
+        </div>
+
+        <div class="sub-question">
+          <span class="sub-label">(c)</span>
+          Conclude NP-completeness of Set Cover.
+        </div>
+      </div>
+
+      <div class="question-card">
+        <div class="question-header">
+          <span class="q-badge">Q11</span>
+          <span class="q-title">3-SAT to Integer Linear Programming (ILP) Feasibility</span>
+        </div>
+
+        <div class="sub-question">
+          <span class="sub-label">(a)</span>
+          Describe the polynomial-time reduction from 3-SAT to ILP Feasibility. For each variable and each clause, what constraints do you introduce?
+        </div>
+
+        <div class="sub-question">
+          <span class="sub-label">(b)</span>
+          Prove both directions of correctness of the reduction.
+        </div>
+
+        <div class="sub-question">
+          <span class="sub-label">(c)</span>
+          Conclude NP-completeness of ILP Feasibility.
+        </div>
+      </div>
+
+      <div class="question-card">
+        <div class="question-header">
+          <span class="q-badge">Q12</span>
+          <span class="q-title">Clique to Subgraph Isomorphism</span>
+        </div>
+
+        <div class="sub-question">
+          <span class="sub-label">(a)</span>
+          Describe the polynomial-time reduction from Clique to Subgraph Isomorphism. Given graph \(G\) and integer \(k\), how do you construct the pattern graph \(H\)?
+        </div>
+
+        <div class="sub-question">
+          <span class="sub-label">(b)</span>
+          Prove both directions: \(G\) contains a clique of size \(k\) if and only if \(H = K_k\) is isomorphic to a subgraph of \(G\).
+        </div>
+
+        <div class="sub-question">
+          <span class="sub-label">(c)</span>
+          Conclude NP-completeness of Subgraph Isomorphism.
+        </div>
+      </div>
+
+      <div class="question-card">
+        <div class="question-header">
+          <span class="q-badge">Q13</span>
+          <span class="q-title">3-SAT to Directed Hamiltonian Cycle</span>
+        </div>
+
+        <div class="sub-question">
+          <span class="sub-label">(a)</span>
+          Describe the polynomial-time reduction from 3-SAT to Directed Hamiltonian Cycle. Given a 3-CNF formula with \(n\) variables and \(k\) clauses, how do you construct the directed graph \(G\)?
+        </div>
+
+        <div class="sub-question">
+          <span class="sub-label">(b)</span>
+          Prove: if \(\varphi\) is satisfiable, then \(G\) has a directed Hamiltonian cycle.
+        </div>
+
+        <div class="sub-question">
+          <span class="sub-label">(c)</span>
+          Prove: if \(G\) has a directed Hamiltonian cycle, then \(\varphi\) is satisfiable.
+        </div>
+
+        <div class="sub-question">
+          <span class="sub-label">(d)</span>
+          Conclude NP-completeness of Directed Hamiltonian Cycle, and briefly state how this implies NP-completeness of the Travelling Salesman Problem (Decision version).
+        </div>
+      </div>
+
+    </div>
+
+    <footer>
+      CS 637 – Tutorial: NP Reductions • Spring 2026<br>
+      © Dr. Debasish Pattanayak • Department of Computer Science
+    </footer>
+  </div>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      renderMathInElement(document.body, {
         delimiters: [
-            {left: "31952", right: "31952", display: true},
-            {left: "\[", right: "\]", display: true},
-            {left: "\(", right: "\)", display: false}
+          { left: "$$", right: "$$", display: true },
+          { left: "\\[", right: "\\]", display: true },
+          { left: "\\(", right: "\\)", display: false },
+          { left: "$", right: "$", display: false }
         ]
+      });
     });
-});
-</script>
+  </script>
 
-<a href="index.html" class="fab-btn" title="Back to Index">🏠</a>
+  <a href="index.html" class="fab-btn" title="Back to Index">🏠</a>
 </body>
+
 </html>
