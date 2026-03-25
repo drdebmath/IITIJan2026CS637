@@ -343,21 +343,57 @@
         <div class="sub-question">
           <span class="sub-label">(a)</span>
           Describe the polynomial-time reduction from 3-SAT to Clique. Given a 3-CNF formula with \(k\) clauses, how do you construct a graph \(G\) and target size \(t\) such that the formula is satisfiable if and only if \(G\) has a clique of size \(t\)?
+          <div class="solution">
+            <strong>Solution:</strong> Let
+            \[
+            \varphi = C_1 \wedge C_2 \wedge \cdots \wedge C_k,
+            \qquad
+            C_i = (\ell_{i1} \vee \ell_{i2} \vee \ell_{i3}).
+            \]
+            Create one vertex for each literal occurrence \(\ell_{ij}\), so there are \(3k\) vertices. Connect two
+            vertices coming from different clauses if the corresponding literals are <em>not</em> contradictory. Do not
+            connect vertices from the same clause. Set the target to \(t=k\). Intuitively, a clique of size \(k\) must
+            choose one mutually consistent literal from each clause.
+          </div>
         </div>
 
         <div class="sub-question">
           <span class="sub-label">(b)</span>
           Prove the forward direction: if \(\varphi\) is satisfiable, then \(G\) has a clique of size \(k\).
+          <div class="solution">
+            <strong>Solution:</strong> Suppose \(\varphi\) is satisfiable. In each clause \(C_i\), choose one literal
+            that is true under the satisfying assignment. This gives one chosen vertex from each clause, so \(k\)
+            vertices in total. Any two chosen literals lie in different clauses. They cannot be contradictory, because
+            a satisfying assignment cannot make both \(x\) and \(\neg x\) true. Hence every pair of chosen vertices is
+            connected by an edge. Therefore the chosen vertices form a clique of size \(k\).
+          </div>
         </div>
 
         <div class="sub-question">
           <span class="sub-label">(c)</span>
           Prove the backward direction: if \(G\) has a clique of size \(k\), then \(\varphi\) is satisfiable.
+          <div class="solution">
+            <strong>Solution:</strong> Let \(S\) be a clique of size \(k\). Since no two vertices from the same clause
+            are adjacent, \(S\) can contain at most one vertex from each clause. Because there are \(k\) clauses, it
+            must contain exactly one vertex from each clause. Also, no two chosen literals are contradictory, since
+            contradictory pairs are not joined by edges. Thus the literals in \(S\) are mutually consistent. Assign
+            truth values so that all chosen literals become true; extend the remaining variables arbitrarily. Then each
+            clause has one chosen true literal, so \(\varphi\) is satisfiable.
+          </div>
         </div>
 
         <div class="sub-question">
           <span class="sub-label">(d)</span>
           Verify the reduction runs in polynomial time and conclude NP-completeness of Clique.
+          <div class="solution">
+            <strong>Solution:</strong> The graph has \(3k\) vertices. We inspect pairs of literal occurrences and add
+            edges according to a simple consistency test, so the construction is polynomial-time. Since Clique is in
+            \(NP\) (a \(k\)-clique is a polynomial-size certificate) and
+            \[
+            \varphi \in \operatorname{3SAT} \iff (G,k) \in \operatorname{CLIQUE},
+            \]
+            we conclude \(\operatorname{3SAT} \leq_p \operatorname{CLIQUE}\). Hence Clique is NP-complete.
+          </div>
         </div>
       </div>
 
@@ -370,16 +406,41 @@
         <div class="sub-question">
           <span class="sub-label">(a)</span>
           Describe the polynomial-time reduction from 3-SAT to Graph 3-Colorability. How do you build variable gadgets and clause gadgets in the graph?
+          <div class="solution">
+            <strong>Solution:</strong> Use the standard base triangle with three special colors \(T,F,B\) (true, false,
+            base). For each variable \(x_i\), create two vertices labeled \(x_i\) and \(\neg x_i\), join them to each
+            other, and connect both to \(B\). Then the pair must receive colors \(T\) and \(F\) in some order, which
+            encodes a truth assignment. For each clause \(C_j=(\ell_{j1}\vee\ell_{j2}\vee\ell_{j3})\), attach a
+            constant-size clause gadget connected to the three literal vertices \(\ell_{j1},\ell_{j2},\ell_{j3}\) so
+            that the gadget is 3-colorable exactly when at least one of those literals is colored \(T\).
+          </div>
         </div>
 
         <div class="sub-question">
           <span class="sub-label">(b)</span>
           Prove that a valid 3-coloring of \(G\) exists if and only if \(\varphi\) is satisfiable.
+          <div class="solution">
+            <strong>Solution:</strong> If \(\varphi\) is satisfiable, color the base triangle by \(T,F,B\). For each
+            variable, color \(x_i\) by \(T\) and \(\neg x_i\) by \(F\) if \(x_i\) is true; reverse these colors if
+            \(x_i\) is false. Then every clause has at least one true literal, so its clause gadget can be completed to
+            a legal 3-coloring. Conversely, any proper 3-coloring forces each variable gadget to choose opposite colors
+            \(T\) and \(F\), thereby defining an assignment. The clause gadget design guarantees that at least one of
+            its literals is colored \(T\), so each clause is satisfied. Hence \(\varphi\) is satisfiable.
+          </div>
         </div>
 
         <div class="sub-question">
           <span class="sub-label">(c)</span>
           Verify the reduction is polynomial-time and conclude NP-completeness of 3-Colorability.
+          <div class="solution">
+            <strong>Solution:</strong> Each variable contributes a constant-size gadget, and each clause contributes a
+            constant-size gadget, so the graph size is polynomial in the formula size. Graph 3-Colorability lies in
+            \(NP\), since a coloring is easy to verify. Therefore
+            \[
+            \operatorname{3SAT} \leq_p \operatorname{3COL},
+            \]
+            and 3-Colorability is NP-complete.
+          </div>
         </div>
       </div>
 
@@ -392,21 +453,57 @@
         <div class="sub-question">
           <span class="sub-label">(a)</span>
           Describe the polynomial-time reduction from 3-SAT to Vertex Cover. For each variable and each clause in the formula, what subgraph do you construct?
+          <div class="solution">
+            <strong>Solution:</strong> Let \(\varphi\) have \(n\) variables and \(k\) clauses. For each variable
+            \(x_i\), create an edge between two vertices labeled \(x_i\) and \(\neg x_i\). For each clause
+            \(C_j=(\ell_{j1}\vee\ell_{j2}\vee\ell_{j3})\), create a triangle on three clause vertices
+            \(c_{j1},c_{j2},c_{j3}\). Then connect \(c_{jr}\) to the variable vertex carrying the same literal
+            \(\ell_{jr}\). Set the target size to
+            \[
+            K = n + 2k.
+            \]
+          </div>
         </div>
 
         <div class="sub-question">
           <span class="sub-label">(b)</span>
           Prove: if \(\varphi\) is satisfiable, then \(G\) has a vertex cover of size \(n + 2k\).
+          <div class="solution">
+            <strong>Solution:</strong> Fix a satisfying assignment. From each variable edge \((x_i,\neg x_i)\), choose
+            the vertex corresponding to the literal set to true; this contributes \(n\) vertices. In each clause
+            triangle, at least one literal is true. Leave the clause vertex corresponding to one true literal
+            unchosen, and include the other two clause vertices; this contributes \(2k\) vertices. Every variable edge
+            is covered by the chosen variable endpoint. Every edge inside a clause triangle is covered because two
+            vertices are chosen. The edge from the unchosen clause vertex goes to a chosen literal vertex, since that
+            literal is true. Hence all edges are covered, giving a vertex cover of size \(n+2k\).
+          </div>
         </div>
 
         <div class="sub-question">
           <span class="sub-label">(c)</span>
           Prove: if \(G\) has a vertex cover of size \(n + 2k\), then \(\varphi\) is satisfiable.
+          <div class="solution">
+            <strong>Solution:</strong> A vertex cover of size \(n+2k\) must choose exactly one endpoint from each
+            variable edge and exactly two vertices from each clause triangle; otherwise the size bound is exceeded. Set
+            \(x_i=\text{true}\) if the chosen endpoint on the variable edge is \(x_i\), and false otherwise. In each
+            clause triangle, exactly one clause vertex is unchosen. Since all its incident edges must still be covered,
+            the corresponding literal vertex on the variable side must be chosen. By the assignment rule, that literal
+            is true. So each clause has a true literal and \(\varphi\) is satisfiable.
+          </div>
         </div>
 
         <div class="sub-question">
           <span class="sub-label">(d)</span>
           Conclude that Vertex Cover is NP-complete.
+          <div class="solution">
+            <strong>Solution:</strong> The construction uses \(2n+3k\) vertices and only polynomially many edges, so it
+            is polynomial-time. Vertex Cover is in \(NP\) because a proposed cover can be checked in polynomial time.
+            Therefore
+            \[
+            \operatorname{3SAT} \leq_p \operatorname{VC},
+            \]
+            and Vertex Cover is NP-complete.
+          </div>
         </div>
       </div>
 
@@ -419,21 +516,56 @@
         <div class="sub-question">
           <span class="sub-label">(a)</span>
           Describe the polynomial-time reduction from 3-SAT to Subset Sum. Given a 3-CNF formula with \(n\) variables and \(m\) clauses, how do you construct a set of integers and a target \(t\)?
+          <div class="solution">
+            <strong>Solution:</strong> Use decimal numbers with \(n+m\) digit positions and arrange that no carry ever
+            occurs. The first \(n\) columns correspond to variables; the last \(m\) columns correspond to clauses. For
+            each variable \(x_i\), create two numbers \(t_i\) and \(f_i\). In the \(i\)-th variable column they both
+            have digit \(1\), forcing us to choose exactly one of them. In a clause column \(j\), the number \(t_i\)
+            has digit \(1\) if literal \(x_i\) appears in \(C_j\), while \(f_i\) has digit \(1\) if literal
+            \(\neg x_i\) appears in \(C_j\). For each clause \(C_j\), add slack numbers whose only nonzero digit is in
+            clause column \(j\), typically \(1\) and \(2\), so that the clause column can reach the target exactly when
+            at least one literal contributing to that clause has been selected. The target \(t\) has digit \(1\) in
+            each variable column and digit \(4\) in each clause column.
+          </div>
         </div>
 
         <div class="sub-question">
           <span class="sub-label">(b)</span>
           Prove: if \(\varphi\) is satisfiable, then some subset sums to \(t\).
+          <div class="solution">
+            <strong>Solution:</strong> Given a satisfying assignment, choose \(t_i\) if \(x_i\) is true and \(f_i\) if
+            \(x_i\) is false. Then each variable column sums to exactly \(1\), matching the target. In each clause
+            column, at least one chosen variable-number contributes \(1\), because the clause is satisfied. Using the
+            available slack numbers for that clause column, we can bring the total exactly up to \(4\). Since there are
+            no carries, the resulting selected subset sums exactly to \(t\).
+          </div>
         </div>
 
         <div class="sub-question">
           <span class="sub-label">(c)</span>
           Prove: if some subset sums to \(t\), then \(\varphi\) is satisfiable.
+          <div class="solution">
+            <strong>Solution:</strong> Because the target has digit \(1\) in each variable column and only \(t_i\) and
+            \(f_i\) contribute there, any valid subset must choose exactly one of \(t_i,f_i\) for each variable. This
+            defines a truth assignment. Now consider any clause column \(j\). The slack numbers alone cannot reach the
+            target digit \(4\); they can only complete the sum after at least one variable-number contributes \(1\) in
+            that clause column. Hence at least one selected literal corresponding to that clause is true. Therefore
+            every clause is satisfied, so \(\varphi\) is satisfiable.
+          </div>
         </div>
 
         <div class="sub-question">
           <span class="sub-label">(d)</span>
           Verify the reduction is polynomial-time and conclude NP-completeness of Subset Sum.
+          <div class="solution">
+            <strong>Solution:</strong> The number of constructed integers is polynomial in \(n+m\), and each integer has
+            only \(n+m\) digits, so the reduction is polynomial-time. Subset Sum belongs to \(NP\), since a proposed
+            subset can be added and checked in polynomial time. Therefore
+            \[
+            \operatorname{3SAT} \leq_p \operatorname{SUBSETSUM},
+            \]
+            and Subset Sum is NP-complete.
+          </div>
         </div>
       </div>
 
@@ -446,21 +578,49 @@
         <div class="sub-question">
           <span class="sub-label">(a)</span>
           Describe the polynomial-time reduction from 3-SAT to Hamiltonian Path. How do you construct the directed graph with variable gadgets and clause nodes?
+          <div class="solution">
+            <strong>Solution:</strong> Build a directed graph with a start vertex \(s\), an end vertex \(t\), and one
+            gadget for each variable \(x_i\). Each variable gadget is a directed chain or ladder that can be traversed
+            in one of two ways, encoding \(x_i=\text{true}\) or \(x_i=\text{false}\). For each clause \(C_j\), create a
+            clause node (or a small constant-size clause gadget) connected to the literal positions in the relevant
+            variable gadgets. The edges are arranged so that the Hamiltonian path can visit the clause gadget only
+            through a literal made available by the chosen truth-direction in the corresponding variable gadget.
+          </div>
         </div>
 
         <div class="sub-question">
           <span class="sub-label">(b)</span>
           Prove: if \(\varphi\) is satisfiable, then \(G\) has a Hamiltonian path from \(s\) to \(t\).
+          <div class="solution">
+            <strong>Solution:</strong> Suppose \(\varphi\) is satisfiable. Traverse each variable gadget according to the
+            satisfying assignment. This gives a consistent route from \(s\) toward \(t\). Since every clause has at
+            least one true literal, we can detour through its clause gadget using one of the available literal edges and
+            then return to the main route without missing any vertices. Doing this for each clause yields an \(s\)-to-\(t\)
+            path visiting every vertex exactly once, that is, a Hamiltonian path.
+          </div>
         </div>
 
         <div class="sub-question">
           <span class="sub-label">(c)</span>
           Prove: if \(G\) has a Hamiltonian path from \(s\) to \(t\), then \(\varphi\) is satisfiable.
+          <div class="solution">
+            <strong>Solution:</strong> In each variable gadget, the Hamiltonian path is forced to choose one of the two
+            possible traversals, which we interpret as a truth value for that variable. Because the path is Hamiltonian,
+            every clause gadget must be visited. The only way to enter and leave a clause gadget is through one of its
+            literal connections, and such a connection is usable only when the corresponding variable gadget is
+            traversed in the matching direction. Hence each clause has at least one true literal under the induced
+            assignment. Therefore \(\varphi\) is satisfiable.
+          </div>
         </div>
 
         <div class="sub-question">
           <span class="sub-label">(d)</span>
           Conclude that Hamiltonian Path is NP-complete.
+          <div class="solution">
+            <strong>Solution:</strong> The graph uses polynomially many vertices and edges, so the reduction is
+            polynomial-time. Hamiltonian Path belongs to \(NP\), because a proposed path ordering is easy to verify.
+            Therefore \(\operatorname{3SAT} \leq_p \operatorname{HPATH}\), and Hamiltonian Path is NP-complete.
+          </div>
         </div>
       </div>
 
@@ -473,16 +633,43 @@
         <div class="sub-question">
           <span class="sub-label">(a)</span>
           Describe the polynomial-time reduction from Independent Set to Vertex Cover. Given \(G=(V,E)\) and integer \(k\), how do you produce an instance of Vertex Cover directly?
+          <div class="solution">
+            <strong>Solution:</strong> Keep the same graph \(G\), and change only the parameter. From an instance
+            \((G,k)\) of Independent Set, output the Vertex Cover instance
+            \[
+            (G,\ |V|-k).
+            \]
+            So the reduction is simply the identity on the graph together with a translated target size.
+          </div>
         </div>
 
         <div class="sub-question">
           <span class="sub-label">(b)</span>
           Prove: \(G\) has an independent set of size \(k\) if and only if \(G\) has a vertex cover of size \(|V|-k\).
+          <div class="solution">
+            <strong>Solution:</strong> For any graph \(G=(V,E)\), a set \(S \subseteq V\) is independent if and only if
+            \(V \setminus S\) is a vertex cover. Indeed, if \(S\) is independent, no edge has both endpoints in
+            \(S\), so every edge has at least one endpoint in \(V \setminus S\); thus \(V \setminus S\) is a vertex
+            cover. Conversely, if \(C\) is a vertex cover, then no edge can have both endpoints in \(V \setminus C\),
+            so \(V \setminus C\) is independent. Therefore
+            \[
+            \alpha(G) \ge k \iff \tau(G) \le |V|-k.
+            \]
+          </div>
         </div>
 
         <div class="sub-question">
           <span class="sub-label">(c)</span>
           Verify the reduction is polynomial-time and state what it implies about the complexity of Vertex Cover.
+          <div class="solution">
+            <strong>Solution:</strong> The graph is unchanged and the new parameter is computed in polynomial time, so
+            the reduction is polynomial-time. Since Independent Set is NP-complete and
+            \[
+            (G,k) \in \operatorname{INDSET} \iff (G,|V|-k) \in \operatorname{VC},
+            \]
+            Vertex Cover is NP-hard. Together with Vertex Cover \(\in NP\), this implies that Vertex Cover is
+            NP-complete.
+          </div>
         </div>
       </div>
 
@@ -495,16 +682,48 @@
         <div class="sub-question">
           <span class="sub-label">(a)</span>
           Describe the polynomial-time reduction from Vertex Cover to Set Cover. Given graph \(G=(V,E)\) and integer \(k\), how do you define the universe \(U\), the collection of sets \(\mathcal{S}\), and the budget \(b\)?
+          <div class="solution">
+            <strong>Solution:</strong> Let the universe be the edge set:
+            \[
+            U = E.
+            \]
+            For each vertex \(v \in V\), define a set
+            \[
+            S_v = \{ e \in E : e \text{ is incident to } v \}.
+            \]
+            Let
+            \[
+            \mathcal{S} = \{S_v : v \in V\},
+            \qquad
+            b = k.
+            \]
+            Thus choosing sets corresponds to choosing vertices that cover edges.
+          </div>
         </div>
 
         <div class="sub-question">
           <span class="sub-label">(b)</span>
           Prove: \(G\) has a vertex cover of size \(k\) if and only if the Set Cover instance has a cover of size \(k\).
+          <div class="solution">
+            <strong>Solution:</strong> If \(C \subseteq V\) is a vertex cover with \(|C| \le k\), then the sets
+            \(\{S_v : v \in C\}\) cover every edge in \(U\), since each edge is incident to at least one vertex in
+            \(C\). Conversely, if \(k\) sets from \(\mathcal{S}\) cover \(U\), let \(C\) be the corresponding vertices.
+            Every edge \(e \in E\) lies in one of the chosen sets, so one of its endpoints lies in \(C\). Hence \(C\)
+            is a vertex cover of size at most \(k\).
+          </div>
         </div>
 
         <div class="sub-question">
           <span class="sub-label">(c)</span>
           Conclude NP-completeness of Set Cover.
+          <div class="solution">
+            <strong>Solution:</strong> The construction is clearly polynomial-time. Set Cover is in \(NP\), because a
+            proposed family of \(k\) sets can be checked quickly. Since
+            \[
+            \operatorname{VC} \leq_p \operatorname{SETCOVER},
+            \]
+            and Vertex Cover is NP-complete, Set Cover is NP-complete.
+          </div>
         </div>
       </div>
 
@@ -517,16 +736,47 @@
         <div class="sub-question">
           <span class="sub-label">(a)</span>
           Describe the polynomial-time reduction from 3-SAT to ILP Feasibility. For each variable and each clause, what constraints do you introduce?
+          <div class="solution">
+            <strong>Solution:</strong> Introduce a \(0\)-\(1\) variable \(x_i\) for each Boolean variable. Interpret
+            \(x_i=1\) as true and \(x_i=0\) as false. For each clause
+            \(C_j=(\ell_{j1}\vee\ell_{j2}\vee\ell_{j3})\), convert literals into linear terms by replacing \(x_i\) with
+            \(x_i\) and \(\neg x_i\) with \(1-x_i\). Then impose the inequality
+            \[
+            \ell_{j1}^\ast + \ell_{j2}^\ast + \ell_{j3}^\ast \ge 1,
+            \]
+            where each \(\ell^\ast\) is either \(x_i\) or \(1-x_i\). Also require
+            \[
+            0 \le x_i \le 1,\qquad x_i \in \mathbb{Z}.
+            \]
+            This produces an ILP system feasible exactly when the formula is satisfiable.
+          </div>
         </div>
 
         <div class="sub-question">
           <span class="sub-label">(b)</span>
           Prove both directions of correctness of the reduction.
+          <div class="solution">
+            <strong>Solution:</strong> If \(\varphi\) is satisfiable, assign each ILP variable \(x_i\) the
+            corresponding Boolean value \(0\) or \(1\). In every clause, at least one literal is true, so the sum of
+            the three translated literal terms is at least \(1\), and all constraints are satisfied. Conversely, if the
+            ILP system is feasible, integrality forces each \(x_i\) to be either \(0\) or \(1\). Interpret this as a
+            Boolean assignment. Each clause inequality then implies that at least one of its three literals is true.
+            Hence the original 3-CNF formula is satisfiable.
+          </div>
         </div>
 
         <div class="sub-question">
           <span class="sub-label">(c)</span>
           Conclude NP-completeness of ILP Feasibility.
+          <div class="solution">
+            <strong>Solution:</strong> The number of variables and constraints is polynomial in the size of the formula,
+            so the reduction is polynomial-time. ILP Feasibility is in \(NP\) because a proposed integer assignment can
+            be verified in polynomial time. Therefore
+            \[
+            \operatorname{3SAT} \leq_p \operatorname{ILP\text{-}FEAS},
+            \]
+            and ILP Feasibility is NP-complete.
+          </div>
         </div>
       </div>
 
@@ -539,16 +789,39 @@
         <div class="sub-question">
           <span class="sub-label">(a)</span>
           Describe the polynomial-time reduction from Clique to Subgraph Isomorphism. Given graph \(G\) and integer \(k\), how do you construct the pattern graph \(H\)?
+          <div class="solution">
+            <strong>Solution:</strong> Given \((G,k)\), let the pattern graph be the complete graph
+            \[
+            H = K_k.
+            \]
+            The target instance asks whether \(H\) is isomorphic to a subgraph of \(G\). So the reduction keeps \(G\)
+            and replaces the parameter \(k\) by the fixed pattern \(K_k\).
+          </div>
         </div>
 
         <div class="sub-question">
           <span class="sub-label">(b)</span>
           Prove both directions: \(G\) contains a clique of size \(k\) if and only if \(H = K_k\) is isomorphic to a subgraph of \(G\).
+          <div class="solution">
+            <strong>Solution:</strong> If \(G\) has a clique on vertices \(v_1,\dots,v_k\), then the subgraph induced by
+            those vertices is exactly \(K_k\), so \(H\) is isomorphic to a subgraph of \(G\). Conversely, if \(K_k\) is
+            isomorphic to a subgraph of \(G\), then there are \(k\) vertices in \(G\) with all \(\binom{k}{2}\) edges
+            present among them. Those vertices form a clique of size \(k\). Thus the two instances are equivalent.
+          </div>
         </div>
 
         <div class="sub-question">
           <span class="sub-label">(c)</span>
           Conclude NP-completeness of Subgraph Isomorphism.
+          <div class="solution">
+            <strong>Solution:</strong> The reduction is polynomial-time, since \(K_k\) is easy to construct. Subgraph
+            Isomorphism lies in \(NP\): a certificate is an injective mapping from \(V(H)\) into \(V(G)\), and one can
+            check adjacency preservation in polynomial time. Since Clique is NP-complete and
+            \[
+            \operatorname{CLIQUE} \leq_p \operatorname{SUBGRAPH\text{-}ISO},
+            \]
+            Subgraph Isomorphism is NP-complete.
+          </div>
         </div>
       </div>
 
@@ -561,21 +834,55 @@
         <div class="sub-question">
           <span class="sub-label">(a)</span>
           Describe the polynomial-time reduction from 3-SAT to Directed Hamiltonian Cycle. Given a 3-CNF formula with \(n\) variables and \(k\) clauses, how do you construct the directed graph \(G\)?
+          <div class="solution">
+            <strong>Solution:</strong> Construct one directed variable gadget for each variable \(x_i\). The gadget has
+            two possible traversals, corresponding to setting \(x_i\) to true or false. Next create a clause gadget for
+            each clause \(C_j\), with three literal entry points corresponding to its three literals. Connect each
+            literal occurrence in a clause gadget to the matching position in the appropriate variable gadget. Add
+            connector edges so the graph can form a single directed cycle visiting all gadgets. The graph is designed so
+            that a Hamiltonian cycle can pass through a clause gadget only through a literal made available by the
+            chosen traversal in its variable gadget.
+          </div>
         </div>
 
         <div class="sub-question">
           <span class="sub-label">(b)</span>
           Prove: if \(\varphi\) is satisfiable, then \(G\) has a directed Hamiltonian cycle.
+          <div class="solution">
+            <strong>Solution:</strong> Let \(a\) be a satisfying assignment. Traverse each variable gadget according to
+            the truth value assigned by \(a\). In each clause, choose one literal made true by \(a\), and route the
+            cycle through the corresponding literal port of the clause gadget. Since every clause has a true literal,
+            every clause gadget can be inserted into the tour. By the construction, all remaining connector vertices are
+            then forced, so we obtain a directed Hamiltonian cycle through all vertices.
+          </div>
         </div>
 
         <div class="sub-question">
           <span class="sub-label">(c)</span>
           Prove: if \(G\) has a directed Hamiltonian cycle, then \(\varphi\) is satisfiable.
+          <div class="solution">
+            <strong>Solution:</strong> A directed Hamiltonian cycle must choose exactly one traversal in each variable
+            gadget; this defines a truth value for every variable. Because the cycle must visit every clause gadget, it
+            must enter each clause gadget through one of its literal ports. Such a port is usable only when the
+            corresponding literal is consistent with the chosen variable traversal. Hence each clause has at least one
+            true literal under the induced assignment. Therefore \(\varphi\) is satisfiable.
+          </div>
         </div>
 
         <div class="sub-question">
           <span class="sub-label">(d)</span>
           Conclude NP-completeness of Directed Hamiltonian Cycle, and briefly state how this implies NP-completeness of the Travelling Salesman Problem (Decision version).
+          <div class="solution">
+            <strong>Solution:</strong> The graph is built in polynomial time and Directed Hamiltonian Cycle is in
+            \(NP\), so
+            \[
+            \operatorname{3SAT} \leq_p \operatorname{DHC}
+            \]
+            proves Directed Hamiltonian Cycle is NP-complete. To get the decision version of TSP, take a graph on
+            \(n\) vertices and build a complete weighted graph where existing edges get weight \(1\) and missing edges
+            get weight \(2\). Then the original graph has a Hamiltonian cycle iff the weighted graph has a tour of cost
+            at most \(n\). Hence TSP (decision) is NP-complete as well.
+          </div>
         </div>
       </div>
 

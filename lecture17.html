@@ -1,8 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="utf-8">
-  <title>CS 637 – Lecture 17 Definitions</title>
+  <title>CS 637 - Lecture 17: Space Complexity Classes</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
@@ -10,108 +11,650 @@
   <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
 
   <style>
-    body {
-      font-family: "Times New Roman", serif;
-      margin: 40px;
-      line-height: 1.5;
-      background-color: #ffffff;
-      color: #000000;
+    :root {
+      --primary: #0f766e;
+      --secondary: #1d4ed8;
+      --accent: #ea580c;
+      --accent-hover: #c2410c;
+      --success: #059669;
+      --warning: #d97706;
+      --text-dark: #1e293b;
+      --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.08);
+      --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.15);
     }
-    h1, h2 {
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      line-height: 1.7;
+      background: linear-gradient(135deg, #082f49 0%, #0f172a 55%, #1e293b 100%);
+      min-height: 100vh;
+      padding: 20px;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    .particles {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 25px 80px rgba(0, 0, 0, 0.4);
+      overflow: hidden;
+      position: relative;
+      z-index: 1;
+    }
+
+    header {
+      background: linear-gradient(135deg, #0f766e, #1d4ed8, #ea580c);
+      background-size: 200% 200%;
+      animation: gradientShift 15s ease infinite;
+      color: white;
+      padding: 50px 40px;
       text-align: center;
     }
+
+    @keyframes gradientShift {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
     h1 {
-      font-size: 1.8em;
-      margin-bottom: 0.2em;
+      font-size: 2.8em;
+      margin-bottom: 12px;
+      font-weight: 800;
     }
-    h2 {
-      font-size: 1.2em;
-      margin-top: 2em;
-      margin-bottom: 0.5em;
-    }
-    .definition {
-      margin-bottom: 1em;
-    }
-    .term {
-      font-weight: bold;
-    }
-    .number {
-      font-weight: bold;
-    }
-    .instructor {
-      margin-top: 8px;
-      font-size: 0.95rem;
-      color: #64748b;
-    }
-    .instructor a {
-      color: #0ea5e9;
-      text-decoration: none;
+
+    .subtitle {
+      font-size: 1.35em;
+      margin-bottom: 20px;
+      opacity: 0.96;
       font-weight: 500;
     }
-    .instructor a:hover {
-      text-decoration: underline;
+
+    .instructor {
+      margin-top: 20px;
+      font-size: 1.08em;
+      opacity: 0.96;
     }
+
+    .instructor a {
+      color: #fde68a;
+      text-decoration: none;
+      font-weight: 600;
+      padding: 4px 8px;
+    }
+
+    .progress-bar {
+      position: sticky;
+      top: 0;
+      height: 4px;
+      background: #e2e8f0;
+      z-index: 101;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--primary), var(--secondary), var(--accent));
+      width: 0%;
+      transition: width 0.3s ease;
+    }
+
+    .nav-wrapper {
+      background: #fff;
+      position: sticky;
+      top: 4px;
+      z-index: 100;
+      border-bottom: 2px solid #e2e8f0;
+    }
+
+    .nav-tabs {
+      display: flex;
+      overflow-x: auto;
+      padding: 0 20px;
+      scrollbar-width: thin;
+    }
+
+    .tab-btn {
+      padding: 15px 22px;
+      background: none;
+      border: none;
+      font-size: 1em;
+      cursor: pointer;
+      color: #64748b;
+      font-weight: 600;
+      border-bottom: 3px solid transparent;
+      transition: all 0.3s;
+      white-space: nowrap;
+    }
+
+    .tab-btn.active {
+      color: var(--primary);
+      border-bottom-color: var(--primary);
+    }
+
+    .content {
+      padding: 50px 40px;
+      min-height: 600px;
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+      animation: slideIn 0.5s ease-out;
+    }
+
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .section-title {
+      font-size: 2em;
+      color: var(--text-dark);
+      margin-bottom: 30px;
+      padding-bottom: 12px;
+      border-bottom: 4px solid var(--secondary);
+    }
+
+    .definition-card,
+    .example-card,
+    .theorem-card,
+    .key-point,
+    .remark-card {
+      padding: 25px;
+      margin-bottom: 25px;
+      border-radius: 12px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .definition-card { background: #f8fafc; border-left: 5px solid var(--primary); }
+    .example-card { background: #fff7ed; border-left: 5px solid var(--warning); }
+    .theorem-card { background: #eff6ff; border-left: 5px solid #0ea5e9; }
+    .key-point { background: #ecfdf5; border-left: 5px solid var(--success); }
+    .remark-card { background: #f5f3ff; border-left: 5px solid #7c3aed; }
+
+    .card-title {
+      font-size: 1.3em;
+      font-weight: 700;
+      margin-bottom: 15px;
+      color: var(--text-dark);
+    }
+
+    .formula-box {
+      background: white;
+      border: 1px solid #dbeafe;
+      border-radius: 10px;
+      padding: 16px 18px;
+      margin-top: 15px;
+      overflow-x: auto;
+    }
+
+    .mini-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 16px;
+      font-size: 0.96em;
+      background: white;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    .mini-table th,
+    .mini-table td {
+      border: 1px solid #e2e8f0;
+      padding: 12px 14px;
+      vertical-align: top;
+      text-align: left;
+    }
+
+    .mini-table th {
+      background: #eff6ff;
+      color: var(--text-dark);
+      font-weight: 700;
+    }
+
+    ul,
+    ol {
+      margin-left: 25px;
+      margin-top: 15px;
+    }
+
+    li {
+      margin-bottom: 10px;
+    }
+
+    p + p {
+      margin-top: 12px;
+    }
+
     footer {
-      margin-top: 3em;
+      background: #0f172a;
+      color: white;
       text-align: center;
-      font-size: 0.85em;
-      color: #333;
+      padding: 30px;
+    }
+
+    .fab-btn {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      color: white;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+      z-index: 1000;
+      border: none;
+      font-size: 28px;
+      transition: all 0.3s;
+      cursor: pointer;
+    }
+
+    .scroll-top {
+      position: fixed;
+      bottom: 100px;
+      right: 30px;
+      width: 52px;
+      height: 52px;
+      border: none;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent), var(--accent-hover));
+      color: white;
+      font-size: 1.3em;
+      cursor: pointer;
+      box-shadow: var(--shadow-lg);
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s;
+      z-index: 120;
+    }
+
+    .scroll-top.visible {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    @media (max-width: 768px) {
+      .content { padding: 30px 20px; }
+      h1 { font-size: 2.1em; }
+      .subtitle { font-size: 1.15em; }
     }
   </style>
-
-<style>
-.fab-btn {
-  position: fixed;
-  bottom: 24px;
-  right: 24px;
-  width: 56px;
-  height: 56px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #3b82f6, #2563eb);
-  color: white;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-  cursor: pointer;
-  z-index: 1000;
-  border: none;
-  font-size: 24px;
-  transition: transform 0.2s, box-shadow 0.2s;
-  text-decoration: none;
-}
-.fab-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(0,0,0,0.3);
-}
-</style>
-
 </head>
 
 <body>
+  <div class="particles" id="particles"></div>
 
-<h1>CS 637: Mathematics-II</h1>
-<div class="instructor">
-  <strong>Instructor:</strong> <a href="https://drdebmath.github.io" target="_blank">Dr. Debasish Pattanayak</a>
-</div>
-<h2>Lecture 17 – NP-Completeness: Definitions and Framework</h2>
+  <div class="container">
+    <div class="progress-bar">
+      <div class="progress-fill" id="progressFill"></div>
+    </div>
 
-<footer>
-  
-</footer>
+    <header>
+      <h1>CS 637: Mathematics-II</h1>
+      <div class="subtitle">Lecture 17: Space Complexity Classes L, NL, PSPACE, and NPSPACE</div>
+      <div class="instructor">
+        <strong>Instructor:</strong> <a href="https://drdebmath.github.io/" target="_blank">Dr. Debasish Pattanayak</a>
+      </div>
+    </header>
 
-<script>
-document.addEventListener("DOMContentLoaded", function() {
-    renderMathInElement(document.body, {
+    <div class="nav-wrapper">
+      <div class="nav-tabs">
+        <button class="tab-btn active" onclick="switchTab('defs')">Definitions</button>
+        <button class="tab-btn" onclick="switchTab('relations')">Relations</button>
+        <button class="tab-btn" onclick="switchTab('enumeration')">Enumeration</button>
+        <button class="tab-btn" onclick="switchTab('path')">PATH in NL</button>
+        <button class="tab-btn" onclick="switchTab('addition')">Addition in L</button>
+      </div>
+    </div>
+
+    <div class="content">
+      <div id="defs" class="tab-content active">
+        <h2 class="section-title">Definitions via SPACE and NSPACE</h2>
+
+        <div class="definition-card">
+          <h3 class="card-title">Space-Bounded Classes</h3>
+          <div class="formula-box">
+            \[
+            SPACE(s(n)) =
+            \{L : \text{some deterministic TM decides } L \text{ using } O(s(n)) \text{ work space}\},
+            \]
+            \[
+            NSPACE(s(n)) =
+            \{L : \text{some nondeterministic TM decides } L \text{ using } O(s(n)) \text{ work space}\}.
+            \]
+          </div>
+          <p>The input tape is read-only and is not counted toward work space.</p>
+        </div>
+
+        <div class="theorem-card">
+          <h3 class="card-title">Named Classes</h3>
+          <div class="formula-box">
+            \[
+            L = SPACE(\log n),
+            \qquad
+            NL = NSPACE(\log n),
+            \]
+            \[
+            PSPACE = \bigcup_{c \ge 1} SPACE(n^c),
+            \qquad
+            NPSPACE = \bigcup_{c \ge 1} NSPACE(n^c).
+            \]
+          </div>
+        </div>
+
+        <div class="remark-card">
+          <h3 class="card-title">Why Logarithmic Space Is Tiny</h3>
+          <p>With \(O(\log n)\) space, a machine cannot store the whole input, but it can store a constant number of
+            pointers, counters, or vertex indices of size \(O(\log n)\).</p>
+        </div>
+      </div>
+
+      <div id="relations" class="tab-content">
+        <h2 class="section-title">Relationships Among the Classes</h2>
+
+        <div class="key-point">
+          <h3 class="card-title">Standard Inclusions</h3>
+          <div class="formula-box">
+            \[
+            L \subseteq NL \subseteq PSPACE \subseteq EXPTIME
+            \]
+          </div>
+          <p>and trivially</p>
+          <div class="formula-box">
+            \[
+            PSPACE \subseteq NPSPACE.
+            \]
+          </div>
+        </div>
+
+        <div class="theorem-card">
+          <h3 class="card-title">Savitch's Theorem</h3>
+          <p>For every space-constructible \(s(n) \ge \log n\),</p>
+          <div class="formula-box">
+            \[
+            NSPACE(s(n)) \subseteq SPACE(s(n)^2).
+            \]
+          </div>
+          <p>Applying this to polynomial space yields</p>
+          <div class="formula-box">
+            \[
+            NPSPACE = PSPACE.
+            \]
+          </div>
+        </div>
+
+        <div class="theorem-card">
+          <h3 class="card-title">Immerman-Szelepcsényi Theorem</h3>
+          <div class="formula-box">
+            \[
+            NL = coNL.
+            \]
+          </div>
+          <p>This is a special feature of space-bounded computation. The proof relies on counting how many vertices are
+            reachable within a bounded number of steps, using only logarithmic space and repeated enumeration.</p>
+        </div>
+
+        <div class="example-card">
+          <h3 class="card-title">What Is Known and Unknown</h3>
+          <table class="mini-table">
+            <thead>
+              <tr>
+                <th>Statement</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>\(L \subseteq NL\)</td>
+                <td>known</td>
+              </tr>
+              <tr>
+                <td>\(NL = coNL\)</td>
+                <td>known</td>
+              </tr>
+              <tr>
+                <td>\(L = NL\)</td>
+                <td>open</td>
+              </tr>
+              <tr>
+                <td>\(P \stackrel{?}{=} PSPACE\)</td>
+                <td>open</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div id="enumeration" class="tab-content">
+        <h2 class="section-title">Enumeration Technique</h2>
+
+        <div class="definition-card">
+          <h3 class="card-title">General Idea</h3>
+          <p>When the machine has little memory, it can recompute needed information rather than store it. A common
+            method is to enumerate all candidate objects one by one using a logarithmic-space counter.</p>
+        </div>
+
+        <div class="example-card">
+          <h3 class="card-title">Typical Pattern</h3>
+          <ol>
+            <li>Store an index \(i\) using \(O(\log n)\) bits.</li>
+            <li>Generate the \(i\)-th object on demand.</li>
+            <li>Test a local property.</li>
+            <li>Increment \(i\) and repeat.</li>
+          </ol>
+          <p>This is enough to scan all vertices, all positions of a string, or all pairs \((i,j)\) without storing the
+            full list.</p>
+        </div>
+
+        <div class="theorem-card">
+          <h3 class="card-title">Reachability Counting Version</h3>
+          <p>For directed reachability, define \(R_i\) to be the set of vertices reachable from \(s\) by a path of
+            length at most \(i\). The key subroutine is to compute \(|R_i|\) from \(|R_{i-1}|\).</p>
+          <ol>
+            <li>Enumerate all vertices \(v\).</li>
+            <li>For each \(v\), check whether \(v\in R_i\) by testing whether \(v\in R_{i-1}\) or some predecessor
+              \(u\in R_{i-1}\) has an edge to \(v\).</li>
+            <li>Increase the counter whenever the test succeeds.</li>
+          </ol>
+          <p>Only the loop indices, a few vertex names, and the running count are stored, so the space usage is
+            \(O(\log n)\).</p>
+        </div>
+
+        <div class="key-point">
+          <h3 class="card-title">Why Enumeration Is Powerful</h3>
+          <p>Logarithmic space does not mean weak control. It means the algorithm must trade memory for repeated
+            passes over the input. This is exactly what makes the proof of \(NL = coNL\) possible.</p>
+        </div>
+      </div>
+
+      <div id="path" class="tab-content">
+        <h2 class="section-title">Why PATH Belongs to \(NL\)</h2>
+
+        <div class="definition-card">
+          <h3 class="card-title">PATH Problem</h3>
+          <div class="formula-box">
+            \[
+            PATH = \{\langle G,s,t \rangle : \text{there is a directed path from } s \text{ to } t \text{ in } G\}.
+            \]
+          </div>
+        </div>
+
+        <div class="theorem-card">
+          <h3 class="card-title">Nondeterministic Log-Space Algorithm</h3>
+          <ol>
+            <li>Keep the current vertex \(v\) and a step counter \(c\), each using \(O(\log n)\) bits.</li>
+            <li>Start with \(v=s\) and \(c=0\).</li>
+            <li>Nondeterministically guess a next vertex \(u\).</li>
+            <li>Verify from the input that \((v,u)\) is an edge.</li>
+            <li>Replace \(v\) by \(u\), increment \(c\), and accept if \(v=t\).</li>
+            <li>Reject if \(c\) exceeds \(n-1\).</li>
+          </ol>
+          <p>If a path exists, one branch guesses it. If no path exists, no branch can reach \(t\) within \(n-1\)
+            steps.</p>
+        </div>
+
+        <div class="remark-card">
+          <h3 class="card-title">Space Analysis</h3>
+          <p>The machine stores only a constant number of vertex names and counters, each of size \(O(\log n)\). Hence
+            \(PATH \in NL\).</p>
+        </div>
+      </div>
+
+      <div id="addition" class="tab-content">
+        <h2 class="section-title">Why Binary Addition Belongs to \(L\)</h2>
+
+        <div class="definition-card">
+          <h3 class="card-title">Problem</h3>
+          <p>Given binary strings \(x\), \(y\), and \(z\), decide whether</p>
+          <div class="formula-box">
+            \[
+            x + y = z.
+            \]
+          </div>
+        </div>
+
+        <div class="example-card">
+          <h3 class="card-title">Log-Space Method</h3>
+          <ol>
+            <li>Use counters to point to the current bit positions of \(x\), \(y\), and \(z\).</li>
+            <li>Maintain one carry bit.</li>
+            <li>Scan from right to left, recomputing the current bits from the input as needed.</li>
+            <li>Check that each output bit equals the sum of the two input bits plus carry modulo \(2\).</li>
+            <li>Update the carry and continue.</li>
+          </ol>
+        </div>
+
+        <div class="theorem-card">
+          <h3 class="card-title">Space Bound</h3>
+          <p>The machine stores:</p>
+          <ul>
+            <li>three position counters, each needing \(O(\log n)\) bits,</li>
+            <li>one carry bit,</li>
+            <li>a constant number of temporary symbols.</li>
+          </ul>
+          <p>Therefore the total work space is \(O(\log n)\), so binary addition is in \(L\).</p>
+        </div>
+
+        <div class="key-point">
+          <h3 class="card-title">Lesson</h3>
+          <p>Sequential arithmetic can often be checked in logarithmic space because we only need a few pointers and a
+            tiny amount of state.</p>
+        </div>
+      </div>
+    </div>
+
+    <footer>
+      <p>&copy; 2026 Dr. Debasish Pattanayak | CS 637 Mathematics-II</p>
+    </footer>
+  </div>
+
+  <a href="index.html" class="fab-btn" title="Back to Course Home">🏠</a>
+  <button class="scroll-top" id="scrollTop" onclick="scrollToTop()">↑</button>
+
+  <script>
+    function switchTab(tabId) {
+      document.querySelectorAll(".tab-content").forEach((tab) => tab.classList.remove("active"));
+      document.querySelectorAll(".tab-btn").forEach((btn) => btn.classList.remove("active"));
+      document.getElementById(tabId).classList.add("active");
+      for (const btn of document.querySelectorAll(".tab-btn")) {
+        if (btn.getAttribute("onclick").includes(tabId)) {
+          btn.classList.add("active");
+          break;
+        }
+      }
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      renderMathInElement(document.getElementById(tabId), {
         delimiters: [
-            {left: "31952", right: "31952", display: true},
-            {left: "\[", right: "\]", display: true},
-            {left: "\(", right: "\)", display: false}
-        ]
-    });
-});
-</script>
+          { left: "$$", right: "$$", display: true },
+          { left: "\\[", right: "\\]", display: true },
+          { left: "$", right: "$", display: false },
+          { left: "\\(", right: "\\)", display: false }
+        ],
+        throwOnError: false
+      });
+    }
 
-<a href="index.html" class="fab-btn" title="Back to Index">🏠</a>
+    window.addEventListener("scroll", function () {
+      updateProgress();
+      const scrollTop = document.getElementById("scrollTop");
+      if (window.pageYOffset > 300) {
+        scrollTop.classList.add("visible");
+      } else {
+        scrollTop.classList.remove("visible");
+      }
+    });
+
+    function scrollToTop() {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function updateProgress() {
+      const scrollTotal = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+      const scrollPos = document.documentElement.scrollTop;
+      const progress = (scrollPos / (scrollTotal || 1)) * 100;
+      document.getElementById("progressFill").style.width = progress + "%";
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+      renderMathInElement(document.body, {
+        delimiters: [
+          { left: "$$", right: "$$", display: true },
+          { left: "\\[", right: "\\]", display: true },
+          { left: "$", right: "$", display: false },
+          { left: "\\(", right: "\\)", display: false }
+        ],
+        throwOnError: false
+      });
+      updateProgress();
+    });
+
+    const particlesContainer = document.getElementById("particles");
+    for (let i = 0; i < 20; i++) {
+      const p = document.createElement("div");
+      p.style.position = "absolute";
+      p.style.width = Math.random() * 5 + "px";
+      p.style.height = p.style.width;
+      p.style.background = "rgba(255, 255, 255, 0.1)";
+      p.style.borderRadius = "50%";
+      p.style.top = Math.random() * 100 + "%";
+      p.style.left = Math.random() * 100 + "%";
+      p.style.animation = "float " + (Math.random() * 10 + 5) + "s linear infinite";
+      particlesContainer.appendChild(p);
+    }
+
+    const style = document.createElement("style");
+    style.textContent = `
+      @keyframes float {
+        0% { transform: translateY(0); opacity: 0; }
+        50% { opacity: 0.5; }
+        100% { transform: translateY(-100vh); opacity: 0; }
+      }
+    `;
+    document.head.appendChild(style);
+  </script>
 </body>
+
 </html>

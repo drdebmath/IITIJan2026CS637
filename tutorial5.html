@@ -1,117 +1,394 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="utf-8">
-  <title>CS 637 – Tutorial 5 Definitions</title>
+  <title>CS 637 – Tutorial 5: NP-Completeness Reductions</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
   <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
   <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
-
   <style>
-    body {
-      font-family: "Times New Roman", serif;
-      margin: 40px;
-      line-height: 1.5;
-      background-color: #ffffff;
-      color: #000000;
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
     }
-    h1, h2 {
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      line-height: 1.6;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      overflow: hidden;
+    }
+
+    header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 40px;
       text-align: center;
     }
+
     h1 {
-      font-size: 1.8em;
-      margin-bottom: 0.2em;
+      font-size: 2.5em;
+      margin-bottom: 10px;
+      font-weight: 700;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
     }
-    h2 {
-      font-size: 1.2em;
-      margin-top: 2em;
-      margin-bottom: 0.5em;
+
+    .subtitle {
+      font-size: 1.3em;
+      margin-bottom: 15px;
+      opacity: 0.95;
     }
-    .definition {
-      margin-bottom: 1em;
+
+    .date-line {
+      font-size: 1em;
+      opacity: 0.9;
     }
-    .term {
-      font-weight: bold;
-    }
-    .number {
-      font-weight: bold;
-    }
+
     .instructor {
-      margin-top: 8px;
-      font-size: 0.95rem;
-      color: #64748b;
+      margin-top: 12px;
+      font-size: 1.05em;
+      opacity: 0.9;
     }
+
     .instructor a {
-      color: #0ea5e9;
+      color: #ffd700;
       text-decoration: none;
-      font-weight: 500;
+      font-weight: 600;
+      transition: opacity 0.3s;
     }
+
     .instructor a:hover {
+      opacity: 0.8;
       text-decoration: underline;
     }
+
+    .content {
+      padding: 40px;
+    }
+
+    .section-title {
+      font-size: 1.8em;
+      color: #1e293b;
+      margin-bottom: 25px;
+      padding-bottom: 10px;
+      border-bottom: 3px solid #667eea;
+      font-weight: 700;
+    }
+
+    .question-card {
+      background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
+      border-left: 4px solid #667eea;
+      padding: 25px;
+      margin-bottom: 30px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+      transition: all 0.3s;
+    }
+
+    .question-card:hover {
+      transform: translateX(5px);
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+    }
+
+    .question-header {
+      display: flex;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+
+    .q-badge {
+      background: #667eea;
+      color: white;
+      padding: 5px 15px;
+      border-radius: 20px;
+      font-weight: 700;
+      font-size: 0.9em;
+      margin-right: 15px;
+    }
+
+    .q-title {
+      font-size: 1.2em;
+      font-weight: 700;
+      color: #1e293b;
+    }
+
+    .solution {
+      margin-top: 12px;
+      background: #eff6ff;
+      border-left: 4px solid #3b82f6;
+      border-radius: 6px;
+      padding: 12px 14px;
+    }
+
+    .solution strong {
+      color: #1e3a8a;
+    }
+
+    ol,
+    ul {
+      margin-left: 22px;
+      margin-top: 8px;
+    }
+
+    li {
+      margin-bottom: 6px;
+    }
+
+    .katex {
+      font-size: 1.05em;
+    }
+
     footer {
-      margin-top: 3em;
+      background: #1e293b;
+      color: white;
       text-align: center;
-      font-size: 0.85em;
-      color: #333;
+      padding: 25px;
+      font-size: 0.9em;
+    }
+
+    .fab-btn {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #3b82f6, #2563eb);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      cursor: pointer;
+      z-index: 1000;
+      border: none;
+      font-size: 24px;
+      transition: transform 0.2s, box-shadow 0.2s;
+      text-decoration: none;
+    }
+
+    .fab-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+    }
+
+    @media (max-width: 768px) {
+      .content {
+        padding: 20px;
+      }
+
+      h1 {
+        font-size: 1.8em;
+      }
     }
   </style>
-
-<style>
-.fab-btn {
-  position: fixed;
-  bottom: 24px;
-  right: 24px;
-  width: 56px;
-  height: 56px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #3b82f6, #2563eb);
-  color: white;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-  cursor: pointer;
-  z-index: 1000;
-  border: none;
-  font-size: 24px;
-  transition: transform 0.2s, box-shadow 0.2s;
-  text-decoration: none;
-}
-.fab-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(0,0,0,0.3);
-}
-</style>
-
 </head>
 
 <body>
+  <div class="container">
+    <header>
+      <h1>CS 637: Mathematics-II</h1>
+      <div class="subtitle">Tutorial 5: NP-Completeness Reductions</div>
+      <div class="date-line">19 March 2026</div>
+      <div class="instructor">
+        <strong>Instructor:</strong> <a href="https://drdebmath.github.io" target="_blank">Dr. Debasish Pattanayak</a>
+      </div>
+    </header>
 
-<h1>CS 637: Mathematics-II</h1>
-<div class="instructor">
-  <strong>Instructor:</strong> <a href="https://drdebmath.github.io" target="_blank">Dr. Debasish Pattanayak</a>
-</div>
-<h2>Tutorial 5: Problems from Models of Computation</h2>
+    <div class="content">
+      <h2 class="section-title">Tutorial Questions and Solutions</h2>
 
-<footer>
-  
-</footer>
+      <div class="question-card">
+        <div class="question-header">
+          <span class="q-badge">Q1</span>
+          <span class="q-title">Vertex Cover to Dominating Set</span>
+        </div>
+        <p>Give a polynomial-time reduction from Vertex Cover to Dominating Set and show that Dominating Set is NP-complete.</p>
+        <div class="solution">
+          <strong>Solution:</strong> First delete all isolated vertices from \(G\). This does not change whether \(G\)
+          has a vertex cover of size at most \(k\), since isolated vertices belong to no edge. Now construct \(G'\) from
+          a copy of \(G\) as follows.
+          <ul>
+            <li>For each edge \(e=\{u,v\}\in E\), create a new vertex \(x_e\) adjacent to both \(u\) and \(v\).</li>
+            <li>For each original vertex \(u\in V\), create a new vertex \(y_u\) adjacent to every vertex in the closed
+              neighborhood \(N_G[u]\).</li>
+          </ul>
+          Keep the parameter \(k' = k\).<br><br>
+          If \(C \subseteq V\) is a vertex cover of size \(k\), then \(C\) dominates all of \(G'\):
+          <ul>
+            <li>every original vertex \(u\), because either \(u\in C\) or some neighbor of \(u\) lies in \(C\),</li>
+            <li>every edge-vertex \(x_e\), because \(e\) has an endpoint in \(C\),</li>
+            <li>every vertex \(y_u\), because \(u\) is non-isolated and some vertex of \(N_G[u]\) lies in \(C\).</li>
+          </ul>
+          Hence \(C\) is a dominating set of size \(k\) in \(G'\).<br><br>
+          Conversely, let \(D\) be a dominating set of size at most \(k\) in \(G'\). If \(x_e \in D\) for
+          \(e=\{u,v\}\), replace \(x_e\) by \(u\) or \(v\); if \(y_u \in D\), replace \(y_u\) by \(u\). These
+          replacements do not increase the size and only enlarge the dominated region, so we may assume \(D' \subseteq
+          V\). Now each edge-vertex \(x_e\) must be dominated by \(D'\), and the only vertices adjacent to \(x_e\) are
+          the two endpoints of \(e\). Therefore at least one endpoint of every edge lies in \(D'\). Thus \(D'\) is a
+          vertex cover of size at most \(k\). Therefore
+          \[
+          (G,k)\in \operatorname{VC} \iff (G',k)\in \operatorname{DOMSET}.
+          \]
+          The construction is polynomial-time. Dominating Set is in \(NP\), since a proposed dominating set can be
+          checked in polynomial time. Hence Dominating Set is NP-complete.
+        </div>
+      </div>
 
-<script>
-document.addEventListener("DOMContentLoaded", function() {
-    renderMathInElement(document.body, {
+      <div class="question-card">
+        <div class="question-header">
+          <span class="q-badge">Q2</span>
+          <span class="q-title">Dominating Set to Set Cover</span>
+        </div>
+        <p>Give a polynomial-time reduction from Dominating Set to Set Cover.</p>
+        <div class="solution">
+          <strong>Solution:</strong> Let \((G=(V,E),k)\) be an instance of Dominating Set. Define the universe
+          \[
+          U = V.
+          \]
+          For each vertex \(v\in V\), define the set
+          \[
+          S_v = N[v] = \{v\}\cup \{u\in V : uv\in E\}.
+          \]
+          Let \(\mathcal{S}=\{S_v : v\in V\}\), and keep the budget \(k\).<br><br>
+          A set \(D\subseteq V\) is a dominating set iff
+          \[
+          \bigcup_{v\in D} S_v = V.
+          \]
+          Thus \(G\) has a dominating set of size at most \(k\) iff the Set Cover instance \((U,\mathcal{S},k)\) has a
+          cover of size at most \(k\). The reduction is clearly polynomial-time.
+        </div>
+      </div>
+
+      <div class="question-card">
+        <div class="question-header">
+          <span class="q-badge">Q3</span>
+          <span class="q-title">Hamiltonian Cycle to Longest Path</span>
+        </div>
+        <p>Give a polynomial-time reduction from the Hamiltonian Cycle problem to the Longest Path problem.</p>
+        <div class="solution">
+          <strong>Solution:</strong> Use the decision version of Longest Path:
+          \[
+          \operatorname{LONGPATH} = \{\langle H,\ell\rangle : H \text{ has a simple path with at least } \ell
+          \text{ edges}\}.
+          \]
+          Let \(G=(V,E)\) be an instance of Hamiltonian Cycle and let \(n=|V|\). Choose any vertex \(v\in V\). Replace
+          \(v\) by two new vertices \(v_1,v_2\), each joined to all former neighbors of \(v\), and do not join
+          \(v_1\) to \(v_2\). Then add two leaves \(s,t\), where \(s\) is adjacent only to \(v_1\) and \(t\) is
+          adjacent only to \(v_2\). Call the resulting graph \(G'\). The graph \(G'\) has \(n+3\) vertices, so a
+          Hamiltonian path in \(G'\) has \(n+2\) edges. Output the Longest Path instance \((G',n+2)\).<br><br>
+          If \(G\) has a Hamiltonian cycle, delete the vertex \(v\) from the cycle. The remaining cycle edges become a
+          Hamiltonian path through all vertices of \(G-v\) whose endpoints are two former neighbors of \(v\). In \(G'\)
+          we can extend this to the path
+          \[
+          s - v_1 - \cdots - v_2 - t,
+          \]
+          which visits all \(n+3\) vertices, so \(G'\) has a path of length \(n+2\).<br><br>
+          Conversely, if \(G'\) has a simple path of length at least \(n+2\), then it must visit all \(n+3\) vertices,
+          hence it is a Hamiltonian path of \(G'\). Since \(s\) and \(t\) are leaves, this path must start at \(s\) and
+          end at \(t\), and therefore has the form
+          \[
+          s - v_1 - \cdots - v_2 - t.
+          \]
+          Merging \(v_1\) and \(v_2\) back into the original vertex \(v\) turns this path into a Hamiltonian cycle of
+          \(G\). Therefore
+          \[
+          G \in \operatorname{HC} \iff (G', n+2) \in \operatorname{LONGPATH}.
+          \]
+          This is a polynomial-time reduction.
+        </div>
+      </div>
+
+      <div class="question-card">
+        <div class="question-header">
+          <span class="q-badge">Q4</span>
+          <span class="q-title">Multicolored Clique</span>
+        </div>
+        <p>Given a graph \(G\) and a partition \(V_1 \sqcup V_2 \sqcup \cdots \sqcup V_k\) of \(V(G)\), show that the Multicolored Clique problem is NP-complete.</p>
+        <div class="solution">
+          <strong>Solution:</strong> Multicolored Clique is in \(NP\): a certificate is a set \(S\) of \(k\) vertices,
+          one from each color class, and we can check in polynomial time that every pair in \(S\) is adjacent.<br><br>
+          To show NP-hardness, reduce from Clique. Given \((G,k)\), create a new graph \(G'\) with \(k\) color classes
+          \(V_1,\dots,V_k\), where each \(V_i\) is a fresh copy of \(V(G)\). Denote by \(v_i\) the copy of vertex
+          \(v\in V(G)\) in class \(V_i\). For \(i\neq j\), connect \(u_i\in V_i\) to \(v_j\in V_j\) iff \(u\neq v\) and
+          \(\{u,v\}\in E(G)\). No edges are placed within a color class.<br><br>
+          If \(G\) has a clique \(\{v_1,\dots,v_k\}\), then selecting the copy of the \(i\)-th clique vertex in color
+          class \(V_i\) yields a multicolored clique in \(G'\). Conversely, if \(G'\) has a multicolored clique with one
+          vertex from each class, their original vertices in \(G\) must be pairwise adjacent, so they form a clique of
+          size \(k\) in \(G\). Hence Clique reduces to Multicolored Clique in polynomial time. Therefore Multicolored
+          Clique is NP-complete.
+        </div>
+      </div>
+
+      <div class="question-card">
+        <div class="question-header">
+          <span class="q-badge">Q5</span>
+          <span class="q-title">Feedback Vertex Set</span>
+        </div>
+        <p>Given a graph \(G\), the goal is to find a minimum-size set \(S \subseteq V(G)\) such that \(G-S\) is acyclic. Show that the Feedback Vertex Set problem is NP-complete.</p>
+        <div class="solution">
+          <strong>Solution:</strong> Consider the decision version:
+          \[
+          \operatorname{FVS} = \{\langle G,k\rangle : \text{there exists } S\subseteq V(G), |S|\le k, \text{ and } G-S
+          \text{ is acyclic}\}.
+          \]
+          This problem is in \(NP\), since given \(S\), we can delete it and test whether the remaining graph is acyclic
+          in polynomial time.<br><br>
+          To prove NP-hardness, reduce from Vertex Cover. Given \((G=(V,E),k)\), construct \(G'\) by replacing every
+          edge \(\{u,v\}\in E\) with a triangle on \(u,v,x_e\), where \(x_e\) is a new vertex unique to edge \(e\).
+          Thus for every original edge, the graph \(G'\) contains the cycle \(u-x_e-v-u\). Keep parameter \(k\).<br><br>
+          If \(C\subseteq V\) is a vertex cover of size at most \(k\), then every triangle contains at least one vertex
+          of \(C\). After deleting \(C\), no original edge \(uv\) remains with both endpoints present, so each new
+          vertex \(x_e\) has degree at most \(1\) in \(G'-C\). Hence every connected component of \(G'-C\) is a tree or
+          an isolated vertex, so \(G'-C\) is acyclic. Thus \(C\) is a feedback vertex set of size at most \(k\).<br><br>
+          Conversely, let \(S\) be a feedback vertex set of size at most \(k\) in \(G'\). If \(S\) contains some new
+          vertex \(x_e\), we may replace \(x_e\) by one endpoint of the corresponding edge \(e\) without increasing the
+          size: after removing that endpoint, the restored vertex \(x_e\) has degree at most \(1\), so it cannot lie on
+          a cycle. Repeating this, we may assume \(S\subseteq V\). Now every triangle \(u-x_e-v-u\) must be broken, so
+          at least one of \(u,v\) lies in \(S\). Therefore \(S\) is a vertex cover of \(G\) of size at most \(k\).
+          Hence
+          \[
+          (G,k)\in \operatorname{VC} \iff (G',k)\in \operatorname{FVS}.
+          \]
+          The reduction is polynomial-time, so Feedback Vertex Set is NP-complete.
+        </div>
+      </div>
+    </div>
+
+    <footer>
+      CS 637 – Tutorial 5: NP-Completeness Reductions • Spring 2026<br>
+      © Dr. Debasish Pattanayak • Department of Computer Science
+    </footer>
+  </div>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      renderMathInElement(document.body, {
         delimiters: [
-            {left: "31952", right: "31952", display: true},
-            {left: "\[", right: "\]", display: true},
-            {left: "\(", right: "\)", display: false}
-        ]
+          { left: "$$", right: "$$", display: true },
+          { left: "\\[", right: "\\]", display: true },
+          { left: "\\(", right: "\\)", display: false },
+          { left: "$", right: "$", display: false }
+        ],
+        throwOnError: false
+      });
     });
-});
-</script>
+  </script>
 
-<a href="index.html" class="fab-btn" title="Back to Index">🏠</a>
+  <a href="index.html" class="fab-btn" title="Back to Index">🏠</a>
 </body>
+
 </html>

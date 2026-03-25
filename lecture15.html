@@ -1,8 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="utf-8">
-  <title>CS 637 – Lecture 15 Definitions</title>
+  <title>CS 637 - Lecture 15: 3SAT to Hamiltonian Cycle</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
@@ -10,108 +11,1010 @@
   <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
 
   <style>
+    :root {
+      --primary: #0f766e;
+      --secondary: #1d4ed8;
+      --accent: #ea580c;
+      --accent-hover: #c2410c;
+      --success: #059669;
+      --warning: #d97706;
+      --text-dark: #1e293b;
+      --bg-light: #f8fafc;
+      --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.08);
+      --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.12);
+      --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.15);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
     body {
-      font-family: "Times New Roman", serif;
-      margin: 40px;
-      line-height: 1.5;
-      background-color: #ffffff;
-      color: #000000;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      line-height: 1.7;
+      background: linear-gradient(135deg, #082f49 0%, #0f172a 55%, #1e293b 100%);
+      min-height: 100vh;
+      padding: 20px;
+      position: relative;
+      overflow-x: hidden;
     }
-    h1, h2 {
+
+    .particles {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 25px 80px rgba(0, 0, 0, 0.4);
+      overflow: hidden;
+      position: relative;
+      z-index: 1;
+    }
+
+    header {
+      background: linear-gradient(135deg, #0f766e, #1d4ed8, #ea580c);
+      background-size: 200% 200%;
+      animation: gradientShift 15s ease infinite;
+      color: white;
+      padding: 50px 40px;
       text-align: center;
+      position: relative;
+      overflow: hidden;
     }
+
+    @keyframes gradientShift {
+      0% {
+        background-position: 0% 50%;
+      }
+
+      50% {
+        background-position: 100% 50%;
+      }
+
+      100% {
+        background-position: 0% 50%;
+      }
+    }
+
     h1 {
-      font-size: 1.8em;
-      margin-bottom: 0.2em;
+      font-size: 2.8em;
+      margin-bottom: 12px;
+      font-weight: 800;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
     }
-    h2 {
-      font-size: 1.2em;
-      margin-top: 2em;
-      margin-bottom: 0.5em;
-    }
-    .definition {
-      margin-bottom: 1em;
-    }
-    .term {
-      font-weight: bold;
-    }
-    .number {
-      font-weight: bold;
-    }
-    .instructor {
-      margin-top: 8px;
-      font-size: 0.95rem;
-      color: #64748b;
-    }
-    .instructor a {
-      color: #0ea5e9;
-      text-decoration: none;
+
+    .subtitle {
+      font-size: 1.35em;
+      margin-bottom: 20px;
+      opacity: 0.96;
       font-weight: 500;
     }
-    .instructor a:hover {
-      text-decoration: underline;
+
+    .instructor {
+      margin-top: 20px;
+      font-size: 1.08em;
+      opacity: 0.96;
     }
+
+    .instructor a {
+      color: #fde68a;
+      text-decoration: none;
+      font-weight: 600;
+      padding: 4px 8px;
+    }
+
+    .progress-bar {
+      position: sticky;
+      top: 0;
+      height: 4px;
+      background: #e2e8f0;
+      z-index: 101;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--primary), var(--secondary), var(--accent));
+      width: 0%;
+      transition: width 0.3s ease;
+    }
+
+    .nav-wrapper {
+      background: #fff;
+      position: sticky;
+      top: 4px;
+      z-index: 100;
+      border-bottom: 2px solid #e2e8f0;
+    }
+
+    .nav-tabs {
+      display: flex;
+      overflow-x: auto;
+      padding: 0 20px;
+      scrollbar-width: thin;
+    }
+
+    .tab-btn {
+      padding: 15px 22px;
+      background: none;
+      border: none;
+      font-size: 1em;
+      cursor: pointer;
+      color: #64748b;
+      font-weight: 600;
+      border-bottom: 3px solid transparent;
+      transition: all 0.3s;
+      white-space: nowrap;
+    }
+
+    .tab-btn.active {
+      color: var(--primary);
+      border-bottom-color: var(--primary);
+    }
+
+    .content {
+      padding: 50px 40px;
+      min-height: 600px;
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+      animation: slideIn 0.5s ease-out;
+    }
+
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .section-title {
+      font-size: 2em;
+      color: var(--text-dark);
+      margin-bottom: 30px;
+      padding-bottom: 12px;
+      border-bottom: 4px solid var(--secondary);
+      position: relative;
+    }
+
+    .definition-card,
+    .example-card,
+    .theorem-card,
+    .key-point,
+    .remark-card {
+      padding: 25px;
+      margin-bottom: 25px;
+      border-radius: 12px;
+      box-shadow: var(--shadow-sm);
+      transition: all 0.4s;
+    }
+
+    .definition-card {
+      background: #f8fafc;
+      border-left: 5px solid var(--primary);
+    }
+
+    .example-card {
+      background: #fff7ed;
+      border-left: 5px solid var(--warning);
+    }
+
+    .theorem-card {
+      background: #eff6ff;
+      border-left: 5px solid #0ea5e9;
+    }
+
+    .key-point {
+      background: #ecfdf5;
+      border-left: 5px solid var(--success);
+    }
+
+    .remark-card {
+      background: #f5f3ff;
+      border-left: 5px solid #7c3aed;
+    }
+
+    .card-title {
+      font-size: 1.3em;
+      font-weight: 700;
+      margin-bottom: 15px;
+      color: var(--text-dark);
+    }
+
+    .formula-box {
+      background: white;
+      border: 1px solid #dbeafe;
+      border-radius: 10px;
+      padding: 16px 18px;
+      margin-top: 15px;
+      overflow-x: auto;
+    }
+
+    .figure-box {
+      background: white;
+      border: 1px solid #dbeafe;
+      border-radius: 10px;
+      padding: 16px 18px;
+      margin: 18px 0;
+      overflow-x: auto;
+    }
+
+    .figure-caption {
+      margin-top: 12px;
+      color: #475569;
+      font-size: 0.95em;
+    }
+
+    .diagram-legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 18px;
+      margin-top: 12px;
+      color: #334155;
+      font-size: 0.92em;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .legend-chip {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: #e2e8f0;
+      border: 2px solid #475569;
+    }
+
+    .legend-chip.slot {
+      width: 28px;
+      height: 12px;
+      border-radius: 999px;
+      background: #fde68a;
+      border-color: #d97706;
+    }
+
+    .legend-chip.clause {
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: #dbeafe;
+      border-color: #1d4ed8;
+    }
+
+    .legend-line {
+      width: 26px;
+      border-top: 3px dashed #0f766e;
+    }
+
+    .legend-line.negative {
+      border-top-color: #dc2626;
+    }
+
+    .mini-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 16px;
+      font-size: 0.96em;
+      background: white;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    .mini-table th,
+    .mini-table td {
+      border: 1px solid #e2e8f0;
+      padding: 12px 14px;
+      vertical-align: top;
+      text-align: left;
+    }
+
+    .mini-table th {
+      background: #eff6ff;
+      color: var(--text-dark);
+      font-weight: 700;
+    }
+
+    .step-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 18px;
+      margin-top: 18px;
+    }
+
+    .step-box {
+      background: white;
+      border: 1px solid #e2e8f0;
+      border-radius: 10px;
+      padding: 18px;
+    }
+
+    .step-label {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: #dbeafe;
+      color: #1d4ed8;
+      font-size: 0.86em;
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+
+    ul,
+    ol {
+      margin-left: 25px;
+      margin-top: 15px;
+    }
+
+    li {
+      margin-bottom: 10px;
+    }
+
+    p + p {
+      margin-top: 12px;
+    }
+
     footer {
-      margin-top: 3em;
+      background: #0f172a;
+      color: white;
       text-align: center;
-      font-size: 0.85em;
-      color: #333;
+      padding: 30px;
+    }
+
+    .fab-btn {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      color: white;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+      z-index: 1000;
+      border: none;
+      font-size: 28px;
+      transition: all 0.3s;
+      cursor: pointer;
+    }
+
+    .fab-btn:hover {
+      transform: translateY(-4px) scale(1.05);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+    }
+
+    .scroll-top {
+      position: fixed;
+      bottom: 100px;
+      right: 30px;
+      width: 52px;
+      height: 52px;
+      border: none;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent), var(--accent-hover));
+      color: white;
+      font-size: 1.3em;
+      cursor: pointer;
+      box-shadow: var(--shadow-lg);
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s;
+      z-index: 120;
+    }
+
+    .scroll-top.visible {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    @media (max-width: 768px) {
+      .content {
+        padding: 30px 20px;
+      }
+
+      h1 {
+        font-size: 2.1em;
+      }
+
+      .subtitle {
+        font-size: 1.15em;
+      }
+
+      .fab-btn {
+        width: 52px;
+        height: 52px;
+        bottom: 20px;
+        right: 20px;
+        font-size: 24px;
+      }
+
+      .scroll-top {
+        width: 46px;
+        height: 46px;
+        bottom: 85px;
+        right: 22px;
+      }
     }
   </style>
-
-<style>
-.fab-btn {
-  position: fixed;
-  bottom: 24px;
-  right: 24px;
-  width: 56px;
-  height: 56px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #3b82f6, #2563eb);
-  color: white;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-  cursor: pointer;
-  z-index: 1000;
-  border: none;
-  font-size: 24px;
-  transition: transform 0.2s, box-shadow 0.2s;
-  text-decoration: none;
-}
-.fab-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(0,0,0,0.3);
-}
-</style>
-
 </head>
 
 <body>
+  <div class="particles" id="particles"></div>
 
-<h1>CS 637: Mathematics-II</h1>
-<div class="instructor">
-  <strong>Instructor:</strong> <a href="https://drdebmath.github.io" target="_blank">Dr. Debasish Pattanayak</a>
-</div>
-<h2>Lecture 15 – Complexity Classes: P, NP, and co-NP</h2>
+  <div class="container">
+    <div class="progress-bar">
+      <div class="progress-fill" id="progressFill"></div>
+    </div>
 
-<footer>
-  
-</footer>
+    <header>
+      <h1>CS 637: Mathematics-II</h1>
+      <div class="subtitle">Lecture 15: 3SAT to Hamiltonian Cycle Reduction</div>
+      <div class="instructor">
+        <strong>Instructor:</strong> <a href="https://drdebmath.github.io/" target="_blank">Dr. Debasish Pattanayak</a>
+      </div>
+    </header>
 
-<script>
-document.addEventListener("DOMContentLoaded", function() {
-    renderMathInElement(document.body, {
+    <div class="nav-wrapper">
+      <div class="nav-tabs">
+        <button class="tab-btn active" onclick="switchTab('overview')">Overview</button>
+        <button class="tab-btn" onclick="switchTab('gadgets')">Gadgets</button>
+        <button class="tab-btn" onclick="switchTab('construction')">Construction</button>
+        <button class="tab-btn" onclick="switchTab('correctness')">Correctness</button>
+        <button class="tab-btn" onclick="switchTab('consequences')">Consequences</button>
+      </div>
+    </div>
+
+    <div class="content">
+      <div id="overview" class="tab-content active">
+        <h2 class="section-title">Reduction Goal</h2>
+
+        <div class="definition-card">
+          <h3 class="card-title">Source and Target Problems</h3>
+          <div class="formula-box">
+            \[
+            \operatorname{3SAT} = \{\varphi : \varphi \text{ is a satisfiable 3-CNF formula}\}
+            \]
+            \[
+            \operatorname{DHC} = \{\langle G \rangle : G \text{ is a directed graph with a directed Hamiltonian cycle}\}.
+            \]
+          </div>
+          <p>Today we build a polynomial-time map \(\varphi \mapsto G_{\varphi}\) such that</p>
+          <div class="formula-box">
+            \[
+            \varphi \in \operatorname{3SAT}
+            \iff
+            G_{\varphi} \in \operatorname{DHC}.
+            \]
+          </div>
+        </div>
+
+        <div class="key-point">
+          <h3 class="card-title">High-Level Idea</h3>
+          <ul>
+            <li>Each variable gadget forces the Hamiltonian cycle to choose one of two consistent traversals.</li>
+            <li>Those two traversals encode \(x_i = \text{true}\) or \(x_i = \text{false}\).</li>
+            <li>Clause gadgets can be visited only through a literal that is made available by the chosen traversal.</li>
+            <li>Thus the cycle exists exactly when every clause has at least one satisfied literal.</li>
+          </ul>
+        </div>
+
+        <div class="remark-card">
+          <h3 class="card-title">Why Hamiltonian Constructions Look Complicated</h3>
+          <p>For independent set or clique reductions, a solution is just a selected subset. For Hamiltonian cycle, a
+            solution must visit <em>every</em> vertex exactly once and return to the start. So the reduction must
+            enforce a very rigid global traversal pattern.</p>
+          <p>Most textbook proofs first show
+            \[
+            \operatorname{3SAT} \le_p \operatorname{Directed\ Hamiltonian\ Cycle},
+            \]
+            and then use a standard gadget conversion from directed Hamiltonian cycle to the undirected Hamiltonian cycle
+            problem.</p>
+        </div>
+      </div>
+
+      <div id="gadgets" class="tab-content">
+        <h2 class="section-title">Variable and Clause Gadgets</h2>
+
+        <div class="example-card">
+          <h3 class="card-title">Variable Gadget</h3>
+          <p>For each variable \(x_i\), construct a directed path
+            \[
+            p_{i,0}, p_{i,1}, p_{i,2}, \dots, p_{i,3m+2},
+            \]
+            so each variable gadget has exactly \(3m+3\) vertices.</p>
+          <div class="formula-box">
+            \[
+            \text{left-to-right traversal } \Longleftrightarrow x_i = 1,
+            \qquad
+            \text{right-to-left traversal } \Longleftrightarrow x_i = 0.
+            \]
+          </div>
+          <p>For clause \(C_j\), the interaction with the \(x_i\)-gadget takes place at the consecutive vertices
+            \(p_{i,3j}\) and \(p_{i,3j+1}\). Whether the clause node attaches above or below that slot depends on
+            whether the literal is \(x_i\) or \(\neg x_i\).</p>
+          <ul>
+            <li>if \(x_i \in C_j\), the clause attachment is usable when the gadget is traversed left-to-right,</li>
+            <li>if \(\neg x_i \in C_j\), the clause attachment is usable when the gadget is traversed right-to-left.</li>
+          </ul>
+          <div class="figure-box">
+            <svg viewBox="0 0 1100 360" width="100%" role="img"
+              aria-label="Variable gadget drawn as a two-way path with 3m+3 vertices and clause attachments at positions 3j and 3j+1">
+              <defs>
+                <marker id="arrowBlue" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+                  <polygon points="0 0, 10 3.5, 0 7" fill="#1d4ed8"></polygon>
+                </marker>
+                <marker id="arrowRed" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+                  <polygon points="0 0, 10 3.5, 0 7" fill="#dc2626"></polygon>
+                </marker>
+                <marker id="arrowTeal" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+                  <polygon points="0 0, 10 3.5, 0 7" fill="#0f766e"></polygon>
+                </marker>
+              </defs>
+
+              <rect x="70" y="58" width="760" height="240" rx="24" fill="#f8fafc" stroke="#cbd5e1" stroke-width="3"></rect>
+              <text x="450" y="38" text-anchor="middle" font-size="24" font-weight="700" fill="#0f172a">Variable Gadget for x_i</text>
+
+              <line x1="120" y1="118" x2="760" y2="118" stroke="#2563eb" stroke-width="5"
+                marker-end="url(#arrowBlue)"></line>
+              <text x="200" y="95" font-size="18" font-weight="700" fill="#1d4ed8">left to right  ⇒  x_i = true</text>
+
+              <line x1="760" y1="240" x2="120" y2="240" stroke="#dc2626" stroke-width="5"
+                marker-end="url(#arrowRed)"></line>
+              <text x="200" y="270" font-size="18" font-weight="700" fill="#dc2626">right to left  ⇒  x_i = false</text>
+
+              <line x1="120" y1="180" x2="760" y2="180" stroke="#334155" stroke-width="4" stroke-linecap="round"></line>
+              <line x1="527" y1="180" x2="585" y2="180" stroke="#d97706" stroke-width="9" stroke-linecap="round"></line>
+
+              <circle cx="130" cy="180" r="12" fill="#ffffff" stroke="#475569" stroke-width="3"></circle>
+              <circle cx="188" cy="180" r="12" fill="#ffffff" stroke="#475569" stroke-width="3"></circle>
+              <circle cx="246" cy="180" r="12" fill="#ffffff" stroke="#475569" stroke-width="3"></circle>
+              <circle cx="304" cy="180" r="12" fill="#ffffff" stroke="#475569" stroke-width="3"></circle>
+              <circle cx="362" cy="180" r="12" fill="#ffffff" stroke="#475569" stroke-width="3"></circle>
+              <circle cx="420" cy="180" r="12" fill="#ffffff" stroke="#475569" stroke-width="3"></circle>
+              <circle cx="480" cy="180" r="12" fill="#ffffff" stroke="#475569" stroke-width="3"></circle>
+              <circle cx="540" cy="180" r="14" fill="#fde68a" stroke="#d97706" stroke-width="3"></circle>
+              <circle cx="600" cy="180" r="14" fill="#fde68a" stroke="#d97706" stroke-width="3"></circle>
+              <circle cx="660" cy="180" r="12" fill="#ffffff" stroke="#475569" stroke-width="3"></circle>
+              <circle cx="718" cy="180" r="12" fill="#ffffff" stroke="#475569" stroke-width="3"></circle>
+              <circle cx="776" cy="180" r="12" fill="#ffffff" stroke="#475569" stroke-width="3"></circle>
+
+              <text x="118" y="210" font-size="14" fill="#334155">0</text>
+              <text x="179" y="210" font-size="14" fill="#334155">1</text>
+              <text x="237" y="210" font-size="14" fill="#334155">2</text>
+              <text x="298" y="210" font-size="14" fill="#334155">…</text>
+              <text x="412" y="210" font-size="14" fill="#334155">3j-1</text>
+              <text x="530" y="210" text-anchor="middle" font-size="14" font-weight="700" fill="#92400e">3j</text>
+              <text x="600" y="210" text-anchor="middle" font-size="14" font-weight="700" fill="#92400e">3j+1</text>
+              <text x="645" y="210" font-size="14" fill="#334155">3j+2</text>
+              <text x="711" y="210" font-size="14" fill="#334155">…</text>
+              <text x="758" y="210" text-anchor="end" font-size="14" fill="#334155">3m+2</text>
+
+              <circle cx="570" cy="88" r="22" fill="#ecfeff" stroke="#0f766e" stroke-width="3"></circle>
+              <text x="570" y="94" text-anchor="middle" font-size="15" font-weight="700" fill="#115e59">C_j</text>
+              <line x1="558" y1="106" x2="540" y2="154" stroke="#0f766e" stroke-width="4" stroke-dasharray="8 7"
+                marker-end="url(#arrowTeal)"></line>
+              <line x1="582" y1="106" x2="600" y2="154" stroke="#0f766e" stroke-width="4" stroke-dasharray="8 7"
+                marker-end="url(#arrowTeal)"></line>
+              <text x="430" y="74" font-size="15" fill="#0f766e">positive occurrence of x_i in clause C_j</text>
+
+              <circle cx="570" cy="304" r="22" fill="#fee2e2" stroke="#dc2626" stroke-width="3"></circle>
+              <text x="570" y="310" text-anchor="middle" font-size="15" font-weight="700" fill="#991b1b">C_j</text>
+              <line x1="558" y1="286" x2="540" y2="206" stroke="#dc2626" stroke-width="4" stroke-dasharray="8 7"
+                marker-end="url(#arrowRed)"></line>
+              <line x1="582" y1="286" x2="600" y2="206" stroke="#dc2626" stroke-width="4" stroke-dasharray="8 7"
+                marker-end="url(#arrowRed)"></line>
+              <text x="418" y="332" font-size="15" fill="#991b1b">negative occurrence of ¬x_i in clause C_j</text>
+
+              <rect x="860" y="72" width="190" height="210" rx="20" fill="#ffffff" stroke="#cbd5e1" stroke-width="3"></rect>
+              <text x="955" y="102" text-anchor="middle" font-size="20" font-weight="700" fill="#0f172a">Key Facts</text>
+              <text x="878" y="132" font-size="15" fill="#334155">• one path per variable</text>
+              <text x="878" y="156" font-size="15" fill="#334155">• total vertices = 3m+3</text>
+              <text x="878" y="180" font-size="15" fill="#334155">• slot for clause j uses</text>
+              <text x="896" y="201" font-size="15" fill="#334155">vertices 3j and 3j+1</text>
+              <text x="878" y="225" font-size="15" fill="#334155">• direction determines which</text>
+              <text x="896" y="246" font-size="15" fill="#334155">clause attachment is usable</text>
+            </svg>
+            <div class="figure-caption">
+              The variable gadget is one \(3m+3\)-vertex path. The truth value comes from whether the Hamiltonian cycle
+              traverses that path from left to right or from right to left.
+            </div>
+            <div class="diagram-legend">
+              <div class="legend-item"><span class="legend-chip"></span><span>ordinary path vertex</span></div>
+              <div class="legend-item"><span class="legend-chip slot"></span><span>highlighted slot \((3j,3j+1)\)</span></div>
+              <div class="legend-item"><span class="legend-line"></span><span>positive-literal attachment</span></div>
+              <div class="legend-item"><span class="legend-line negative"></span><span>negative-literal attachment</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="definition-card">
+          <h3 class="card-title">Clause Gadget</h3>
+          <p>For each clause \(C_j = (\ell_{j1} \vee \ell_{j2} \vee \ell_{j3})\), create one clause node \(c_j\) and
+            attach it to the three relevant variable gadgets at their \(j\)-th slots.</p>
+          <p>The clause node always uses the pair of vertices indexed \(3j\) and \(3j+1\) inside each involved variable
+            gadget. What changes from literal to literal is whether the attachment matches the left-to-right direction
+            or the right-to-left direction.</p>
+          <div class="figure-box">
+            <svg viewBox="0 0 1100 360" width="100%" role="img"
+              aria-label="Clause node connected to three variable gadgets at their 3j and 3j plus 1 positions">
+              <defs>
+                <marker id="arrowPos" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+                  <polygon points="0 0, 10 3.5, 0 7" fill="#0f766e"></polygon>
+                </marker>
+                <marker id="arrowNeg" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+                  <polygon points="0 0, 10 3.5, 0 7" fill="#dc2626"></polygon>
+                </marker>
+              </defs>
+
+              <text x="550" y="36" text-anchor="middle" font-size="24" font-weight="700" fill="#0f172a">Clause Node c_j and Its Three Literal Attachments</text>
+
+              <circle cx="550" cy="182" r="34" fill="#fde68a" stroke="#d97706" stroke-width="4"></circle>
+              <text x="550" y="189" text-anchor="middle" font-size="20" font-weight="700" fill="#7c2d12">c_j</text>
+              <text x="486" y="124" font-size="16" fill="#334155">clause C_j = (l_1 ∨ l_2 ∨ l_3)</text>
+
+              <rect x="80" y="78" width="260" height="82" rx="18" fill="#f8fafc" stroke="#cbd5e1" stroke-width="3"></rect>
+              <text x="210" y="104" text-anchor="middle" font-size="18" font-weight="700" fill="#0f172a">variable gadget for x_a</text>
+              <line x1="120" y1="126" x2="300" y2="126" stroke="#334155" stroke-width="4"></line>
+              <circle cx="160" cy="126" r="11" fill="#ffffff" stroke="#475569" stroke-width="3"></circle>
+              <circle cx="214" cy="126" r="13" fill="#fde68a" stroke="#d97706" stroke-width="3"></circle>
+              <circle cx="268" cy="126" r="13" fill="#fde68a" stroke="#d97706" stroke-width="3"></circle>
+              <text x="214" y="154" text-anchor="middle" font-size="13" fill="#92400e">3j</text>
+              <text x="268" y="154" text-anchor="middle" font-size="13" fill="#92400e">3j+1</text>
+              <line x1="535" y1="165" x2="268" y2="112" stroke="#0f766e" stroke-width="4" stroke-dasharray="8 7"
+                marker-end="url(#arrowPos)"></line>
+              <line x1="532" y1="180" x2="214" y2="112" stroke="#0f766e" stroke-width="4" stroke-dasharray="8 7"
+                marker-end="url(#arrowPos)"></line>
+              <text x="110" y="70" font-size="15" fill="#0f766e">positive literal x_a in clause C_j</text>
+
+              <rect x="760" y="78" width="260" height="82" rx="18" fill="#f8fafc" stroke="#cbd5e1" stroke-width="3"></rect>
+              <text x="890" y="104" text-anchor="middle" font-size="18" font-weight="700" fill="#0f172a">variable gadget for x_b</text>
+              <line x1="800" y1="126" x2="980" y2="126" stroke="#334155" stroke-width="4"></line>
+              <circle cx="840" cy="126" r="11" fill="#ffffff" stroke="#475569" stroke-width="3"></circle>
+              <circle cx="894" cy="126" r="13" fill="#fde68a" stroke="#d97706" stroke-width="3"></circle>
+              <circle cx="948" cy="126" r="13" fill="#fde68a" stroke="#d97706" stroke-width="3"></circle>
+              <text x="894" y="154" text-anchor="middle" font-size="13" fill="#92400e">3j</text>
+              <text x="948" y="154" text-anchor="middle" font-size="13" fill="#92400e">3j+1</text>
+              <line x1="568" y1="180" x2="894" y2="140" stroke="#dc2626" stroke-width="4" stroke-dasharray="8 7"
+                marker-end="url(#arrowNeg)"></line>
+              <line x1="565" y1="198" x2="948" y2="140" stroke="#dc2626" stroke-width="4" stroke-dasharray="8 7"
+                marker-end="url(#arrowNeg)"></line>
+              <text x="776" y="70" font-size="15" fill="#991b1b">negative literal ¬x_b in clause C_j</text>
+
+              <rect x="420" y="254" width="260" height="82" rx="18" fill="#f8fafc" stroke="#cbd5e1" stroke-width="3"></rect>
+              <text x="550" y="280" text-anchor="middle" font-size="18" font-weight="700" fill="#0f172a">variable gadget for x_c</text>
+              <line x1="460" y1="302" x2="640" y2="302" stroke="#334155" stroke-width="4"></line>
+              <circle cx="500" cy="302" r="11" fill="#ffffff" stroke="#475569" stroke-width="3"></circle>
+              <circle cx="554" cy="302" r="13" fill="#fde68a" stroke="#d97706" stroke-width="3"></circle>
+              <circle cx="608" cy="302" r="13" fill="#fde68a" stroke="#d97706" stroke-width="3"></circle>
+              <text x="554" y="330" text-anchor="middle" font-size="13" fill="#92400e">3j</text>
+              <text x="608" y="330" text-anchor="middle" font-size="13" fill="#92400e">3j+1</text>
+              <line x1="545" y1="216" x2="554" y2="276" stroke="#0f766e" stroke-width="4" stroke-dasharray="8 7"
+                marker-end="url(#arrowPos)"></line>
+              <line x1="560" y1="216" x2="608" y2="276" stroke="#0f766e" stroke-width="4" stroke-dasharray="8 7"
+                marker-end="url(#arrowPos)"></line>
+              <text x="430" y="350" font-size="15" fill="#0f766e">positive literal x_c in clause C_j</text>
+
+              <rect x="40" y="260" width="260" height="60" rx="16" fill="#ffffff" stroke="#cbd5e1" stroke-width="3"></rect>
+              <text x="170" y="286" text-anchor="middle" font-size="16" font-weight="700" fill="#0f172a">Interpretation</text>
+              <text x="60" y="308" font-size="14" fill="#334155">c_j can be inserted only if one of its three</text>
+              <text x="60" y="328" font-size="14" fill="#334155">literal attachments matches a chosen direction.</text>
+            </svg>
+            <div class="figure-caption">
+              Clause \(C_j\) is represented by one node \(c_j\) that connects to three different variable gadgets. In
+              every case, the connection uses the \(j\)-th slot, namely vertices \(3j\) and \(3j+1\), of the
+              corresponding variable path.
+            </div>
+          </div>
+        </div>
+
+        <div class="theorem-card">
+          <h3 class="card-title">Consistency Enforced by the Gadget Design</h3>
+          <table class="mini-table">
+            <thead>
+              <tr>
+                <th>Chosen traversal direction</th>
+                <th>Clause attachments that become usable</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>left to right</td>
+                <td>attachments corresponding to occurrences of \(x_i\)</td>
+              </tr>
+              <tr>
+                <td>right to left</td>
+                <td>attachments corresponding to occurrences of \(\neg x_i\)</td>
+              </tr>
+            </tbody>
+          </table>
+          <p>So a clause can be integrated into the Hamiltonian cycle only through a literal whose attachment matches
+            the direction selected for that variable path.</p>
+        </div>
+      </div>
+
+      <div id="construction" class="tab-content">
+        <h2 class="section-title">Formal Construction</h2>
+
+        <div class="definition-card">
+          <h3 class="card-title">Input Formula</h3>
+          <p>Let</p>
+          <div class="formula-box">
+            \[
+            \varphi = C_1 \wedge C_2 \wedge \cdots \wedge C_m,
+            \qquad
+            C_j = (\ell_{j1} \vee \ell_{j2} \vee \ell_{j3}),
+            \]
+          </div>
+          <p>with variables \(x_1,\dots,x_n\).</p>
+        </div>
+
+        <div class="example-card">
+          <h3 class="card-title">Construction Steps</h3>
+          <div class="step-grid">
+            <div class="step-box">
+              <div class="step-label">Step 1</div>
+              <p>Create one \(3m+3\)-vertex variable path for each \(x_i\), to be traversed in one of two directions.</p>
+            </div>
+            <div class="step-box">
+              <div class="step-label">Step 2</div>
+              <p>Connect the variable gadgets in sequence so the cycle must pass through all of them.</p>
+            </div>
+            <div class="step-box">
+              <div class="step-label">Step 3</div>
+              <p>For each clause \(C_j\), create a clause gadget and connect it to the three literal occurrences
+                \(\ell_{j1}, \ell_{j2}, \ell_{j3}\).</p>
+            </div>
+            <div class="step-box">
+              <div class="step-label">Step 4</div>
+              <p>Add connector vertices so that every vertex has to be covered by the Hamiltonian cycle and the cycle
+                closes back to the start.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="key-point">
+          <h3 class="card-title">Size Bound</h3>
+          <p>Each variable contributes a gadget of size polynomial in its number of occurrences, and each clause
+            contributes a constant-size gadget. Therefore</p>
+          <div class="formula-box">
+            \[
+            |V(G_{\varphi})|, |E(G_{\varphi})| = \operatorname{poly}(n+m).
+            \]
+          </div>
+        </div>
+
+        <div class="remark-card">
+          <h3 class="card-title">What Must Be Checked in a Reduction Proof</h3>
+          <ol>
+            <li>The graph is built in polynomial time.</li>
+            <li>Every satisfying assignment yields a Hamiltonian cycle.</li>
+            <li>Every Hamiltonian cycle determines a satisfying assignment.</li>
+          </ol>
+        </div>
+      </div>
+
+      <div id="correctness" class="tab-content">
+        <h2 class="section-title">Why the Reduction Works</h2>
+
+        <div class="theorem-card">
+          <h3 class="card-title">Forward Direction</h3>
+          <p>If \(\varphi\) is satisfiable, choose a satisfying assignment \(a\).</p>
+          <ol>
+            <li>Traverse each variable gadget in the direction prescribed by \(a\).</li>
+            <li>For every clause \(C_j\), choose one literal made true by \(a\).</li>
+            <li>Use the corresponding literal attachment at the \((3j,3j+1)\)-slot to detour through the clause
+              gadget and return to the main cycle.
+            </li>
+          </ol>
+          <p>Because each clause has at least one true literal, every clause gadget can be inserted. The gadget design
+            ensures that the whole walk visits every vertex once and closes into a directed Hamiltonian cycle.</p>
+        </div>
+
+        <div class="theorem-card">
+          <h3 class="card-title">Backward Direction</h3>
+          <p>Suppose \(G_{\varphi}\) has a directed Hamiltonian cycle \(H\).</p>
+          <ol>
+            <li>In each variable gadget, \(H\) must choose exactly one of the two traversal directions; otherwise some
+              gadget vertex would be missed or revisited.</li>
+            <li>Set \(x_i=1\) if \(H\) uses the left-to-right direction and \(x_i=0\) if \(H\) uses the
+              right-to-left direction.</li>
+            <li>Each clause gadget must be entered through one of its three literal attachments.</li>
+          </ol>
+          <p>The only usable attachments are those exposed by the chosen direction, so the literal used for clause
+            \(C_j\) is true under the derived assignment. Hence every clause is satisfied and \(\varphi\) is
+            satisfiable.</p>
+        </div>
+
+        <div class="key-point">
+          <h3 class="card-title">Core Invariant</h3>
+          <p>The Hamiltonian constraint is doing two jobs simultaneously:</p>
+          <ul>
+            <li>it forces a globally consistent truth assignment across all occurrences of a variable, and</li>
+            <li>it forces every clause gadget to be serviced by at least one satisfied literal.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div id="consequences" class="tab-content">
+        <h2 class="section-title">NP-Completeness Consequences</h2>
+
+        <div class="definition-card">
+          <h3 class="card-title">Membership in NP</h3>
+          <p>Directed Hamiltonian Cycle belongs to \(NP\): a certificate is an ordering of the vertices. The verifier
+            checks in polynomial time that consecutive vertices form directed edges and that every vertex appears
+            exactly once.</p>
+        </div>
+
+        <div class="theorem-card">
+          <h3 class="card-title">Conclusion</h3>
+          <div class="formula-box">
+            \[
+            \operatorname{3SAT} \le_p \operatorname{DHC}
+            \quad \text{and} \quad
+            \operatorname{DHC} \in NP,
+            \]
+          </div>
+          <p>so Directed Hamiltonian Cycle is NP-complete.</p>
+        </div>
+
+        <div class="theorem-card">
+          <h3 class="card-title">From Directed to Undirected Hamiltonian Cycle</h3>
+          <p>There is also a polynomial-time reduction</p>
+          <div class="formula-box">
+            \[
+            \operatorname{DHC} \le_p \operatorname{HC},
+            \]
+          </div>
+          <p>obtained by replacing each directed vertex with a small undirected gadget that forces any Hamiltonian cycle
+            to respect the original entry and exit directions. Combining this with the reduction above shows that the
+            standard undirected Hamiltonian Cycle problem is NP-complete as well.</p>
+        </div>
+
+        <div class="example-card">
+          <h3 class="card-title">How This Leads to TSP (Decision)</h3>
+          <p>Given a graph \(G\), define a complete weighted graph where edges of \(G\) get weight \(1\) and missing
+            edges get weight \(2\). Then</p>
+          <div class="formula-box">
+            \[
+            G \text{ has a Hamiltonian cycle }
+            \iff
+            \text{the weighted graph has a tour of cost } \le n.
+            \]
+          </div>
+          <p>This gives the standard NP-hardness reduction from Hamiltonian Cycle to the decision version of TSP.</p>
+        </div>
+
+        <div class="remark-card">
+          <h3 class="card-title">Takeaway</h3>
+          <p>Hamiltonian reductions encode logical choices as forced traversal choices. The same pattern reappears in
+            many path and routing problems.</p>
+        </div>
+      </div>
+    </div>
+
+    <footer>
+      <p>&copy; 2026 Dr. Debasish Pattanayak | CS 637 Mathematics-II</p>
+    </footer>
+  </div>
+
+  <a href="index.html" class="fab-btn" title="Back to Course Home">🏠</a>
+  <button class="scroll-top" id="scrollTop" onclick="scrollToTop()">↑</button>
+
+  <script>
+    function switchTab(tabId) {
+      document.querySelectorAll(".tab-content").forEach((tab) => {
+        tab.classList.remove("active");
+      });
+      document.querySelectorAll(".tab-btn").forEach((btn) => {
+        btn.classList.remove("active");
+      });
+      document.getElementById(tabId).classList.add("active");
+      const buttons = document.querySelectorAll(".tab-btn");
+      for (const btn of buttons) {
+        if (btn.getAttribute("onclick").includes(tabId)) {
+          btn.classList.add("active");
+          break;
+        }
+      }
+
+      window.scrollTo({ top: 0, behavior: "smooth" });
+
+      renderMathInElement(document.getElementById(tabId), {
         delimiters: [
-            {left: "31952", right: "31952", display: true},
-            {left: "\[", right: "\]", display: true},
-            {left: "\(", right: "\)", display: false}
-        ]
-    });
-});
-</script>
+          { left: "$$", right: "$$", display: true },
+          { left: "\\[", right: "\\]", display: true },
+          { left: "$", right: "$", display: false },
+          { left: "\\(", right: "\\)", display: false }
+        ],
+        throwOnError: false
+      });
+    }
 
-<a href="index.html" class="fab-btn" title="Back to Index">🏠</a>
+    window.addEventListener("scroll", function () {
+      updateProgress();
+
+      const scrollTop = document.getElementById("scrollTop");
+      if (window.pageYOffset > 300) {
+        scrollTop.classList.add("visible");
+      } else {
+        scrollTop.classList.remove("visible");
+      }
+    });
+
+    function scrollToTop() {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function updateProgress() {
+      const scrollTotal = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+      const scrollPos = document.documentElement.scrollTop;
+      const progress = (scrollPos / (scrollTotal || 1)) * 100;
+      document.getElementById("progressFill").style.width = progress + "%";
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+      renderMathInElement(document.body, {
+        delimiters: [
+          { left: "$$", right: "$$", display: true },
+          { left: "\\[", right: "\\]", display: true },
+          { left: "$", right: "$", display: false },
+          { left: "\\(", right: "\\)", display: false }
+        ],
+        throwOnError: false
+      });
+      updateProgress();
+    });
+
+    const particlesContainer = document.getElementById("particles");
+    for (let i = 0; i < 20; i++) {
+      const p = document.createElement("div");
+      p.style.position = "absolute";
+      p.style.width = Math.random() * 5 + "px";
+      p.style.height = p.style.width;
+      p.style.background = "rgba(255, 255, 255, 0.1)";
+      p.style.borderRadius = "50%";
+      p.style.top = Math.random() * 100 + "%";
+      p.style.left = Math.random() * 100 + "%";
+      p.style.animation = "float " + (Math.random() * 10 + 5) + "s linear infinite";
+      particlesContainer.appendChild(p);
+    }
+
+    const style = document.createElement("style");
+    style.textContent = `
+      @keyframes float {
+        0% { transform: translateY(0); opacity: 0; }
+        50% { opacity: 0.5; }
+        100% { transform: translateY(-100vh); opacity: 0; }
+      }
+    `;
+    document.head.appendChild(style);
+  </script>
 </body>
+
 </html>
