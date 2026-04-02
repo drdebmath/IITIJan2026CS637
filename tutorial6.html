@@ -1,117 +1,437 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="utf-8">
-  <title>CS 637 – Tutorial 6 Definitions</title>
+  <title>CS 637 - Tutorial 6: Graph Basics, Eulerian Cycles, and Hamiltonian Cycles</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
   <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
   <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
-
   <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
     body {
-      font-family: "Times New Roman", serif;
-      margin: 40px;
-      line-height: 1.5;
-      background-color: #ffffff;
-      color: #000000;
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      line-height: 1.6;
+      background: linear-gradient(135deg, #0f766e 0%, #155e75 45%, #1d4ed8 100%);
+      min-height: 100vh;
+      padding: 20px;
     }
-    h1, h2 {
+
+    .container {
+      max-width: 1050px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      overflow: hidden;
+    }
+
+    header {
+      background: linear-gradient(135deg, #115e59 0%, #0f766e 45%, #2563eb 100%);
+      color: white;
+      padding: 40px;
       text-align: center;
     }
+
     h1 {
-      font-size: 1.8em;
-      margin-bottom: 0.2em;
+      font-size: 2.4em;
+      margin-bottom: 10px;
+      font-weight: 700;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
     }
-    h2 {
+
+    .subtitle {
       font-size: 1.2em;
-      margin-top: 2em;
-      margin-bottom: 0.5em;
+      margin-bottom: 12px;
+      opacity: 0.95;
     }
-    .definition {
-      margin-bottom: 1em;
+
+    .date-line {
+      font-size: 1em;
+      opacity: 0.92;
     }
-    .term {
-      font-weight: bold;
-    }
-    .number {
-      font-weight: bold;
-    }
+
     .instructor {
-      margin-top: 8px;
-      font-size: 0.95rem;
-      color: #64748b;
+      margin-top: 12px;
+      font-size: 1.02em;
+      opacity: 0.94;
     }
+
     .instructor a {
-      color: #0ea5e9;
+      color: #fde68a;
       text-decoration: none;
-      font-weight: 500;
+      font-weight: 600;
     }
-    .instructor a:hover {
-      text-decoration: underline;
+
+    .content {
+      padding: 40px;
     }
+
+    .instructions-box {
+      background: #f8fafc;
+      border: 2px solid #0f766e;
+      padding: 20px 22px;
+      margin-bottom: 30px;
+      border-radius: 12px;
+    }
+
+    .instructions-title {
+      font-weight: 700;
+      color: #134e4a;
+      margin-bottom: 10px;
+      display: block;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      font-size: 0.9em;
+    }
+
+    .instructions-box ul {
+      margin-left: 20px;
+    }
+
+    .section-title {
+      font-size: 1.75em;
+      color: #1e293b;
+      margin-bottom: 22px;
+      padding-bottom: 10px;
+      border-bottom: 3px solid #0f766e;
+      font-weight: 700;
+    }
+
+    .question-card {
+      background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
+      border-left: 4px solid #0f766e;
+      padding: 24px;
+      margin-bottom: 24px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+      transition: all 0.3s;
+    }
+
+    .question-card:hover {
+      transform: translateX(4px);
+      box-shadow: 0 4px 12px rgba(15, 118, 110, 0.18);
+    }
+
+    .question-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 14px;
+      flex-wrap: wrap;
+    }
+
+    .q-badge {
+      background: #0f766e;
+      color: white;
+      padding: 5px 14px;
+      border-radius: 999px;
+      font-weight: 700;
+      font-size: 0.9em;
+    }
+
+    .q-title {
+      font-size: 1.15em;
+      font-weight: 700;
+      color: #1e293b;
+    }
+
+    .statement {
+      color: #334155;
+      font-size: 1.02em;
+    }
+
+    .answer-line {
+      margin-top: 16px;
+      padding-top: 10px;
+      border-top: 1px dashed #cbd5e1;
+      color: #64748b;
+      font-size: 0.95em;
+    }
+
+    .note-box {
+      background: #eff6ff;
+      border-left: 4px solid #3b82f6;
+      border-radius: 8px;
+      padding: 14px 16px;
+      margin-bottom: 26px;
+      color: #1e3a8a;
+    }
+
+    ol,
+    ul {
+      margin-left: 22px;
+      margin-top: 8px;
+    }
+
+    li {
+      margin-bottom: 6px;
+    }
+
+    .katex {
+      font-size: 1.05em;
+    }
+
     footer {
-      margin-top: 3em;
+      background: #0f172a;
+      color: white;
       text-align: center;
-      font-size: 0.85em;
-      color: #333;
+      padding: 25px;
+      font-size: 0.9em;
+    }
+
+    .fab-btn {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #3b82f6, #2563eb);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      cursor: pointer;
+      z-index: 1000;
+      border: none;
+      font-size: 24px;
+      transition: transform 0.2s, box-shadow 0.2s;
+      text-decoration: none;
+    }
+
+    .fab-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+    }
+
+    @media (max-width: 768px) {
+      .content {
+        padding: 22px;
+      }
+
+      h1 {
+        font-size: 1.85em;
+      }
     }
   </style>
-
-<style>
-.fab-btn {
-  position: fixed;
-  bottom: 24px;
-  right: 24px;
-  width: 56px;
-  height: 56px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #3b82f6, #2563eb);
-  color: white;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-  cursor: pointer;
-  z-index: 1000;
-  border: none;
-  font-size: 24px;
-  transition: transform 0.2s, box-shadow 0.2s;
-  text-decoration: none;
-}
-.fab-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(0,0,0,0.3);
-}
-</style>
-
 </head>
 
 <body>
+  <div class="container">
+    <header>
+      <h1>CS 637: Mathematics-II</h1>
+      <div class="subtitle">Tutorial 6: Problems from Graph Theory for Computation</div>
+      <div class="date-line">2 April 2026</div>
+      <div class="instructor">
+        <strong>Instructor:</strong> <a href="https://drdebmath.github.io" target="_blank">Dr. Debasish Pattanayak</a>
+      </div>
+    </header>
 
-<h1>CS 637: Mathematics-II</h1>
-<div class="instructor">
-  <strong>Instructor:</strong> <a href="https://drdebmath.github.io" target="_blank">Dr. Debasish Pattanayak</a>
-</div>
-<h2>Tutorial 6: Problems from Undecidability</h2>
+    <div class="content">
+      <div class="instructions-box">
+        <span class="instructions-title">Instructions</span>
+        <ul>
+          <li>For Questions 1 to 10, mark each statement as <strong>True</strong> or <strong>False</strong> and give a short justification.</li>
+          <li>For Questions 11 to 17, write complete proofs.</li>
+          <li>Use standard definitions of path, trail, cycle, tree, clique, chromatic number, Eulerian cycle, and Hamiltonian cycle.</li>
+        </ul>
+      </div>
 
-<footer>
-  
-</footer>
+      <h2 class="section-title">Part A: True or False</h2>
+      <div class="note-box">
+        Give a one-line reason with each answer. A correct truth value without justification should not receive full credit.
+      </div>
 
-<script>
-document.addEventListener("DOMContentLoaded", function() {
-    renderMathInElement(document.body, {
+      <div class="question-card">
+        <div class="question-header">
+          <span class="q-badge">Q1</span>
+          <span class="q-title">Clique Number and Chromatic Number</span>
+        </div>
+        <p class="statement">For every graph \(G\), the size of the largest clique is at most the chromatic number:
+          \[
+          \omega(G) \le \chi(G).
+          \]</p>
+        <div class="answer-line">Answer: ________ &nbsp;&nbsp; Justification: ________________________________________</div>
+      </div>
+
+      <div class="question-card">
+        <div class="question-header">
+          <span class="q-badge">Q2</span>
+          <span class="q-title">Chromatic Number and Number of Vertices</span>
+        </div>
+        <p class="statement">If a graph \(G\) has \(n\) vertices, then
+          \[
+          \chi(G) \le n.
+          \]</p>
+        <div class="answer-line">Answer: ________ &nbsp;&nbsp; Justification: ________________________________________</div>
+      </div>
+
+      <div class="question-card">
+        <div class="question-header">
+          <span class="q-badge">Q3</span>
+          <span class="q-title">Chromatic Number Need Not Equal Clique Number</span>
+        </div>
+        <p class="statement">If \(\chi(G)=3\), then \(G\) must contain a clique of size 3.</p>
+        <div class="answer-line">Answer: ________ &nbsp;&nbsp; Justification: ________________________________________</div>
+      </div>
+
+      <div class="question-card">
+        <div class="question-header">
+          <span class="q-badge">Q4</span>
+          <span class="q-title">Bipartite Graphs and Coloring</span>
+        </div>
+        <p class="statement">Every bipartite graph with at least one edge has chromatic number 2.</p>
+        <div class="answer-line">Answer: ________ &nbsp;&nbsp; Justification: ________________________________________</div>
+      </div>
+
+      <div class="question-card">
+        <div class="question-header">
+          <span class="q-badge">Q5</span>
+          <span class="q-title">Trees Are Bipartite</span>
+        </div>
+        <p class="statement">Every tree is a bipartite graph.</p>
+        <div class="answer-line">Answer: ________ &nbsp;&nbsp; Justification: ________________________________________</div>
+      </div>
+
+      <div class="question-card">
+        <div class="question-header">
+          <span class="q-badge">Q6</span>
+          <span class="q-title">Odd Cycles</span>
+        </div>
+        <p class="statement">Every odd cycle is bipartite.</p>
+        <div class="answer-line">Answer: ________ &nbsp;&nbsp; Justification: ________________________________________</div>
+      </div>
+
+      <div class="question-card">
+        <div class="question-header">
+          <span class="q-badge">Q7</span>
+          <span class="q-title">Edge Count in Trees</span>
+        </div>
+        <p class="statement">Every tree on \(n\) vertices has exactly \(n-1\) edges.</p>
+        <div class="answer-line">Answer: ________ &nbsp;&nbsp; Justification: ________________________________________</div>
+      </div>
+
+      <div class="question-card">
+        <div class="question-header">
+          <span class="q-badge">Q8</span>
+          <span class="q-title">Connected Graphs with \(n-1\) Edges</span>
+        </div>
+        <p class="statement">Every connected graph on \(n\) vertices with exactly \(n-1\) edges is a tree.</p>
+        <div class="answer-line">Answer: ________ &nbsp;&nbsp; Justification: ________________________________________</div>
+      </div>
+
+      <div class="question-card">
+        <div class="question-header">
+          <span class="q-badge">Q9</span>
+          <span class="q-title">Adjacency Matrix Symmetry</span>
+        </div>
+        <p class="statement">For every simple undirected graph \(G\), the adjacency matrix of \(G\) is symmetric.</p>
+        <div class="answer-line">Answer: ________ &nbsp;&nbsp; Justification: ________________________________________</div>
+      </div>
+
+      <div class="question-card">
+        <div class="question-header">
+          <span class="q-badge">Q10</span>
+          <span class="q-title">Row Sums in the Adjacency Matrix</span>
+        </div>
+        <p class="statement">In a simple undirected graph, the sum of the entries in the row corresponding to a vertex \(v\) in the adjacency matrix equals \(\deg(v)\).</p>
+        <div class="answer-line">Answer: ________ &nbsp;&nbsp; Justification: ________________________________________</div>
+      </div>
+
+      <h2 class="section-title">Part B: Proof Questions</h2>
+      <div class="note-box">
+        These questions ask for short proofs of standard facts about Eulerian cycles, Hamiltonian cycles, bridges, and graph distance.
+      </div>
+
+      <div class="question-card">
+        <div class="question-header">
+          <span class="q-badge">Q11</span>
+          <span class="q-title">Even Degrees in Eulerian Graphs</span>
+        </div>
+        <p class="statement">Prove that if a connected graph has an Eulerian cycle, then every vertex of the graph has even degree.</p>
+      </div>
+
+      <div class="question-card">
+        <div class="question-header">
+          <span class="q-badge">Q12</span>
+          <span class="q-title">Odd-Degree Endpoints of an Eulerian Trail</span>
+        </div>
+        <p class="statement">Prove that if a connected graph has an Eulerian trail that is not a cycle, then the graph has exactly two vertices of odd degree.</p>
+      </div>
+
+      <div class="question-card">
+        <div class="question-header">
+          <span class="q-badge">Q13</span>
+          <span class="q-title">Distance Decomposition Along a Shortest Path</span>
+        </div>
+        <p class="statement">Prove that if \(d(u,v)\ge 2\), then there is a vertex \(z\) in \(G\) such that
+          \[
+          d(u,v)=d(u,z)+d(z,v).
+          \]</p>
+      </div>
+
+      <div class="question-card">
+        <div class="question-header">
+          <span class="q-badge">Q14</span>
+          <span class="q-title">Minimum Degree in a Hamiltonian Graph</span>
+        </div>
+        <p class="statement">Prove that if a graph has a Hamiltonian cycle, then every vertex has degree at least 2.</p>
+      </div>
+
+      <div class="question-card">
+        <div class="question-header">
+          <span class="q-badge">Q15</span>
+          <span class="q-title">Bipartite Hamiltonian Graphs</span>
+        </div>
+        <p class="statement">Prove that if a bipartite graph has a Hamiltonian cycle, then the two parts of the bipartition have the same number of vertices.</p>
+      </div>
+
+      <div class="question-card">
+        <div class="question-header">
+          <span class="q-badge">Q16</span>
+          <span class="q-title">Every Edge Is a Bridge</span>
+        </div>
+        <p class="statement">Prove that if every edge of a connected graph is a bridge, then the graph is a tree.</p>
+      </div>
+
+      <div class="question-card">
+        <div class="question-header">
+          <span class="q-badge">Q17</span>
+          <span class="q-title">Characterizing Bridges by Cycles</span>
+        </div>
+        <p class="statement">Prove that an edge of a graph is a bridge if and only if it does not belong to any cycle.</p>
+      </div>
+    </div>
+
+    <footer>
+      CS 637 - Tutorial 6 • Spring 2026<br>
+      Dr. Debasish Pattanayak • Department of Computer Science
+    </footer>
+  </div>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      renderMathInElement(document.body, {
         delimiters: [
-            {left: "31952", right: "31952", display: true},
-            {left: "\[", right: "\]", display: true},
-            {left: "\(", right: "\)", display: false}
-        ]
+          { left: "$$", right: "$$", display: true },
+          { left: "\\[", right: "\\]", display: true },
+          { left: "$", right: "$", display: false },
+          { left: "\\(", right: "\\)", display: false }
+        ],
+        throwOnError: false
+      });
     });
-});
-</script>
+  </script>
 
-<a href="index.html" class="fab-btn" title="Back to Index">🏠</a>
+  <a href="index.html" class="fab-btn" title="Back to Index">🏠</a>
 </body>
+
 </html>

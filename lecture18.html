@@ -1,8 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="utf-8">
-  <title>CS 637 – Lecture 18 Definitions</title>
+  <title>CS 637 - Lecture 18: Graph Theory Foundations and Representations</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
@@ -10,108 +11,708 @@
   <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
 
   <style>
-    body {
-      font-family: "Times New Roman", serif;
-      margin: 40px;
-      line-height: 1.5;
-      background-color: #ffffff;
-      color: #000000;
+    :root {
+      --primary: #0f766e;
+      --secondary: #1d4ed8;
+      --accent: #ea580c;
+      --accent-hover: #c2410c;
+      --success: #059669;
+      --warning: #d97706;
+      --text-dark: #1e293b;
+      --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.08);
+      --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.15);
     }
-    h1, h2 {
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      line-height: 1.7;
+      background: linear-gradient(135deg, #082f49 0%, #0f172a 55%, #1e293b 100%);
+      min-height: 100vh;
+      padding: 20px;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    .particles {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 25px 80px rgba(0, 0, 0, 0.4);
+      overflow: hidden;
+      position: relative;
+      z-index: 1;
+    }
+
+    header {
+      background: linear-gradient(135deg, #0f766e, #1d4ed8, #ea580c);
+      background-size: 200% 200%;
+      animation: gradientShift 15s ease infinite;
+      color: white;
+      padding: 50px 40px;
       text-align: center;
     }
+
+    @keyframes gradientShift {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
     h1 {
-      font-size: 1.8em;
-      margin-bottom: 0.2em;
+      font-size: 2.8em;
+      margin-bottom: 12px;
+      font-weight: 800;
     }
-    h2 {
-      font-size: 1.2em;
-      margin-top: 2em;
-      margin-bottom: 0.5em;
-    }
-    .definition {
-      margin-bottom: 1em;
-    }
-    .term {
-      font-weight: bold;
-    }
-    .number {
-      font-weight: bold;
-    }
-    .instructor {
-      margin-top: 8px;
-      font-size: 0.95rem;
-      color: #64748b;
-    }
-    .instructor a {
-      color: #0ea5e9;
-      text-decoration: none;
+
+    .subtitle {
+      font-size: 1.35em;
+      margin-bottom: 20px;
+      opacity: 0.96;
       font-weight: 500;
     }
-    .instructor a:hover {
-      text-decoration: underline;
+
+    .instructor {
+      margin-top: 20px;
+      font-size: 1.08em;
+      opacity: 0.96;
     }
+
+    .instructor a {
+      color: #fde68a;
+      text-decoration: none;
+      font-weight: 600;
+      padding: 4px 8px;
+    }
+
+    .progress-bar {
+      position: sticky;
+      top: 0;
+      height: 4px;
+      background: #e2e8f0;
+      z-index: 101;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--primary), var(--secondary), var(--accent));
+      width: 0%;
+      transition: width 0.3s ease;
+    }
+
+    .nav-wrapper {
+      background: #fff;
+      position: sticky;
+      top: 4px;
+      z-index: 100;
+      border-bottom: 2px solid #e2e8f0;
+    }
+
+    .nav-tabs {
+      display: flex;
+      overflow-x: auto;
+      padding: 0 20px;
+      scrollbar-width: thin;
+    }
+
+    .tab-btn {
+      padding: 15px 22px;
+      background: none;
+      border: none;
+      font-size: 1em;
+      cursor: pointer;
+      color: #64748b;
+      font-weight: 600;
+      border-bottom: 3px solid transparent;
+      transition: all 0.3s;
+      white-space: nowrap;
+    }
+
+    .tab-btn.active {
+      color: var(--primary);
+      border-bottom-color: var(--primary);
+    }
+
+    .content {
+      padding: 50px 40px;
+      min-height: 600px;
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+      animation: slideIn 0.5s ease-out;
+    }
+
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .section-title {
+      font-size: 2em;
+      color: var(--text-dark);
+      margin-bottom: 30px;
+      padding-bottom: 12px;
+      border-bottom: 4px solid var(--secondary);
+    }
+
+    .definition-card,
+    .example-card,
+    .theorem-card,
+    .key-point,
+    .remark-card {
+      padding: 25px;
+      margin-bottom: 25px;
+      border-radius: 12px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .definition-card { background: #f8fafc; border-left: 5px solid var(--primary); }
+    .example-card { background: #fff7ed; border-left: 5px solid var(--warning); }
+    .theorem-card { background: #eff6ff; border-left: 5px solid #0ea5e9; }
+    .key-point { background: #ecfdf5; border-left: 5px solid var(--success); }
+    .remark-card { background: #f5f3ff; border-left: 5px solid #7c3aed; }
+
+    .card-title {
+      font-size: 1.3em;
+      font-weight: 700;
+      margin-bottom: 15px;
+      color: var(--text-dark);
+    }
+
+    .formula-box {
+      background: white;
+      border: 1px solid #dbeafe;
+      border-radius: 10px;
+      padding: 16px 18px;
+      margin-top: 15px;
+      overflow-x: auto;
+    }
+
+    .mini-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 16px;
+      font-size: 0.96em;
+      background: white;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    .mini-table th,
+    .mini-table td {
+      border: 1px solid #e2e8f0;
+      padding: 12px 14px;
+      vertical-align: top;
+      text-align: left;
+    }
+
+    .mini-table th {
+      background: #eff6ff;
+      color: var(--text-dark);
+      font-weight: 700;
+    }
+
+    .figure-box {
+      background: white;
+      border: 1px solid #dbeafe;
+      border-radius: 12px;
+      padding: 18px;
+      margin-top: 18px;
+    }
+
+    .figure-box img {
+      width: 100%;
+      height: auto;
+      display: block;
+      border-radius: 8px;
+      background: #f8fafc;
+    }
+
+    .two-col {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 20px;
+    }
+
+    ul,
+    ol {
+      margin-left: 25px;
+      margin-top: 15px;
+    }
+
+    li {
+      margin-bottom: 10px;
+    }
+
+    p + p {
+      margin-top: 12px;
+    }
+
     footer {
-      margin-top: 3em;
+      background: #0f172a;
+      color: white;
       text-align: center;
-      font-size: 0.85em;
-      color: #333;
+      padding: 30px;
+    }
+
+    .fab-btn {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      color: white;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+      z-index: 1000;
+      border: none;
+      font-size: 28px;
+      transition: all 0.3s;
+      cursor: pointer;
+    }
+
+    .scroll-top {
+      position: fixed;
+      bottom: 100px;
+      right: 30px;
+      width: 52px;
+      height: 52px;
+      border: none;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent), var(--accent-hover));
+      color: white;
+      font-size: 1.3em;
+      cursor: pointer;
+      box-shadow: var(--shadow-lg);
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s;
+      z-index: 120;
+    }
+
+    .scroll-top.visible {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    @media (max-width: 768px) {
+      .content { padding: 30px 20px; }
+      h1 { font-size: 2.1em; }
+      .subtitle { font-size: 1.15em; }
+      .two-col { grid-template-columns: 1fr; }
     }
   </style>
-
-<style>
-.fab-btn {
-  position: fixed;
-  bottom: 24px;
-  right: 24px;
-  width: 56px;
-  height: 56px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #3b82f6, #2563eb);
-  color: white;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-  cursor: pointer;
-  z-index: 1000;
-  border: none;
-  font-size: 24px;
-  transition: transform 0.2s, box-shadow 0.2s;
-  text-decoration: none;
-}
-.fab-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(0,0,0,0.3);
-}
-</style>
-
 </head>
 
 <body>
+  <div class="particles" id="particles"></div>
 
-<h1>CS 637: Mathematics-II</h1>
-<div class="instructor">
-  <strong>Instructor:</strong> <a href="https://drdebmath.github.io" target="_blank">Dr. Debasish Pattanayak</a>
-</div>
-<h2>Lecture 18 – Canonical NP-Complete Problems</h2>
+  <div class="container">
+    <div class="progress-bar">
+      <div class="progress-fill" id="progressFill"></div>
+    </div>
 
-<footer>
-  
-</footer>
+    <header>
+      <h1>CS 637: Mathematics-II</h1>
+      <div class="subtitle">Lecture 18: Graph Theory Foundations and Representations</div>
+      <div class="instructor">
+        <strong>Instructor:</strong> <a href="https://drdebmath.github.io/" target="_blank">Dr. Debasish Pattanayak</a>
+      </div>
+    </header>
 
-<script>
-document.addEventListener("DOMContentLoaded", function() {
-    renderMathInElement(document.body, {
+    <div class="nav-wrapper">
+      <div class="nav-tabs">
+        <button class="tab-btn active" onclick="switchTab('basics')">Basics</button>
+        <button class="tab-btn" onclick="switchTab('matrices')">Representations</button>
+        <button class="tab-btn" onclick="switchTab('coloring')">Coloring</button>
+        <button class="tab-btn" onclick="switchTab('bipartite')">Bipartite</button>
+        <button class="tab-btn" onclick="switchTab('properties')">Properties</button>
+      </div>
+    </div>
+
+    <div class="content">
+      <div id="basics" class="tab-content active">
+        <h2 class="section-title">Basic Graph Objects</h2>
+
+        <div class="definition-card">
+          <h3 class="card-title">Graph, Vertices, and Edges</h3>
+          <div class="formula-box">
+            \[
+            G = (V,E),
+            \]
+          </div>
+          <p>where \(V\) is the set of vertices and \(E\) is the set of edges. In a simple undirected graph, edges are
+            unordered pairs of distinct vertices, and there are no parallel edges or self-loops.</p>
+        </div>
+
+        <div class="two-col">
+          <div class="example-card">
+            <h3 class="card-title">Path and Cycle</h3>
+            <p>A <strong>path</strong> is a sequence of distinct vertices \(v_0,v_1,\dots,v_k\) such that each
+              consecutive pair is connected by an edge.</p>
+            <div class="formula-box">
+              \[
+              (v_{i-1},v_i)\in E \quad \text{for all } 1 \le i \le k.
+              \]
+            </div>
+            <p>A <strong>cycle</strong> is a closed path of length at least 3.</p>
+          </div>
+
+          <div class="example-card">
+            <h3 class="card-title">Clique</h3>
+            <p>A set \(S \subseteq V\) is a <strong>clique</strong> if every pair of distinct vertices in \(S\) is
+              adjacent.</p>
+            <div class="formula-box">
+              \[
+              \forall u,v \in S,\ u \ne v \implies \{u,v\}\in E.
+              \]
+            </div>
+            <p>The complete graph on \(r\) vertices is denoted by \(K_r\).</p>
+          </div>
+        </div>
+
+        <div class="theorem-card">
+          <h3 class="card-title">Bipartite Graph</h3>
+          <p>A graph is <strong>bipartite</strong> if its vertex set can be partitioned into two disjoint parts
+            \(L\) and \(R\) such that every edge has one endpoint in \(L\) and one endpoint in \(R\).</p>
+          <div class="formula-box">
+            \[
+            V = L \cup R,\qquad L \cap R = \varnothing,\qquad E \subseteq L \times R.
+            \]
+          </div>
+        </div>
+
+        <div class="remark-card">
+          <h3 class="card-title">The Petersen Graph</h3>
+          <p>The Petersen graph is a famous 10-vertex, 15-edge graph that serves as a compact counterexample in many
+            results. It is 3-regular, connected, and non-planar. Even when a graph looks highly symmetric, its global
+            structure can still be subtle.</p>
+        </div>
+      </div>
+
+      <div id="matrices" class="tab-content">
+        <h2 class="section-title">Graph Representations</h2>
+
+        <div class="definition-card">
+          <h3 class="card-title">Adjacency Matrix</h3>
+          <p>If \(V=\{v_1,\dots,v_n\}\), the adjacency matrix \(A\) is the \(n\times n\) matrix defined by</p>
+          <div class="formula-box">
+            \[
+            A_{ij} =
+            \begin{cases}
+            1 & \text{if } \{v_i,v_j\}\in E,\\
+            0 & \text{otherwise.}
+            \end{cases}
+            \]
+          </div>
+          <p>For an undirected simple graph, the adjacency matrix is symmetric and has zeros on the diagonal.</p>
+        </div>
+
+        <div class="definition-card">
+          <h3 class="card-title">Incidence Matrix</h3>
+          <p>If \(E=\{e_1,\dots,e_m\}\), the incidence matrix \(B\) is the \(n\times m\) matrix where</p>
+          <div class="formula-box">
+            \[
+            B_{i\ell} =
+            \begin{cases}
+            1 & \text{if vertex } v_i \text{ is incident on edge } e_\ell,\\
+            0 & \text{otherwise.}
+            \end{cases}
+            \]
+          </div>
+          <p>In a simple undirected graph, each column of \(B\) contains exactly two 1s.</p>
+        </div>
+
+        <div class="theorem-card">
+          <h3 class="card-title">Worked Representation Example</h3>
+          <div class="figure-box">
+            <img src="graph-representation.svg"
+              alt="A sample graph with its adjacency matrix and incidence matrix">
+          </div>
+          <p>The picture makes it easy to see the difference between the two encodings:</p>
+          <ul>
+            <li>the adjacency matrix records which <em>vertex pairs</em> are neighbors,</li>
+            <li>the incidence matrix records which <em>vertex-edge pairs</em> touch each other.</li>
+          </ul>
+        </div>
+
+        <div class="example-card">
+          <h3 class="card-title">When Each Representation Is Useful</h3>
+          <table class="mini-table">
+            <thead>
+              <tr>
+                <th>Representation</th>
+                <th>Good For</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Adjacency matrix</td>
+                <td>Fast edge lookups, dense graphs, linear algebraic reasoning</td>
+              </tr>
+              <tr>
+                <td>Incidence matrix</td>
+                <td>Degree arguments, edge-based formulations, flow and cut viewpoints</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div id="coloring" class="tab-content">
+        <h2 class="section-title">Chromatic Number and Connectivity</h2>
+
+        <div class="definition-card">
+          <h3 class="card-title">Chromatic Number</h3>
+          <p>The <strong>chromatic number</strong> \(\chi(G)\) is the minimum number of colors needed to color the
+            vertices so that adjacent vertices receive different colors.</p>
+          <div class="formula-box">
+            \[
+            \chi(K_r)=r,\qquad \chi(P_n)=2 \text{ for every path with at least one edge.}
+            \]
+          </div>
+        </div>
+
+        <div class="theorem-card">
+          <h3 class="card-title">Clique Size Gives a Lower Bound</h3>
+          <p>If \(\omega(G)\) denotes the size of the largest clique in \(G\), then</p>
+          <div class="formula-box">
+            \[
+            \omega(G)\le \chi(G).
+            \]
+          </div>
+          <p>This is because all vertices of a clique must receive distinct colors.</p>
+        </div>
+
+        <div class="definition-card">
+          <h3 class="card-title">Connectivity</h3>
+          <p>A graph is <strong>connected</strong> if every pair of vertices is joined by a path. If not, the graph
+            splits into connected components.</p>
+          <ul>
+            <li>A connected graph with no cycles is a tree.</li>
+            <li>A vertex whose removal disconnects the graph is called a cut vertex.</li>
+            <li>Connectivity captures how robust the graph is under deletions.</li>
+          </ul>
+        </div>
+
+        <div class="key-point">
+          <h3 class="card-title">A Basic Tree Fact</h3>
+          <div class="formula-box">
+            \[
+            \text{If } G \text{ is a tree on } n \text{ vertices, then } |E| = n-1.
+            \]
+          </div>
+          <p>This identity is one of the most frequently used counting facts in elementary graph proofs.</p>
+        </div>
+      </div>
+
+      <div id="bipartite" class="tab-content">
+        <h2 class="section-title">Bipartite Graphs and Even Cycles</h2>
+
+        <div class="theorem-card">
+          <h3 class="card-title">Even-Cycle Property</h3>
+          <p>If \(G\) is bipartite, then every cycle in \(G\) has even length.</p>
+          <ol>
+            <li>In a bipartite graph, every step alternates between the two parts \(L\) and \(R\).</li>
+            <li>Starting in \(L\), after one edge we are in \(R\), after two edges back in \(L\), and so on.</li>
+            <li>A cycle must return to its starting part, so it must use an even number of edges.</li>
+          </ol>
+        </div>
+
+        <div class="theorem-card">
+          <h3 class="card-title">Characterization by Odd Cycles</h3>
+          <p>A graph is bipartite if and only if it has no odd cycle.</p>
+          <div class="formula-box">
+            \[
+            G \text{ is bipartite } \iff \chi(G)\le 2 \iff G \text{ has no odd cycle.}
+            \]
+          </div>
+          <p>The backward direction comes from assigning colors by parity of distance from a chosen root in each
+            connected component.</p>
+        </div>
+
+        <div class="example-card">
+          <h3 class="card-title">Examples</h3>
+          <table class="mini-table">
+            <thead>
+              <tr>
+                <th>Graph</th>
+                <th>Bipartite?</th>
+                <th>Reason</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Path \(P_n\)</td>
+                <td>Yes</td>
+                <td>Alternate colors along the path</td>
+              </tr>
+              <tr>
+                <td>Even cycle \(C_{2k}\)</td>
+                <td>Yes</td>
+                <td>Two-coloring works around the cycle</td>
+              </tr>
+              <tr>
+                <td>Odd cycle \(C_{2k+1}\)</td>
+                <td>No</td>
+                <td>It forces a color conflict at the last edge</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div id="properties" class="tab-content">
+        <h2 class="section-title">Basic Graph Properties</h2>
+
+        <div class="definition-card">
+          <h3 class="card-title">Handshaking Lemma</h3>
+          <div class="formula-box">
+            \[
+            \sum_{v\in V} \deg(v) = 2|E|.
+            \]
+          </div>
+          <p>Each edge contributes exactly 2 to the total degree count, one for each endpoint.</p>
+        </div>
+
+        <div class="theorem-card">
+          <h3 class="card-title">Immediate Consequences</h3>
+          <ul>
+            <li>The number of odd-degree vertices in a graph is even.</li>
+            <li>A simple graph on \(n\) vertices has at most \(\frac{n(n-1)}{2}\) edges.</li>
+            <li>If a graph is bipartite with parts \(L\) and \(R\), then \(|E| \le |L||R|\).</li>
+          </ul>
+        </div>
+
+        <div class="example-card">
+          <h3 class="card-title">Quick Structural Reminders</h3>
+          <ol>
+            <li>Trees are minimally connected: removing any edge disconnects them.</li>
+            <li>Cliques force many colors, because pairwise adjacent vertices cannot share a color.</li>
+            <li>Matrix representations let us move between combinatorial and algebraic viewpoints.</li>
+          </ol>
+        </div>
+
+        <div class="key-point">
+          <h3 class="card-title">Takeaway</h3>
+          <p>These properties are the first tools to try when proving graph identities, checking whether a graph can be
+            bipartite, or designing reductions from one graph problem to another.</p>
+        </div>
+      </div>
+    </div>
+
+    <footer>
+      <p>&copy; 2026 Dr. Debasish Pattanayak | CS 637 Mathematics-II</p>
+    </footer>
+  </div>
+
+  <a href="index.html" class="fab-btn" title="Back to Course Home">🏠</a>
+  <button class="scroll-top" id="scrollTop" onclick="scrollToTop()">↑</button>
+
+  <script>
+    function switchTab(tabId) {
+      document.querySelectorAll(".tab-content").forEach((tab) => tab.classList.remove("active"));
+      document.querySelectorAll(".tab-btn").forEach((btn) => btn.classList.remove("active"));
+      document.getElementById(tabId).classList.add("active");
+      for (const btn of document.querySelectorAll(".tab-btn")) {
+        if (btn.getAttribute("onclick").includes(tabId)) {
+          btn.classList.add("active");
+          break;
+        }
+      }
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      renderMathInElement(document.getElementById(tabId), {
         delimiters: [
-            {left: "31952", right: "31952", display: true},
-            {left: "\[", right: "\]", display: true},
-            {left: "\(", right: "\)", display: false}
-        ]
-    });
-});
-</script>
+          { left: "$$", right: "$$", display: true },
+          { left: "\\[", right: "\\]", display: true },
+          { left: "$", right: "$", display: false },
+          { left: "\\(", right: "\\)", display: false }
+        ],
+        throwOnError: false
+      });
+    }
 
-<a href="index.html" class="fab-btn" title="Back to Index">🏠</a>
+    window.addEventListener("scroll", function () {
+      updateProgress();
+      const scrollTop = document.getElementById("scrollTop");
+      if (window.pageYOffset > 300) {
+        scrollTop.classList.add("visible");
+      } else {
+        scrollTop.classList.remove("visible");
+      }
+    });
+
+    function scrollToTop() {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function updateProgress() {
+      const scrollTotal = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+      const scrollPos = document.documentElement.scrollTop;
+      const progress = (scrollPos / (scrollTotal || 1)) * 100;
+      document.getElementById("progressFill").style.width = progress + "%";
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+      renderMathInElement(document.body, {
+        delimiters: [
+          { left: "$$", right: "$$", display: true },
+          { left: "\\[", right: "\\]", display: true },
+          { left: "$", right: "$", display: false },
+          { left: "\\(", right: "\\)", display: false }
+        ],
+        throwOnError: false
+      });
+      updateProgress();
+    });
+
+    const particlesContainer = document.getElementById("particles");
+    for (let i = 0; i < 20; i++) {
+      const p = document.createElement("div");
+      p.style.position = "absolute";
+      p.style.width = Math.random() * 5 + "px";
+      p.style.height = p.style.width;
+      p.style.background = "rgba(255, 255, 255, 0.1)";
+      p.style.borderRadius = "50%";
+      p.style.top = Math.random() * 100 + "%";
+      p.style.left = Math.random() * 100 + "%";
+      p.style.animation = "float " + (Math.random() * 10 + 5) + "s linear infinite";
+      particlesContainer.appendChild(p);
+    }
+
+    const style = document.createElement("style");
+    style.textContent = `
+      @keyframes float {
+        0% { transform: translateY(0); opacity: 0; }
+        50% { opacity: 0.5; }
+        100% { transform: translateY(-100vh); opacity: 0; }
+      }
+    `;
+    document.head.appendChild(style);
+  </script>
 </body>
+
 </html>

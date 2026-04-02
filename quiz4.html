@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <title>CS637 - Quiz 4</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      line-height: 1.6;
+      background: linear-gradient(135deg, #0f766e 0%, #155e75 45%, #1d4ed8 100%);
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+      background: #ffffff;
+      border-radius: 18px;
+      box-shadow: 0 22px 70px rgba(15, 23, 42, 0.3);
+      overflow: hidden;
+    }
+
+    header {
+      background: linear-gradient(135deg, #115e59 0%, #0f766e 45%, #2563eb 100%);
+      color: #ffffff;
+      padding: 42px 40px;
+      text-align: center;
+    }
+
+    h1 {
+      font-size: 2.5em;
+      margin-bottom: 10px;
+      font-weight: 800;
+      letter-spacing: 0.02em;
+    }
+
+    .subtitle {
+      font-size: 1.22em;
+      opacity: 0.96;
+    }
+
+    .instructor {
+      margin-top: 12px;
+      font-size: 1.02em;
+      opacity: 0.92;
+    }
+
+    .content {
+      padding: 40px;
+    }
+
+    .identity-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(220px, 1fr));
+      gap: 18px;
+      margin-bottom: 28px;
+    }
+
+    .identity-field {
+      background: #f8fafc;
+      border: 1px solid #cbd5e1;
+      border-radius: 12px;
+      padding: 14px 16px;
+    }
+
+    .identity-label {
+      display: block;
+      font-size: 0.86em;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #475569;
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+
+    .identity-line {
+      height: 20px;
+      border-bottom: 2px solid #94a3b8;
+    }
+
+    .instructions-box {
+      background: #f8fafc;
+      border: 2px solid #0f766e;
+      padding: 22px;
+      margin-bottom: 32px;
+      border-radius: 14px;
+    }
+
+    .instructions-title {
+      display: block;
+      margin-bottom: 12px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #134e4a;
+      font-size: 0.92em;
+    }
+
+    .instructions-list {
+      list-style: none;
+      padding-left: 0;
+    }
+
+    .instructions-list li {
+      position: relative;
+      padding-left: 22px;
+      margin-bottom: 8px;
+      color: #334155;
+    }
+
+    .instructions-list li::before {
+      content: "•";
+      position: absolute;
+      left: 0;
+      color: #0f766e;
+      font-weight: 800;
+    }
+
+    .question-card {
+      background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+      border: 1px solid #dbeafe;
+      border-left: 5px solid #0f766e;
+      padding: 26px;
+      margin-bottom: 28px;
+      border-radius: 14px;
+      box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
+    }
+
+    .question-header {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-bottom: 14px;
+    }
+
+    .q-badge {
+      background: #0f766e;
+      color: #ffffff;
+      padding: 5px 14px;
+      border-radius: 999px;
+      font-size: 0.9em;
+      font-weight: 800;
+    }
+
+    .q-title {
+      font-size: 1.16em;
+      font-weight: 800;
+      color: #0f172a;
+    }
+
+    .q-points {
+      margin-left: auto;
+      background: #dbeafe;
+      color: #1e3a8a;
+      padding: 3px 11px;
+      border-radius: 999px;
+      font-size: 0.82em;
+      font-weight: 700;
+    }
+
+    .q-text {
+      color: #334155;
+      margin-bottom: 18px;
+    }
+
+    .solution-toggle {
+      background: linear-gradient(135deg, #0f766e, #0ea5a4);
+      color: #ffffff;
+      border: none;
+      border-radius: 8px;
+      padding: 10px 16px;
+      cursor: pointer;
+      font-weight: 700;
+      font-size: 0.92em;
+    }
+
+    .solution-toggle:hover {
+      filter: brightness(1.05);
+    }
+
+    .solution-block {
+      display: none;
+      margin-top: 16px;
+      background: #ecfeff;
+      border-left: 4px solid #0891b2;
+      border-radius: 10px;
+      padding: 18px;
+      color: #164e63;
+    }
+
+    .solution-block.visible {
+      display: block;
+    }
+
+    .solution-title {
+      display: block;
+      font-weight: 800;
+      margin-bottom: 10px;
+      color: #0f172a;
+    }
+
+    .formula-box {
+      background: #ffffff;
+      border: 1px solid #cbd5e1;
+      border-radius: 10px;
+      padding: 14px 16px;
+      margin: 12px 0;
+      overflow-x: auto;
+    }
+
+    .code-block {
+      margin-top: 12px;
+      background: #0f172a;
+      color: #e2e8f0;
+      border-radius: 10px;
+      padding: 14px;
+      overflow-x: auto;
+      white-space: pre-wrap;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 0.88em;
+      line-height: 1.45;
+    }
+
+    ul,
+    ol {
+      margin-left: 22px;
+      margin-top: 10px;
+    }
+
+    li {
+      margin-bottom: 8px;
+    }
+
+    footer {
+      background: #0f172a;
+      color: #ffffff;
+      text-align: center;
+      padding: 26px;
+      font-size: 0.92em;
+    }
+
+    .fab-btn {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #14b8a6, #2563eb);
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      cursor: pointer;
+      z-index: 1000;
+      border: none;
+      font-size: 24px;
+      text-decoration: none;
+    }
+
+    @media (max-width: 768px) {
+      .content {
+        padding: 22px;
+      }
+
+      header {
+        padding: 34px 22px;
+      }
+
+      h1 {
+        font-size: 1.9em;
+      }
+
+      .identity-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <header>
+      <h1>CS637 - Quiz 4</h1>
+      <div class="subtitle">Reductions</div>
+      <div class="instructor"><strong>Instructor:</strong> Dr. Debasish Pattanayak</div>
+    </header>
+
+    <div class="content">
+      <div class="identity-grid">
+        <div class="identity-field">
+          <span class="identity-label">Name</span>
+          <div class="identity-line"></div>
+        </div>
+        <div class="identity-field">
+          <span class="identity-label">Roll No.</span>
+          <div class="identity-line"></div>
+        </div>
+      </div>
+
+      <div class="instructions-box">
+        <span class="instructions-title">Instructions</span>
+        <ul class="instructions-list">
+          <li>Attempt all questions.</li>
+          <li>For reductions, clearly define the mapping and prove both directions of correctness.</li>
+          <li>For search-from-decision questions, describe the algorithm, the invariant, and the runtime.</li>
+          <li>Solutions are included in collapsible blocks for the instructor version.</li>
+        </ul>
+      </div>
+
+      <div class="question-card">
+        <div class="question-header">
+          <span class="q-badge">Q1</span>
+          <span class="q-title">Reducing Clique to Vertex-Cover</span>
+          <span class="q-points">10 pts</span>
+        </div>
+        <div class="q-text">
+          Show that
+          \[
+          \text{Clique} = \{\langle G,k\rangle \mid G \text{ has a clique of size } k\}
+          \]
+          polynomial-time reduces to
+          \[
+          \text{Vertex-Cover} = \{\langle G,k\rangle \mid G \text{ has a vertex cover of size } k\}.
+          \]
+          Define the mapping \(f\), prove correctness \((\Leftrightarrow)\), and justify polynomial runtime.
+        </div>
+        <button class="solution-toggle" onclick="toggleSolution(this)">Show Solution</button>
+        <div class="solution-block">
+          <span class="solution-title">Solution</span>
+          Let \(n = |V(G)|\), and let \(\overline{G}\) be the complement graph of \(G\). Define
+          <div class="formula-box">
+            \[
+            f(\langle G,k\rangle) = \langle \overline{G}, n-k \rangle.
+            \]
+          </div>
+          A set \(S \subseteq V(G)\) is a clique of size \(k\) in \(G\) if and only if every pair of vertices in \(S\)
+          is adjacent in \(G\), which happens if and only if no pair in \(S\) is adjacent in \(\overline{G}\). Thus
+          \(S\) is a clique of size \(k\) in \(G\) iff \(S\) is an independent set of size \(k\) in
+          \(\overline{G}\).
+          <div class="formula-box">
+            \[
+            S \text{ is independent in } H \iff V(H) \setminus S \text{ is a vertex cover in } H.
+            \]
+          </div>
+          Therefore \(\overline{G}\) has an independent set of size \(k\) iff it has a vertex cover of size
+          \(n-k\). Combining the two facts,
+          <div class="formula-box">
+            \[
+            \langle G,k\rangle \in \text{Clique}
+            \iff
+            \langle \overline{G}, n-k\rangle \in \text{Vertex-Cover}.
+            \]
+          </div>
+          Computing \(\overline{G}\) and \(n-k\) takes polynomial time, so \(f\) is polynomial-time computable. Hence
+          \(\text{Clique} \le_p \text{Vertex-Cover}\).
+        </div>
+      </div>
+
+      <div class="question-card">
+        <div class="question-header">
+          <span class="q-badge">Q2</span>
+          <span class="q-title">Reducing Vertex-Cover to Set-Cover</span>
+          <span class="q-points">10 pts</span>
+        </div>
+        <div class="q-text">
+          Show that
+          \[
+          \text{Vertex-Cover} = \{\langle G,k\rangle \mid G \text{ has a vertex cover of size } k\}
+          \]
+          polynomial-time reduces to
+          \[
+          \text{Set-Cover} = \{\langle U,\mathcal{F},k\rangle \mid \exists \mathcal{C}\subseteq\mathcal{F},
+          \ |\mathcal{C}| \le k,\ \bigcup_{X\in\mathcal{C}} X = U\}.
+          \]
+          Give the construction and prove correctness.
+        </div>
+        <button class="solution-toggle" onclick="toggleSolution(this)">Show Solution</button>
+        <div class="solution-block">
+          <span class="solution-title">Solution</span>
+          Let \(G = (V,E)\). Build the set-cover instance as follows:
+          <ul>
+            <li>Universe: \(U = E\), so every edge becomes an element to be covered.</li>
+            <li>For each vertex \(v \in V\), create the set \(S_v = \{e \in E \mid e \text{ is incident on } v\}\).</li>
+            <li>Family: \(\mathcal{F} = \{S_v \mid v \in V\}\).</li>
+            <li>Keep the same parameter \(k\).</li>
+          </ul>
+          If \(C \subseteq V\) is a vertex cover with \(|C| \le k\), then every edge has at least one endpoint in
+          \(C\), so the sets \(\{S_v : v \in C\}\) cover all elements of \(U\).
+          Conversely, if \(\mathcal{C} \subseteq \mathcal{F}\) with \(|\mathcal{C}| \le k\) covers \(U\), then for each
+          chosen set \(S_v\) we take the corresponding vertex \(v\). Since every edge-element is covered, every edge is
+          incident on at least one chosen vertex, so these vertices form a vertex cover of size at most \(k\).
+          <div class="formula-box">
+            \[
+            \langle G,k\rangle \in \text{Vertex-Cover}
+            \iff
+            \langle U,\mathcal{F},k\rangle \in \text{Set-Cover}.
+            \]
+          </div>
+          The construction scans vertices and edges only polynomially many times, so it runs in polynomial time.
+        </div>
+      </div>
+
+      <div class="question-card">
+        <div class="question-header">
+          <span class="q-badge">Q3</span>
+          <span class="q-title">Recovering a Clique from a Clique Decider</span>
+          <span class="q-points">10 pts</span>
+        </div>
+        <div class="q-text">
+          Assume you are given a polynomial-time black-box decider
+          \[
+          \text{DecideClique}(G,k) \in \{\text{YES}, \text{NO}\}
+          \]
+          for \(\text{Clique}\). Design an algorithm that outputs an actual clique of size \(k\) if one exists;
+          otherwise output <code>NO-SOLUTION</code>. Prove correctness and polynomial runtime.
+        </div>
+        <button class="solution-toggle" onclick="toggleSolution(this)">Show Solution</button>
+        <div class="solution-block">
+          <span class="solution-title">Solution</span>
+          First call \(\text{DecideClique}(G,k)\). If the answer is NO, return <code>NO-SOLUTION</code>.
+          Otherwise, let \(H \leftarrow G\), and process vertices one by one while \(|V(H)| &gt; k\).
+          <div class="code-block">Algorithm RecoverClique(G, k)
+1. If DecideClique(G, k) = NO, return NO-SOLUTION.
+2. H <- G
+3. Make a list U of the vertices of G.
+4. For each vertex v in U:
+     If |V(H)| = k, stop.
+     If v is no longer in H, continue.
+     If DecideClique(H - v, k) = YES, then set H <- H - v.
+     Else keep v in H.
+5. Output V(H).</div>
+          The invariant is: the current graph \(H\) always contains some clique of size \(k\).
+          <ul>
+            <li>If \(\text{DecideClique}(H-v,k)\) returns YES, then a \(k\)-clique survives after removing \(v\), so
+              replacing \(H\) by \(H-v\) preserves the invariant.</li>
+            <li>If it returns NO, then no \(k\)-clique exists without \(v\), so every \(k\)-clique in the current graph
+              must contain \(v\). Keeping \(v\) is therefore safe.</li>
+          </ul>
+          When the algorithm stops, the graph \(H\) has exactly \(k\) vertices and still has a clique of size \(k\).
+          Hence all vertices of \(H\) form the desired clique.
+          The algorithm makes at most \(|V(G)| + 1\) calls to the decider and performs only polynomial-time graph
+          updates, so the overall runtime is polynomial.
+        </div>
+      </div>
+
+      <div class="question-card">
+        <div class="question-header">
+          <span class="q-badge">Q4</span>
+          <span class="q-title">Recovering a Subset from a Subset-Sum Decider</span>
+          <span class="q-points">10 pts</span>
+        </div>
+        <div class="q-text">
+          Assume you are given a polynomial-time black-box decider
+          \[
+          \text{DecideSS}(a_1,\dots,a_n,T) \in \{\text{YES}, \text{NO}\}
+          \]
+          for \(\text{Subset-Sum}\). Design an algorithm that returns an actual subset summing to \(T\) whenever one
+          exists; otherwise return <code>NO-SOLUTION</code>. Prove correctness and polynomial runtime.
+        </div>
+        <button class="solution-toggle" onclick="toggleSolution(this)">Show Solution</button>
+        <div class="solution-block">
+          <span class="solution-title">Solution</span>
+          Start by checking whether any solution exists at all. If
+          \(\text{DecideSS}(a_1,\dots,a_n,T) = \text{NO}\), return <code>NO-SOLUTION</code>.
+          Otherwise maintain a residual target \(R\), initially \(R = T\), and decide for each item whether it must be
+          included.
+          <div class="code-block">Algorithm RecoverSubset(a1, ..., an, T)
+1. If DecideSS(a1, ..., an, T) = NO, return NO-SOLUTION.
+2. S <- empty set, R <- T
+3. For i = 1 to n:
+     Ask whether DecideSS(ai+1, ..., an, R) = YES.
+     If YES, skip ai.
+     If NO, include ai in S and set R <- R - ai.
+4. Output S.</div>
+          The invariant is: before processing \(a_i\), the remaining instance still has a solution summing to the
+          current residual target \(R\).
+          <ul>
+            <li>If the remaining items can already make \(R\) without \(a_i\), then skipping \(a_i\) preserves the
+              invariant.</li>
+            <li>If they cannot, then every solution for the current residual instance must include \(a_i\), so adding
+              \(a_i\) to \(S\) and reducing the target to \(R-a_i\) preserves the invariant.</li>
+          </ul>
+          After the last step, the selected set \(S\) sums exactly to \(T\). The algorithm uses at most \(n+1\)
+          decider calls, so the runtime is polynomial.
+        </div>
+      </div>
+    </div>
+
+    <footer>
+      CS637 - Quiz 4 • Spring 2026<br>
+      Dr. Debasish Pattanayak • Department of Computer Science
+    </footer>
+  </div>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      renderMathInElement(document.body, {
+        delimiters: [
+          { left: "$$", right: "$$", display: true },
+          { left: "\\[", right: "\\]", display: true },
+          { left: "\\(", right: "\\)", display: false }
+        ]
+      });
+    });
+
+    function toggleSolution(button) {
+      const solutionBlock = button.nextElementSibling;
+      solutionBlock.classList.toggle("visible");
+      button.textContent = solutionBlock.classList.contains("visible")
+        ? "Hide Solution"
+        : "Show Solution";
+    }
+  </script>
+
+  <a href="index.html" class="fab-btn" title="Back to Index">🏠</a>
+</body>
+
+</html>
