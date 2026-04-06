@@ -3,7 +3,7 @@
 
 <head>
   <meta charset="utf-8">
-  <title>CS 637 - Tutorial 6: Graph Basics, Eulerian Cycles, and Hamiltonian Cycles</title>
+  <title>CS 637 - Tutorial 6 Solutions: Graph Basics, Eulerian Cycles, and Hamiltonian Cycles</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
   <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
@@ -147,12 +147,17 @@
       font-size: 1.02em;
     }
 
-    .answer-line {
+    .solution {
       margin-top: 16px;
-      padding-top: 10px;
-      border-top: 1px dashed #cbd5e1;
-      color: #64748b;
-      font-size: 0.95em;
+      background: #eff6ff;
+      border-left: 4px solid #3b82f6;
+      border-radius: 8px;
+      padding: 14px 16px;
+      color: #1e293b;
+    }
+
+    .solution strong {
+      color: #1e3a8a;
     }
 
     .note-box {
@@ -228,7 +233,7 @@
   <div class="container">
     <header>
       <h1>CS 637: Mathematics-II</h1>
-      <div class="subtitle">Tutorial 6: Problems from Graph Theory for Computation</div>
+      <div class="subtitle">Tutorial 6: Problems from Graph Theory for Computation with Solutions</div>
       <div class="date-line">2 April 2026</div>
       <div class="instructor">
         <strong>Instructor:</strong> <a href="https://drdebmath.github.io" target="_blank">Dr. Debasish Pattanayak</a>
@@ -239,8 +244,9 @@
       <div class="instructions-box">
         <span class="instructions-title">Instructions</span>
         <ul>
-          <li>For Questions 1 to 10, mark each statement as <strong>True</strong> or <strong>False</strong> and give a short justification.</li>
-          <li>For Questions 11 to 17, write complete proofs.</li>
+          <li>Questions 1 to 10 ask for a <strong>True</strong> or <strong>False</strong> answer with a short justification.</li>
+          <li>Questions 11 to 17 ask for short proofs of standard graph-theoretic facts.</li>
+          <li>Worked solutions are provided immediately below each question.</li>
           <li>Use standard definitions of path, trail, cycle, tree, clique, chromatic number, Eulerian cycle, and Hamiltonian cycle.</li>
         </ul>
       </div>
@@ -259,7 +265,7 @@
           \[
           \omega(G) \le \chi(G).
           \]</p>
-        <div class="answer-line">Answer: ________ &nbsp;&nbsp; Justification: ________________________________________</div>
+        <div class="solution"><strong>Solution:</strong> <strong>True.</strong> All vertices in a clique are pairwise adjacent, so they must receive distinct colors in any proper coloring. Hence a clique of size \(\omega(G)\) forces at least \(\omega(G)\) colors, and therefore \(\omega(G) \le \chi(G)\).</div>
       </div>
 
       <div class="question-card">
@@ -271,7 +277,7 @@
           \[
           \chi(G) \le n.
           \]</p>
-        <div class="answer-line">Answer: ________ &nbsp;&nbsp; Justification: ________________________________________</div>
+        <div class="solution"><strong>Solution:</strong> <strong>True.</strong> We can always assign a different color to each of the \(n\) vertices, so every graph on \(n\) vertices is properly colorable with at most \(n\) colors.</div>
       </div>
 
       <div class="question-card">
@@ -280,7 +286,7 @@
           <span class="q-title">Chromatic Number Need Not Equal Clique Number</span>
         </div>
         <p class="statement">If \(\chi(G)=3\), then \(G\) must contain a clique of size 3.</p>
-        <div class="answer-line">Answer: ________ &nbsp;&nbsp; Justification: ________________________________________</div>
+        <div class="solution"><strong>Solution:</strong> <strong>False.</strong> The cycle \(C_5\) has chromatic number \(3\), but its largest clique has size \(2\). So \(\chi(G)=3\) does not force a triangle.</div>
       </div>
 
       <div class="question-card">
@@ -289,7 +295,7 @@
           <span class="q-title">Bipartite Graphs and Coloring</span>
         </div>
         <p class="statement">Every bipartite graph with at least one edge has chromatic number 2.</p>
-        <div class="answer-line">Answer: ________ &nbsp;&nbsp; Justification: ________________________________________</div>
+        <div class="solution"><strong>Solution:</strong> <strong>True.</strong> A bipartite graph is 2-colorable by coloring the two parts with two colors, and the presence of at least one edge means the graph cannot be colored with only one color.</div>
       </div>
 
       <div class="question-card">
@@ -298,7 +304,7 @@
           <span class="q-title">Trees Are Bipartite</span>
         </div>
         <p class="statement">Every tree is a bipartite graph.</p>
-        <div class="answer-line">Answer: ________ &nbsp;&nbsp; Justification: ________________________________________</div>
+        <div class="solution"><strong>Solution:</strong> <strong>True.</strong> A tree has no cycles, hence no odd cycles. A graph is bipartite exactly when it has no odd cycle, so every tree is bipartite.</div>
       </div>
 
       <div class="question-card">
@@ -307,7 +313,7 @@
           <span class="q-title">Odd Cycles</span>
         </div>
         <p class="statement">Every odd cycle is bipartite.</p>
-        <div class="answer-line">Answer: ________ &nbsp;&nbsp; Justification: ________________________________________</div>
+        <div class="solution"><strong>Solution:</strong> <strong>False.</strong> Odd cycles are the standard obstruction to bipartiteness. For example, \(C_3\) and \(C_5\) are not bipartite.</div>
       </div>
 
       <div class="question-card">
@@ -316,7 +322,7 @@
           <span class="q-title">Edge Count in Trees</span>
         </div>
         <p class="statement">Every tree on \(n\) vertices has exactly \(n-1\) edges.</p>
-        <div class="answer-line">Answer: ________ &nbsp;&nbsp; Justification: ________________________________________</div>
+        <div class="solution"><strong>Solution:</strong> <strong>True.</strong> This is a basic theorem on trees: every connected acyclic graph with \(n\) vertices has exactly \(n-1\) edges.</div>
       </div>
 
       <div class="question-card">
@@ -325,7 +331,7 @@
           <span class="q-title">Connected Graphs with \(n-1\) Edges</span>
         </div>
         <p class="statement">Every connected graph on \(n\) vertices with exactly \(n-1\) edges is a tree.</p>
-        <div class="answer-line">Answer: ________ &nbsp;&nbsp; Justification: ________________________________________</div>
+        <div class="solution"><strong>Solution:</strong> <strong>True.</strong> If a connected graph with \(n-1\) edges had a cycle, we could remove one edge from that cycle and the graph would stay connected, giving a connected graph on \(n\) vertices with only \(n-2\) edges, which is impossible. So it is connected and acyclic, hence a tree.</div>
       </div>
 
       <div class="question-card">
@@ -334,7 +340,7 @@
           <span class="q-title">Adjacency Matrix Symmetry</span>
         </div>
         <p class="statement">For every simple undirected graph \(G\), the adjacency matrix of \(G\) is symmetric.</p>
-        <div class="answer-line">Answer: ________ &nbsp;&nbsp; Justification: ________________________________________</div>
+        <div class="solution"><strong>Solution:</strong> <strong>True.</strong> In an undirected graph, \(u\) is adjacent to \(v\) exactly when \(v\) is adjacent to \(u\). Therefore \(A_{uv}=A_{vu}\), so the adjacency matrix is symmetric.</div>
       </div>
 
       <div class="question-card">
@@ -343,7 +349,7 @@
           <span class="q-title">Row Sums in the Adjacency Matrix</span>
         </div>
         <p class="statement">In a simple undirected graph, the sum of the entries in the row corresponding to a vertex \(v\) in the adjacency matrix equals \(\deg(v)\).</p>
-        <div class="answer-line">Answer: ________ &nbsp;&nbsp; Justification: ________________________________________</div>
+        <div class="solution"><strong>Solution:</strong> <strong>True.</strong> In a simple graph, the row for \(v\) has a \(1\) exactly in the columns corresponding to neighbors of \(v\), so the row sum counts the number of neighbors of \(v\), namely \(\deg(v)\).</div>
       </div>
 
       <h2 class="section-title">Part B: Proof Questions</h2>
@@ -357,6 +363,9 @@
           <span class="q-title">Even Degrees in Eulerian Graphs</span>
         </div>
         <p class="statement">Prove that if a connected graph has an Eulerian cycle, then every vertex of the graph has even degree.</p>
+        <div class="solution">
+          <strong>Solution:</strong> Let \(C\) be an Eulerian cycle of the graph. Each time the traversal arrives at a vertex by some edge, it must leave that vertex by a different unused edge, so the incident edges at that vertex are used in enter-leave pairs. The starting vertex is also the ending vertex, so its first departure is paired with the final arrival. Thus all edges incident to every vertex can be grouped into pairs, which means every vertex has even degree.
+        </div>
       </div>
 
       <div class="question-card">
@@ -365,6 +374,9 @@
           <span class="q-title">Odd-Degree Endpoints of an Eulerian Trail</span>
         </div>
         <p class="statement">Prove that if a connected graph has an Eulerian trail that is not a cycle, then the graph has exactly two vertices of odd degree.</p>
+        <div class="solution">
+          <strong>Solution:</strong> Let the Eulerian trail start at \(s\) and end at \(t\), where \(s \ne t\) because the trail is not a cycle. For every vertex different from \(s\) and \(t\), each time the trail enters that vertex it must later leave it, so the used incident edges come in pairs and its degree is even. At \(s\), the trail has one extra departure and no matching final return, so \(\deg(s)\) is odd. At \(t\), the trail has one extra arrival, so \(\deg(t)\) is odd. Hence exactly two vertices, namely \(s\) and \(t\), have odd degree.
+        </div>
       </div>
 
       <div class="question-card">
@@ -376,6 +388,20 @@
           \[
           d(u,v)=d(u,z)+d(z,v).
           \]</p>
+        <div class="solution">
+          <strong>Solution:</strong> Let
+          \[
+          u=x_0,x_1,\dots,x_k=v
+          \]
+          be a shortest \(u\)-\(v\) path. Then \(k=d(u,v)\) and \(k \ge 2\). Choose \(z=x_1\), the first internal vertex on this shortest path. Clearly \(d(u,z)=1\). Also, the subpath
+          \[
+          z=x_1,x_2,\dots,x_k=v
+          \]
+          has length \(k-1\), so \(d(z,v) \le k-1\). If \(d(z,v) < k-1\), then combining a shorter \(z\)-\(v\) path with the edge \(ux_1\) would give a \(u\)-\(v\) path shorter than \(k\), contradicting the choice of the path. Hence \(d(z,v)=k-1\). Therefore
+          \[
+          d(u,z)+d(z,v)=1+(k-1)=k=d(u,v).
+          \]
+        </div>
       </div>
 
       <div class="question-card">
@@ -384,6 +410,9 @@
           <span class="q-title">Minimum Degree in a Hamiltonian Graph</span>
         </div>
         <p class="statement">Prove that if a graph has a Hamiltonian cycle, then every vertex has degree at least 2.</p>
+        <div class="solution">
+          <strong>Solution:</strong> Suppose \(G\) has a Hamiltonian cycle \(C\). Every vertex of \(G\) appears exactly once on \(C\), and on the cycle each vertex is incident with two distinct cycle edges: one by which the cycle enters the vertex and one by which it leaves. These two edges are edges of \(G\), so every vertex has degree at least \(2\).
+        </div>
       </div>
 
       <div class="question-card">
@@ -392,6 +421,9 @@
           <span class="q-title">Bipartite Hamiltonian Graphs</span>
         </div>
         <p class="statement">Prove that if a bipartite graph has a Hamiltonian cycle, then the two parts of the bipartition have the same number of vertices.</p>
+        <div class="solution">
+          <strong>Solution:</strong> Let the bipartition be \(V(G)=X \cup Y\), where every edge joins a vertex of \(X\) to a vertex of \(Y\). If \(G\) has a Hamiltonian cycle, then as we move around that cycle the vertices must alternate between \(X\) and \(Y\), because consecutive vertices on the cycle are adjacent. Therefore the cycle contains equally many vertices from \(X\) and \(Y\). Since the cycle is Hamiltonian, it visits every vertex of \(G\) exactly once. Hence \(|X|=|Y|\).
+        </div>
       </div>
 
       <div class="question-card">
@@ -400,6 +432,9 @@
           <span class="q-title">Every Edge Is a Bridge</span>
         </div>
         <p class="statement">Prove that if every edge of a connected graph is a bridge, then the graph is a tree.</p>
+        <div class="solution">
+          <strong>Solution:</strong> Let \(G\) be connected and suppose every edge of \(G\) is a bridge. We claim that \(G\) has no cycle. If there were a cycle, then removing any one edge from that cycle would still leave a path between its endpoints using the rest of the cycle, so that edge would not disconnect the graph. This contradicts the assumption that every edge is a bridge. Thus \(G\) is acyclic. Since \(G\) is both connected and acyclic, \(G\) is a tree.
+        </div>
       </div>
 
       <div class="question-card">
@@ -408,6 +443,15 @@
           <span class="q-title">Characterizing Bridges by Cycles</span>
         </div>
         <p class="statement">Prove that an edge of a graph is a bridge if and only if it does not belong to any cycle.</p>
+        <div class="solution">
+          <strong>Solution:</strong> Let \(e=uv\) be an edge.
+          <br><br>
+          First suppose \(e\) is a bridge. If \(e\) belonged to a cycle, then the rest of that cycle would give a \(u\)-\(v\) path even after deleting \(e\). So removing \(e\) would not disconnect the graph, contradicting that \(e\) is a bridge. Hence a bridge cannot lie on any cycle.
+          <br><br>
+          Conversely, suppose \(e\) does not belong to any cycle. If \(e\) were not a bridge, then after deleting \(e\) there would still be a path from \(u\) to \(v\). Together with the edge \(e\), that path would form a cycle containing \(e\), which is impossible. Therefore \(e\) must be a bridge.
+          <br><br>
+          Thus an edge is a bridge if and only if it does not belong to any cycle.
+        </div>
       </div>
     </div>
 
