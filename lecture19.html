@@ -1,8 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="utf-8">
-  <title>CS 637 – Lecture 19 Definitions</title>
+  <title>CS 637 - Lecture 19: Degree Sequences, Adjacency Spectra, and Reachability</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
@@ -10,108 +11,800 @@
   <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
 
   <style>
-    body {
-      font-family: "Times New Roman", serif;
-      margin: 40px;
-      line-height: 1.5;
-      background-color: #ffffff;
-      color: #000000;
+    :root {
+      --primary: #0f766e;
+      --secondary: #1d4ed8;
+      --accent: #ea580c;
+      --accent-hover: #c2410c;
+      --success: #059669;
+      --warning: #d97706;
+      --text-dark: #1e293b;
+      --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.08);
+      --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.15);
     }
-    h1, h2 {
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      line-height: 1.7;
+      background: linear-gradient(135deg, #082f49 0%, #0f172a 55%, #1e293b 100%);
+      min-height: 100vh;
+      padding: 20px;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    .particles {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 25px 80px rgba(0, 0, 0, 0.4);
+      overflow: hidden;
+      position: relative;
+      z-index: 1;
+    }
+
+    header {
+      background: linear-gradient(135deg, #0f766e, #1d4ed8, #ea580c);
+      background-size: 200% 200%;
+      animation: gradientShift 15s ease infinite;
+      color: white;
+      padding: 50px 40px;
       text-align: center;
     }
+
+    @keyframes gradientShift {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
     h1 {
-      font-size: 1.8em;
-      margin-bottom: 0.2em;
+      font-size: 2.8em;
+      margin-bottom: 12px;
+      font-weight: 800;
     }
-    h2 {
-      font-size: 1.2em;
-      margin-top: 2em;
-      margin-bottom: 0.5em;
-    }
-    .definition {
-      margin-bottom: 1em;
-    }
-    .term {
-      font-weight: bold;
-    }
-    .number {
-      font-weight: bold;
-    }
-    .instructor {
-      margin-top: 8px;
-      font-size: 0.95rem;
-      color: #64748b;
-    }
-    .instructor a {
-      color: #0ea5e9;
-      text-decoration: none;
+
+    .subtitle {
+      font-size: 1.35em;
+      margin-bottom: 20px;
+      opacity: 0.96;
       font-weight: 500;
     }
-    .instructor a:hover {
-      text-decoration: underline;
+
+    .instructor {
+      margin-top: 20px;
+      font-size: 1.08em;
+      opacity: 0.96;
     }
+
+    .instructor a {
+      color: #fde68a;
+      text-decoration: none;
+      font-weight: 600;
+      padding: 4px 8px;
+    }
+
+    .progress-bar {
+      position: sticky;
+      top: 0;
+      height: 4px;
+      background: #e2e8f0;
+      z-index: 101;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--primary), var(--secondary), var(--accent));
+      width: 0%;
+      transition: width 0.3s ease;
+    }
+
+    .nav-wrapper {
+      background: #fff;
+      position: sticky;
+      top: 4px;
+      z-index: 100;
+      border-bottom: 2px solid #e2e8f0;
+    }
+
+    .nav-tabs {
+      display: flex;
+      overflow-x: auto;
+      padding: 0 20px;
+      scrollbar-width: thin;
+    }
+
+    .tab-btn {
+      padding: 15px 22px;
+      background: none;
+      border: none;
+      font-size: 1em;
+      cursor: pointer;
+      color: #64748b;
+      font-weight: 600;
+      border-bottom: 3px solid transparent;
+      transition: all 0.3s;
+      white-space: nowrap;
+    }
+
+    .tab-btn.active {
+      color: var(--primary);
+      border-bottom-color: var(--primary);
+    }
+
+    .content {
+      padding: 50px 40px;
+      min-height: 600px;
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+      animation: slideIn 0.5s ease-out;
+    }
+
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .section-title {
+      font-size: 2em;
+      color: var(--text-dark);
+      margin-bottom: 30px;
+      padding-bottom: 12px;
+      border-bottom: 4px solid var(--secondary);
+    }
+
+    .definition-card,
+    .example-card,
+    .theorem-card,
+    .key-point,
+    .remark-card {
+      padding: 25px;
+      margin-bottom: 25px;
+      border-radius: 12px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .definition-card { background: #f8fafc; border-left: 5px solid var(--primary); }
+    .example-card { background: #fff7ed; border-left: 5px solid var(--warning); }
+    .theorem-card { background: #eff6ff; border-left: 5px solid #0ea5e9; }
+    .key-point { background: #ecfdf5; border-left: 5px solid var(--success); }
+    .remark-card { background: #f5f3ff; border-left: 5px solid #7c3aed; }
+
+    .card-title {
+      font-size: 1.3em;
+      font-weight: 700;
+      margin-bottom: 15px;
+      color: var(--text-dark);
+    }
+
+    .formula-box {
+      background: white;
+      border: 1px solid #dbeafe;
+      border-radius: 10px;
+      padding: 16px 18px;
+      margin-top: 15px;
+      overflow-x: auto;
+    }
+
+    .mini-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 16px;
+      font-size: 0.96em;
+      background: white;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    .mini-table th,
+    .mini-table td {
+      border: 1px solid #e2e8f0;
+      padding: 12px 14px;
+      vertical-align: top;
+      text-align: left;
+    }
+
+    .mini-table th {
+      background: #eff6ff;
+      color: var(--text-dark);
+      font-weight: 700;
+    }
+
+    .two-col {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 20px;
+    }
+
+    ul,
+    ol {
+      margin-left: 25px;
+      margin-top: 15px;
+    }
+
+    li {
+      margin-bottom: 10px;
+    }
+
+    p + p {
+      margin-top: 12px;
+    }
+
     footer {
-      margin-top: 3em;
+      background: #0f172a;
+      color: white;
       text-align: center;
-      font-size: 0.85em;
-      color: #333;
+      padding: 30px;
+    }
+
+    .fab-btn {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      color: white;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+      z-index: 1000;
+      border: none;
+      font-size: 28px;
+      transition: all 0.3s;
+      cursor: pointer;
+    }
+
+    .scroll-top {
+      position: fixed;
+      bottom: 100px;
+      right: 30px;
+      width: 52px;
+      height: 52px;
+      border: none;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent), var(--accent-hover));
+      color: white;
+      font-size: 1.3em;
+      cursor: pointer;
+      box-shadow: var(--shadow-lg);
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s;
+      z-index: 120;
+    }
+
+    .scroll-top.visible {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    @media (max-width: 768px) {
+      .content { padding: 30px 20px; }
+      h1 { font-size: 2.1em; }
+      .subtitle { font-size: 1.15em; }
+      .two-col { grid-template-columns: 1fr; }
     }
   </style>
-
-<style>
-.fab-btn {
-  position: fixed;
-  bottom: 24px;
-  right: 24px;
-  width: 56px;
-  height: 56px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #3b82f6, #2563eb);
-  color: white;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-  cursor: pointer;
-  z-index: 1000;
-  border: none;
-  font-size: 24px;
-  transition: transform 0.2s, box-shadow 0.2s;
-  text-decoration: none;
-}
-.fab-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(0,0,0,0.3);
-}
-</style>
-
 </head>
 
 <body>
+  <div class="particles" id="particles"></div>
 
-<h1>CS 637: Mathematics-II</h1>
-<div class="instructor">
-  <strong>Instructor:</strong> <a href="https://drdebmath.github.io" target="_blank">Dr. Debasish Pattanayak</a>
-</div>
-<h2>Lecture 19 – Structural Consequences of NP-Completeness</h2>
+  <div class="container">
+    <div class="progress-bar">
+      <div class="progress-fill" id="progressFill"></div>
+    </div>
 
-<footer>
-  
-</footer>
+    <header>
+      <h1>CS 637: Mathematics-II</h1>
+      <div class="subtitle">Lecture 19: Degree Sequences, Adjacency Spectra, and Reachability</div>
+      <div class="instructor">
+        <strong>Instructor:</strong> <a href="https://drdebmath.github.io/" target="_blank">Dr. Debasish Pattanayak</a>
+      </div>
+    </header>
 
-<script>
-document.addEventListener("DOMContentLoaded", function() {
-    renderMathInElement(document.body, {
+    <div class="nav-wrapper">
+      <div class="nav-tabs">
+        <button class="tab-btn active" onclick="switchTab('sequences')">Sequences</button>
+        <button class="tab-btn" onclick="switchTab('realization')">Realization</button>
+        <button class="tab-btn" onclick="switchTab('spectrum')">Spectrum</button>
+        <button class="tab-btn" onclick="switchTab('reachability')">Reachability</button>
+        <button class="tab-btn" onclick="switchTab('takeaways')">Takeaways</button>
+      </div>
+    </div>
+
+    <div class="content">
+      <div id="sequences" class="tab-content active">
+        <h2 class="section-title">Degree Sequences and Graphicality</h2>
+
+        <div class="definition-card">
+          <h3 class="card-title">Degree Sequence</h3>
+          <p>For a simple graph on \(n\) vertices, the degree sequence is the list of vertex degrees written in
+            nonincreasing order:</p>
+          <div class="formula-box">
+            \[
+            d_1 \ge d_2 \ge \cdots \ge d_n.
+            \]
+          </div>
+          <p>A sequence is called <strong>graphical</strong> if there exists a simple graph whose vertex degrees are
+            exactly \(d_1,\dots,d_n\).</p>
+        </div>
+
+        <div class="key-point">
+          <h3 class="card-title">Immediate Necessary Conditions</h3>
+          <ul>
+            <li>Each degree satisfies \(0 \le d_i \le n-1\).</li>
+            <li>The sum of the degrees must be even, because
+              \[
+              \sum_{i=1}^n d_i = 2|E|.
+              \]</li>
+            <li>These conditions are necessary, but by themselves they are not sufficient.</li>
+          </ul>
+        </div>
+
+        <div class="theorem-card">
+          <h3 class="card-title">Erdos-Gallai Criterion</h3>
+          <p>A nonincreasing sequence \(d_1,\dots,d_n\) of nonnegative integers is graphical if and only if the sum of
+            the degrees is even and, for every \(1 \le k \le n\),</p>
+          <div class="formula-box">
+            \[
+            \sum_{i=1}^k d_i \le k(k-1) + \sum_{i=k+1}^n \min(d_i,k).
+            \]
+          </div>
+          <p>This criterion gives a complete test, while Havel-Hakimi gives a constructive procedure.</p>
+        </div>
+
+        <div class="example-card">
+          <h3 class="card-title">Quick Reality Check</h3>
+          <table class="mini-table">
+            <thead>
+              <tr>
+                <th>Sequence</th>
+                <th>Graphical?</th>
+                <th>Why</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>\((3,3,2,2,2,2)\)</td>
+                <td>Yes</td>
+                <td>It survives Havel-Hakimi reductions down to the zero sequence.</td>
+              </tr>
+              <tr>
+                <td>\((4,4,1,1,1,1)\)</td>
+                <td>No</td>
+                <td>The two vertices of degree 4 would each need too many neighbors among four degree-1 vertices.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div id="realization" class="tab-content">
+        <h2 class="section-title">Graph Realization from Degree Sequences</h2>
+
+        <div class="theorem-card">
+          <h3 class="card-title">Havel-Hakimi Reduction Rule</h3>
+          <p>Suppose \(d_1 \ge d_2 \ge \cdots \ge d_n\). Then the sequence is graphical if and only if the reduced
+            sequence obtained by deleting \(d_1\) and subtracting 1 from the next \(d_1\) entries is graphical, after
+            reordering into nonincreasing form.</p>
+          <div class="formula-box">
+            \[
+            (d_1,d_2,\dots,d_n)
+            \leadsto
+            (d_2-1,d_3-1,\dots,d_{d_1+1}-1,d_{d_1+2},\dots,d_n).
+            \]
+          </div>
+          <p>Combinatorially, we connect the highest-degree vertex to the next \(d_1\) vertices.</p>
+        </div>
+
+        <div class="example-card">
+          <h3 class="card-title">Worked Havel-Hakimi Example</h3>
+          <p>Start with the sequence \((3,3,2,2,2,2)\).</p>
+          <table class="mini-table">
+            <thead>
+              <tr>
+                <th>Round</th>
+                <th>Current Sequence</th>
+                <th>Reduction</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>1</td>
+                <td>\((3,3,2,2,2,2)\)</td>
+                <td>Remove 3, subtract from next 3 terms: \((2,1,1,2,2)\), then reorder to \((2,2,2,1,1)\)</td>
+              </tr>
+              <tr>
+                <td>2</td>
+                <td>\((2,2,2,1,1)\)</td>
+                <td>Remove 2, subtract from next 2 terms: \((1,1,1,1)\)</td>
+              </tr>
+              <tr>
+                <td>3</td>
+                <td>\((1,1,1,1)\)</td>
+                <td>Reduce to \((1,1,0)\), then to \((0,0)\)</td>
+              </tr>
+            </tbody>
+          </table>
+          <p>Since the process ends at the zero sequence, the original sequence is graphical.</p>
+        </div>
+
+        <div class="definition-card">
+          <h3 class="card-title">One Realizing Graph</h3>
+          <p>A concrete realization is obtained by introducing vertices \(v_1,\dots,v_6\) and adding edges</p>
+          <div class="formula-box">
+            \[
+            \{v_1v_2, v_1v_3, v_1v_4, v_2v_5, v_2v_6, v_3v_4, v_5v_6\}.
+            \]
+          </div>
+          <p>The resulting degrees are \((3,3,2,2,2,2)\).</p>
+        </div>
+
+        <div class="key-point">
+          <h3 class="card-title">Algorithmic Cost of Realization</h3>
+          <p>If we repeatedly sort after each reduction, Havel-Hakimi gives a straightforward realization algorithm in
+            about \(O(n^2 \log n)\) time. With more careful data structures the bookkeeping can be improved, but the
+            key point is that graph realization is efficiently decidable and constructible.</p>
+        </div>
+      </div>
+
+      <div id="spectrum" class="tab-content">
+        <h2 class="section-title">Basic Spectral Properties of the Adjacency Matrix</h2>
+
+        <div class="definition-card">
+          <h3 class="card-title">Adjacency Matrix and Spectrum</h3>
+          <p>For \(V=\{v_1,\dots,v_n\}\), the adjacency matrix \(A\) is defined by</p>
+          <div class="formula-box">
+            \[
+            A_{ij} =
+            \begin{cases}
+            1 & \text{if } \{v_i,v_j\}\in E,\\
+            0 & \text{otherwise.}
+            \end{cases}
+            \]
+          </div>
+          <p>Its eigenvalues are called the <strong>adjacency spectrum</strong> of the graph.</p>
+        </div>
+
+        <div class="theorem-card">
+          <h3 class="card-title">Symmetry Gives Real Eigenvalues</h3>
+          <p>For a simple undirected graph, \(A=A^T\). Therefore:</p>
+          <ul>
+            <li>all eigenvalues of \(A\) are real,</li>
+            <li>\(A\) has an orthonormal basis of eigenvectors,</li>
+            <li>there is an eigendecomposition
+              \[
+              A = Q \Lambda Q^T.
+              \]</li>
+          </ul>
+          <p>This is the spectral reason linear algebra interacts so nicely with undirected graphs.</p>
+        </div>
+
+        <div class="theorem-card">
+          <h3 class="card-title">Three Fast Spectral Identities</h3>
+          <div class="formula-box">
+            \[
+            \sum_{i=1}^n \lambda_i = \operatorname{tr}(A) = 0,
+            \qquad
+            \sum_{i=1}^n \lambda_i^2 = \operatorname{tr}(A^2) = 2|E|.
+            \]
+          </div>
+          <p>If \(G\) is \(d\)-regular, then</p>
+          <div class="formula-box">
+            \[
+            A\mathbf{1} = d\mathbf{1},
+            \]
+          </div>
+          <p>so \(d\) is an eigenvalue of \(A\) with eigenvector \(\mathbf{1}\).</p>
+        </div>
+
+        <div class="remark-card">
+          <h3 class="card-title">Spectral Radius and Degree</h3>
+          <p>If \(\Delta\) is the maximum degree, then the spectral radius satisfies</p>
+          <div class="formula-box">
+            \[
+            \rho(A) \le \Delta.
+            \]
+          </div>
+          <p>For regular graphs, equality is immediate because the degree itself is an eigenvalue.</p>
+        </div>
+
+        <div class="example-card">
+          <h3 class="card-title">Small Examples</h3>
+          <table class="mini-table">
+            <thead>
+              <tr>
+                <th>Graph</th>
+                <th>Adjacency Eigenvalues</th>
+                <th>Comment</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>\(P_2\)</td>
+                <td>\(1,-1\)</td>
+                <td>Symmetric around 0 and \(\lambda_1^2+\lambda_2^2=2=2|E|\)</td>
+              </tr>
+              <tr>
+                <td>\(K_3\)</td>
+                <td>\(2,-1,-1\)</td>
+                <td>The graph is 2-regular, so 2 appears as an eigenvalue</td>
+              </tr>
+              <tr>
+                <td>\(C_4\)</td>
+                <td>\(2,0,0,-2\)</td>
+                <td>Again, the sum is 0 and the sum of squares is 8</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div id="reachability" class="tab-content">
+        <h2 class="section-title">Undirected Reachability and Its Algorithmic Cost</h2>
+
+        <div class="definition-card">
+          <h3 class="card-title">Reachability Problem</h3>
+          <p>Given an undirected graph \(G\) and two vertices \(s\) and \(t\), determine whether there is a path from
+            \(s\) to \(t\).</p>
+          <div class="formula-box">
+            \[
+            s \leadsto t
+            \quad \Longleftrightarrow \quad
+            s \text{ and } t \text{ lie in the same connected component.}
+            \]
+          </div>
+        </div>
+
+        <div class="theorem-card">
+          <h3 class="card-title">Walk Counting via Powers of \(A\)</h3>
+          <p>The \((u,v)\)-entry of \(A^k\) counts the number of walks of length \(k\) from \(u\) to \(v\). Hence
+            \(u\) reaches \(v\) if and only if there exists some \(0 \le k \le n-1\) with</p>
+          <div class="formula-box">
+            \[
+            (A^k)_{uv} > 0.
+            \]
+          </div>
+          <p>Equivalently, if</p>
+          <div class="formula-box">
+            \[
+            R = I + A + A^2 + \cdots + A^{n-1},
+            \]
+          </div>
+          <p>then \(u\) reaches \(v\) exactly when \(R_{uv} > 0\).</p>
+        </div>
+
+        <div class="theorem-card">
+          <h3 class="card-title">Spectral Viewpoint on Walks</h3>
+          <p>Since \(A\) is symmetric, we can write \(A = Q \Lambda Q^T\). Therefore</p>
+          <div class="formula-box">
+            \[
+            A^k = Q \Lambda^k Q^T.
+            \]
+          </div>
+          <p>This means the growth of walk counts is governed by the eigenvalues of \(A\). Spectral information is very
+            useful for understanding global structure, but it is not the cheapest way to answer a plain reachability
+            query.</p>
+        </div>
+
+        <div class="example-card">
+          <h3 class="card-title">Cost Comparison</h3>
+          <table class="mini-table">
+            <thead>
+              <tr>
+                <th>Method</th>
+                <th>Input Model</th>
+                <th>Goal</th>
+                <th>Typical Cost</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>BFS or DFS</td>
+                <td>Adjacency list</td>
+                <td>One-source or one-pair reachability</td>
+                <td>\(O(n+m)\)</td>
+              </tr>
+              <tr>
+                <td>BFS or DFS</td>
+                <td>Adjacency matrix</td>
+                <td>One-source or one-pair reachability</td>
+                <td>\(O(n^2)\)</td>
+              </tr>
+              <tr>
+                <td>Repeated matrix powers</td>
+                <td>Dense matrix algebra</td>
+                <td>Reachability through walk counts</td>
+                <td>Naively \(O(n^4)\)</td>
+              </tr>
+              <tr>
+                <td>Transitive closure / dense matrix methods</td>
+                <td>Matrix-based</td>
+                <td>All-pairs reachability</td>
+                <td>Usually \(O(n^3)\) or better with fast matrix multiplication</td>
+              </tr>
+              <tr>
+                <td>Full spectral decomposition</td>
+                <td>Symmetric matrix</td>
+                <td>Global spectral analysis</td>
+                <td>About \(O(n^3)\) preprocessing</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="key-point">
+          <h3 class="card-title">Algorithmic Moral</h3>
+          <p>For undirected reachability, the right algorithmic primitive is graph search. Spectral properties of the
+            adjacency matrix explain walk structure and support deeper analysis, but BFS or DFS is asymptotically and
+            conceptually simpler for deciding whether \(s\) can reach \(t\).</p>
+        </div>
+
+        <div class="remark-card">
+          <h3 class="card-title">A Connectivity Remark</h3>
+          <p>When one studies connectivity spectrally, the Laplacian \(L=D-A\) is often more convenient than the
+            adjacency matrix. Reachability itself, however, is still most efficiently handled by traversing the graph.</p>
+        </div>
+      </div>
+
+      <div id="takeaways" class="tab-content">
+        <h2 class="section-title">What to Remember</h2>
+
+        <div class="two-col">
+          <div class="key-point">
+            <h3 class="card-title">From Degrees to Graphs</h3>
+            <ul>
+              <li>A degree sequence is graphical if it can be realized by a simple graph.</li>
+              <li>Erdos-Gallai gives a complete test.</li>
+              <li>Havel-Hakimi gives a constructive reduction and often an explicit realization.</li>
+            </ul>
+          </div>
+
+          <div class="key-point">
+            <h3 class="card-title">From Graphs to Linear Algebra</h3>
+            <ul>
+              <li>For undirected graphs, the adjacency matrix is symmetric.</li>
+              <li>Therefore all adjacency eigenvalues are real.</li>
+              <li>Trace identities connect eigenvalues back to edge counts.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="theorem-card">
+          <h3 class="card-title">One-Lecture Summary</h3>
+          <ol>
+            <li>Degree sequences tell us which local degree patterns are globally realizable.</li>
+            <li>The adjacency spectrum packages structural information into eigenvalues and eigenvectors.</li>
+            <li>Powers of the adjacency matrix encode walks, which ties spectral ideas to reachability.</li>
+            <li>Even so, for plain undirected reachability, BFS or DFS remains the preferred algorithm.</li>
+          </ol>
+        </div>
+
+        <div class="example-card">
+          <h3 class="card-title">Suggested Follow-Up Questions</h3>
+          <ul>
+            <li>How does the Laplacian spectrum detect connected components?</li>
+            <li>What changes when the graph is directed rather than undirected?</li>
+            <li>How do spectral gaps relate to expansion and random walks?</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <footer>
+      <p>&copy; 2026 Dr. Debasish Pattanayak | CS 637 Mathematics-II</p>
+    </footer>
+  </div>
+
+  <a href="index.html" class="fab-btn" title="Back to Course Home">🏠</a>
+  <button class="scroll-top" id="scrollTop" onclick="scrollToTop()">↑</button>
+
+  <script>
+    function switchTab(tabId) {
+      document.querySelectorAll(".tab-content").forEach((tab) => tab.classList.remove("active"));
+      document.querySelectorAll(".tab-btn").forEach((btn) => btn.classList.remove("active"));
+      document.getElementById(tabId).classList.add("active");
+      for (const btn of document.querySelectorAll(".tab-btn")) {
+        if (btn.getAttribute("onclick").includes(tabId)) {
+          btn.classList.add("active");
+          break;
+        }
+      }
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      renderMathInElement(document.getElementById(tabId), {
         delimiters: [
-            {left: "31952", right: "31952", display: true},
-            {left: "\[", right: "\]", display: true},
-            {left: "\(", right: "\)", display: false}
-        ]
-    });
-});
-</script>
+          { left: "$$", right: "$$", display: true },
+          { left: "\\[", right: "\\]", display: true },
+          { left: "$", right: "$", display: false },
+          { left: "\\(", right: "\\)", display: false }
+        ],
+        throwOnError: false
+      });
+    }
 
-<a href="index.html" class="fab-btn" title="Back to Index">🏠</a>
+    window.addEventListener("scroll", function () {
+      updateProgress();
+      const scrollTop = document.getElementById("scrollTop");
+      if (window.pageYOffset > 300) {
+        scrollTop.classList.add("visible");
+      } else {
+        scrollTop.classList.remove("visible");
+      }
+    });
+
+    function scrollToTop() {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function updateProgress() {
+      const scrollTotal = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+      const scrollPos = document.documentElement.scrollTop;
+      const progress = (scrollPos / (scrollTotal || 1)) * 100;
+      document.getElementById("progressFill").style.width = progress + "%";
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+      renderMathInElement(document.body, {
+        delimiters: [
+          { left: "$$", right: "$$", display: true },
+          { left: "\\[", right: "\\]", display: true },
+          { left: "$", right: "$", display: false },
+          { left: "\\(", right: "\\)", display: false }
+        ],
+        throwOnError: false
+      });
+      updateProgress();
+    });
+
+    const particlesContainer = document.getElementById("particles");
+    for (let i = 0; i < 20; i++) {
+      const p = document.createElement("div");
+      p.style.position = "absolute";
+      p.style.width = Math.random() * 5 + "px";
+      p.style.height = p.style.width;
+      p.style.background = "rgba(255, 255, 255, 0.1)";
+      p.style.borderRadius = "50%";
+      p.style.top = Math.random() * 100 + "%";
+      p.style.left = Math.random() * 100 + "%";
+      p.style.animation = "float " + (Math.random() * 10 + 5) + "s linear infinite";
+      particlesContainer.appendChild(p);
+    }
+
+    const style = document.createElement("style");
+    style.textContent = `
+      @keyframes float {
+        0% { transform: translateY(0); opacity: 0; }
+        50% { opacity: 0.5; }
+        100% { transform: translateY(-100vh); opacity: 0; }
+      }
+    `;
+    document.head.appendChild(style);
+  </script>
 </body>
+
 </html>
