@@ -1,8 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="utf-8">
-  <title>CS 637 – Lecture 20 Definitions</title>
+  <title>CS 637 - Lecture 20: Structural Graph Proofs</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
@@ -10,108 +11,755 @@
   <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
 
   <style>
+    :root {
+      --primary: #14532d;
+      --secondary: #1d4ed8;
+      --accent: #c2410c;
+      --accent-soft: #fff7ed;
+      --ink: #1e293b;
+      --muted: #64748b;
+      --surface: #ffffff;
+      --surface-soft: #f8fafc;
+      --shadow-sm: 0 2px 8px rgba(15, 23, 42, 0.08);
+      --shadow-lg: 0 16px 48px rgba(15, 23, 42, 0.18);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
     body {
-      font-family: "Times New Roman", serif;
-      margin: 40px;
-      line-height: 1.5;
-      background-color: #ffffff;
-      color: #000000;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      line-height: 1.7;
+      background:
+        radial-gradient(circle at top left, rgba(34, 197, 94, 0.18), transparent 30%),
+        radial-gradient(circle at top right, rgba(59, 130, 246, 0.18), transparent 28%),
+        linear-gradient(135deg, #082f49 0%, #0f172a 50%, #172554 100%);
+      min-height: 100vh;
+      padding: 20px;
+      color: var(--ink);
+      overflow-x: hidden;
     }
-    h1, h2 {
+
+    .container {
+      max-width: 1180px;
+      margin: 0 auto;
+      background: var(--surface);
+      border-radius: 22px;
+      box-shadow: 0 25px 80px rgba(0, 0, 0, 0.35);
+      overflow: hidden;
+      position: relative;
+    }
+
+    .progress-bar {
+      position: sticky;
+      top: 0;
+      height: 4px;
+      background: #e2e8f0;
+      z-index: 101;
+    }
+
+    .progress-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--primary), var(--secondary), var(--accent));
+      transition: width 0.2s ease;
+    }
+
+    header {
+      color: white;
+      padding: 52px 40px 44px;
       text-align: center;
+      background: linear-gradient(135deg, #14532d 0%, #1d4ed8 55%, #c2410c 100%);
+      background-size: 200% 200%;
+      animation: gradientShift 16s ease infinite;
     }
+
+    @keyframes gradientShift {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
     h1 {
-      font-size: 1.8em;
-      margin-bottom: 0.2em;
+      font-size: 2.8em;
+      margin-bottom: 12px;
+      font-weight: 800;
     }
-    h2 {
-      font-size: 1.2em;
-      margin-top: 2em;
-      margin-bottom: 0.5em;
-    }
-    .definition {
-      margin-bottom: 1em;
-    }
-    .term {
-      font-weight: bold;
-    }
-    .number {
-      font-weight: bold;
-    }
-    .instructor {
-      margin-top: 8px;
-      font-size: 0.95rem;
-      color: #64748b;
-    }
-    .instructor a {
-      color: #0ea5e9;
-      text-decoration: none;
+
+    .subtitle {
+      font-size: 1.32em;
+      opacity: 0.96;
+      margin-bottom: 18px;
       font-weight: 500;
     }
-    .instructor a:hover {
-      text-decoration: underline;
+
+    .instructor {
+      font-size: 1.05em;
+      opacity: 0.96;
     }
+
+    .instructor a {
+      color: #fef3c7;
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .nav-wrapper {
+      position: sticky;
+      top: 4px;
+      z-index: 100;
+      background: white;
+      border-bottom: 2px solid #e2e8f0;
+    }
+
+    .nav-tabs {
+      display: flex;
+      overflow-x: auto;
+      padding: 0 16px;
+      scrollbar-width: thin;
+    }
+
+    .tab-btn {
+      border: none;
+      background: none;
+      padding: 16px 22px;
+      cursor: pointer;
+      color: var(--muted);
+      font-size: 1em;
+      font-weight: 700;
+      white-space: nowrap;
+      border-bottom: 3px solid transparent;
+      transition: all 0.25s ease;
+    }
+
+    .tab-btn.active {
+      color: var(--primary);
+      border-bottom-color: var(--primary);
+    }
+
+    .content {
+      padding: 48px 40px;
+      min-height: 650px;
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+      animation: fadeUp 0.4s ease-out;
+    }
+
+    @keyframes fadeUp {
+      from {
+        opacity: 0;
+        transform: translateY(16px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .section-title {
+      font-size: 2em;
+      margin-bottom: 28px;
+      padding-bottom: 12px;
+      border-bottom: 4px solid var(--secondary);
+      color: var(--ink);
+    }
+
+    .card,
+    .problem-card,
+    .solution-card,
+    .idea-card,
+    .remark-card,
+    .summary-card {
+      padding: 24px;
+      margin-bottom: 24px;
+      border-radius: 14px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .card {
+      background: var(--surface-soft);
+      border-left: 5px solid var(--primary);
+    }
+
+    .problem-card {
+      background: #eff6ff;
+      border-left: 5px solid var(--secondary);
+    }
+
+    .solution-card {
+      background: #ecfdf5;
+      border-left: 5px solid var(--primary);
+    }
+
+    .idea-card {
+      background: var(--accent-soft);
+      border-left: 5px solid var(--accent);
+    }
+
+    .remark-card {
+      background: #f5f3ff;
+      border-left: 5px solid #7c3aed;
+    }
+
+    .summary-card {
+      background: #f8fafc;
+      border-left: 5px solid #0f766e;
+    }
+
+    .card-title {
+      font-size: 1.28em;
+      font-weight: 800;
+      margin-bottom: 14px;
+      color: var(--ink);
+    }
+
+    .formula-box {
+      margin: 16px 0;
+      padding: 16px 18px;
+      border: 1px solid #dbeafe;
+      border-radius: 12px;
+      background: white;
+      overflow-x: auto;
+    }
+
+    .mini-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 16px;
+      background: white;
+      border-radius: 12px;
+      overflow: hidden;
+      font-size: 0.97em;
+    }
+
+    .mini-table th,
+    .mini-table td {
+      border: 1px solid #e2e8f0;
+      padding: 12px 14px;
+      text-align: left;
+      vertical-align: top;
+    }
+
+    .mini-table th {
+      background: #eff6ff;
+      font-weight: 700;
+    }
+
+    .two-col {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 20px;
+    }
+
+    .figure-box {
+      margin-top: 16px;
+      padding: 18px;
+      border-radius: 14px;
+      background: white;
+      border: 1px solid #dbeafe;
+    }
+
+    .figure-caption {
+      margin-top: 10px;
+      color: var(--muted);
+      font-size: 0.95em;
+    }
+
+    .badge-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: white;
+      border: 1px solid #cbd5e1;
+      font-size: 0.95em;
+      font-weight: 600;
+      color: var(--ink);
+    }
+
+    p + p {
+      margin-top: 12px;
+    }
+
+    ul,
+    ol {
+      margin-left: 24px;
+      margin-top: 14px;
+    }
+
+    li {
+      margin-bottom: 10px;
+    }
+
+    .highlight {
+      color: var(--accent);
+      font-weight: 700;
+    }
+
     footer {
-      margin-top: 3em;
+      background: #0f172a;
+      color: white;
       text-align: center;
-      font-size: 0.85em;
-      color: #333;
+      padding: 28px;
+      font-size: 0.95em;
+    }
+
+    .fab-btn,
+    .scroll-top {
+      position: fixed;
+      right: 28px;
+      border: none;
+      border-radius: 999px;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: var(--shadow-lg);
+      z-index: 120;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      text-decoration: none;
+    }
+
+    .fab-btn {
+      width: 60px;
+      height: 60px;
+      bottom: 28px;
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      font-size: 28px;
+    }
+
+    .scroll-top {
+      width: 52px;
+      height: 52px;
+      bottom: 100px;
+      background: linear-gradient(135deg, var(--accent), #ea580c);
+      font-size: 20px;
+      opacity: 0;
+      visibility: hidden;
+    }
+
+    .scroll-top.visible {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .fab-btn:hover,
+    .scroll-top:hover {
+      transform: translateY(-3px);
+    }
+
+    @media (max-width: 900px) {
+      .two-col {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 768px) {
+      body {
+        padding: 12px;
+      }
+
+      header {
+        padding: 40px 22px 34px;
+      }
+
+      .content {
+        padding: 32px 20px;
+      }
+
+      h1 {
+        font-size: 2.1em;
+      }
+
+      .subtitle {
+        font-size: 1.12em;
+      }
+
+      .fab-btn {
+        width: 54px;
+        height: 54px;
+        right: 18px;
+        bottom: 18px;
+      }
+
+      .scroll-top {
+        right: 18px;
+        bottom: 82px;
+      }
     }
   </style>
-
-<style>
-.fab-btn {
-  position: fixed;
-  bottom: 24px;
-  right: 24px;
-  width: 56px;
-  height: 56px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #3b82f6, #2563eb);
-  color: white;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-  cursor: pointer;
-  z-index: 1000;
-  border: none;
-  font-size: 24px;
-  transition: transform 0.2s, box-shadow 0.2s;
-  text-decoration: none;
-}
-.fab-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(0,0,0,0.3);
-}
-</style>
-
 </head>
 
 <body>
+  <div class="container">
+    <div class="progress-bar">
+      <div class="progress-fill" id="progressFill"></div>
+    </div>
 
-<h1>CS 637: Mathematics-II</h1>
-<div class="instructor">
-  <strong>Instructor:</strong> <a href="https://drdebmath.github.io" target="_blank">Dr. Debasish Pattanayak</a>
-</div>
-<h2>Lecture 20 – Graph Representations and Algorithmic Viewpoints</h2>
+    <header>
+      <h1>CS 637: Mathematics-II</h1>
+      <div class="subtitle">Lecture 20: Structural Graph Proofs on Paths, Cycles, and Trees</div>
+      <div class="instructor">
+        <strong>Instructor:</strong> <a href="https://drdebmath.github.io/" target="_blank">Dr. Debasish Pattanayak</a>
+      </div>
+    </header>
 
-<footer>
-  
-</footer>
+    <div class="nav-wrapper">
+      <div class="nav-tabs">
+        <button class="tab-btn active" onclick="switchTab('overview', this)">Overview</button>
+        <button class="tab-btn" onclick="switchTab('q1', this)">Question 1</button>
+        <button class="tab-btn" onclick="switchTab('q2', this)">Question 2</button>
+        <button class="tab-btn" onclick="switchTab('q3', this)">Question 3</button>
+        <button class="tab-btn" onclick="switchTab('takeaways', this)">Takeaways</button>
+      </div>
+    </div>
 
-<script>
-document.addEventListener("DOMContentLoaded", function() {
-    renderMathInElement(document.body, {
-        delimiters: [
-            {left: "31952", right: "31952", display: true},
-            {left: "\[", right: "\]", display: true},
-            {left: "\(", right: "\)", display: false}
-        ]
+    <div class="content">
+      <div id="overview" class="tab-content active">
+        <h2 class="section-title">Three Worked Structural Proofs</h2>
+
+        <div class="card">
+          <h3 class="card-title">What We Will Prove</h3>
+          <ol>
+            <li>A path \(P_n\) with \(n \ge 2\) has exactly two non-cut vertices.</li>
+            <li>A connected graph with \(n\) vertices and \(n\) edges has exactly one cycle.</li>
+            <li>If a tree has \(n-k+1\) leaves and one vertex of each degree \(2,3,\dots,k\), then
+              \[
+              n = \frac{k(k-1)}{2} + 2.
+              \]</li>
+          </ol>
+        </div>
+
+        <div class="idea-card">
+          <h3 class="card-title">Main Techniques</h3>
+          <div class="badge-row">
+            <span class="badge">Cut vertices in trees</span>
+            <span class="badge">Spanning trees</span>
+            <span class="badge">Unique path property</span>
+            <span class="badge">Handshaking lemma</span>
+            <span class="badge">Leaf counting</span>
+          </div>
+        </div>
+
+        <div class="remark-card">
+          <h3 class="card-title">Notation Note</h3>
+          <p>In Question 3, we interpret the statement in the standard way: among the non-leaf vertices, there is
+            exactly one vertex of each degree \(2,3,\dots,k\). Since there are \(n-k+1\) leaves, the remaining
+            \(k-1\) vertices are precisely those non-leaf vertices.</p>
+        </div>
+      </div>
+
+      <div id="q1" class="tab-content">
+        <h2 class="section-title">Question 1: A Path Has Exactly Two Non-Cut Vertices</h2>
+
+        <div class="problem-card">
+          <h3 class="card-title">Statement</h3>
+          <p>Prove that a path has exactly two non-cut vertices.</p>
+          <p>More precisely, for the path graph \(P_n\) with \(n \ge 2\), the only non-cut vertices are its two
+            endpoints.</p>
+        </div>
+
+        <div class="two-col">
+          <div class="solution-card">
+            <h3 class="card-title">Proof</h3>
+            <p>Let the path be</p>
+            <div class="formula-box">
+              \[
+              v_1 - v_2 - \cdots - v_n.
+              \]
+            </div>
+            <p>The endpoints are \(v_1\) and \(v_n\).</p>
+            <ul>
+              <li>If we remove \(v_1\), the remaining graph is
+                \[
+                v_2 - v_3 - \cdots - v_n,
+                \]
+                which is still connected.</li>
+              <li>Similarly, removing \(v_n\) leaves a connected path.</li>
+              <li>Now take an internal vertex \(v_i\) with \(2 \le i \le n-1\). After removing \(v_i\), the graph
+                splits into
+                \[
+                v_1 - \cdots - v_{i-1}
+                \quad \text{and} \quad
+                v_{i+1} - \cdots - v_n.
+                \]
+                These two parts are disconnected, so \(v_i\) is a cut vertex.</li>
+            </ul>
+            <p>Hence the internal vertices are cut vertices, and the two endpoints are not cut vertices. Therefore a
+              path has exactly <span class="highlight">two non-cut vertices</span>.</p>
+          </div>
+
+          <div class="card">
+            <h3 class="card-title">Picture</h3>
+            <div class="figure-box">
+              <svg viewBox="0 0 520 130" style="width: 100%; height: auto;" aria-label="Path graph illustration">
+                <line x1="70" y1="65" x2="450" y2="65" stroke="#94a3b8" stroke-width="6" stroke-linecap="round"></line>
+                <circle cx="70" cy="65" r="18" fill="#16a34a"></circle>
+                <circle cx="160" cy="65" r="16" fill="#dc2626"></circle>
+                <circle cx="250" cy="65" r="16" fill="#dc2626"></circle>
+                <circle cx="340" cy="65" r="16" fill="#dc2626"></circle>
+                <circle cx="450" cy="65" r="18" fill="#16a34a"></circle>
+                <text x="58" y="108" font-size="16" fill="#14532d">non-cut</text>
+                <text x="130" y="108" font-size="16" fill="#991b1b">cut</text>
+                <text x="222" y="108" font-size="16" fill="#991b1b">cut</text>
+                <text x="312" y="108" font-size="16" fill="#991b1b">cut</text>
+                <text x="436" y="108" font-size="16" fill="#14532d">non-cut</text>
+              </svg>
+              <div class="figure-caption">The endpoints survive deletion without disconnecting the graph; every
+                internal vertex breaks the path into two pieces.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="remark-card">
+          <h3 class="card-title">Small Exception</h3>
+          <p>The trivial path \(P_1\) has only one vertex, so it has one non-cut vertex. The statement “exactly two”
+            is true for \(P_n\) with \(n \ge 2\).</p>
+        </div>
+      </div>
+
+      <div id="q2" class="tab-content">
+        <h2 class="section-title">Question 2: Connected Graph with \(n\) Vertices and \(n\) Edges</h2>
+
+        <div class="problem-card">
+          <h3 class="card-title">Statement</h3>
+          <p>Prove that a connected graph with \(n\) vertices and \(n\) edges has exactly one cycle.</p>
+        </div>
+
+        <div class="idea-card">
+          <h3 class="card-title">Key Idea</h3>
+          <p>Start from a spanning tree. A spanning tree on \(n\) vertices has exactly \(n-1\) edges. Since the graph
+            has \(n\) edges, it has exactly one extra edge beyond a spanning tree.</p>
+        </div>
+
+        <div class="solution-card">
+          <h3 class="card-title">Proof</h3>
+          <p>Let \(G\) be a connected graph with \(n\) vertices and \(n\) edges. Since \(G\) is connected, it has a
+            spanning tree \(T\).</p>
+          <p>A spanning tree on \(n\) vertices has exactly \(n-1\) edges, so</p>
+          <div class="formula-box">
+            \[
+            |E(G)\setminus E(T)| = n-(n-1)=1.
+            \]
+          </div>
+          <p>Thus there is exactly one edge \(e=uv\) in \(G\) that does not belong to \(T\).</p>
+          <p>Because \(T\) is a tree, there is a unique path in \(T\) from \(u\) to \(v\). Adding the extra edge \(e\)
+            to that unique path creates a cycle. So \(G\) has at least one cycle.</p>
+          <p>Now let \(C\) be any cycle in \(G\). Since \(T\) is acyclic, the cycle \(C\) cannot lie entirely inside
+            \(T\). Therefore \(C\) must contain an edge of \(E(G)\setminus E(T)\). But there is only one such edge,
+            namely \(e\). Hence every cycle of \(G\) must contain \(e\).</p>
+          <p>Once \(e=uv\) is fixed, the rest of the cycle must be the unique \(u\)-\(v\) path in the tree \(T\).
+            Therefore there is only one possible cycle.</p>
+          <p>So \(G\) has <span class="highlight">exactly one cycle</span>.</p>
+        </div>
+
+        <div class="card">
+          <h3 class="card-title">Terminology</h3>
+          <p>A connected graph with exactly one cycle is called a <strong>unicyclic graph</strong>. The theorem shows
+            that every connected graph with \(|V|=|E|\) is unicyclic.</p>
+        </div>
+      </div>
+
+      <div id="q3" class="tab-content">
+        <h2 class="section-title">Question 3: Tree with \(n-k+1\) Leaves</h2>
+
+        <div class="problem-card">
+          <h3 class="card-title">Statement</h3>
+          <p>Let \(T\) be a tree with \(n\) vertices. Suppose \(T\) has \(n-k+1\) leaves, and among the remaining
+            vertices there is exactly one vertex of each degree \(2,3,\dots,k\). Find the relation between \(n\) and
+            \(k\).</p>
+        </div>
+
+        <div class="two-col">
+          <div class="card">
+            <h3 class="card-title">First Count the Non-Leaves</h3>
+            <p>The number of leaves is \(n-k+1\), so the number of non-leaf vertices is</p>
+            <div class="formula-box">
+              \[
+              n-(n-k+1)=k-1.
+              \]
+            </div>
+            <p>This matches the list of degrees \(2,3,\dots,k\), which contains exactly \(k-1\) values.</p>
+          </div>
+
+          <div class="idea-card">
+            <h3 class="card-title">Use the Handshaking Lemma</h3>
+            <p>For any tree on \(n\) vertices,</p>
+            <div class="formula-box">
+              \[
+              \sum_{v\in V(T)} \deg(v)=2(n-1).
+              \]
+            </div>
+          </div>
+        </div>
+
+        <div class="solution-card">
+          <h3 class="card-title">Computation</h3>
+          <p>The leaves contribute \(n-k+1\) to the degree sum, because each leaf has degree \(1\).</p>
+          <p>The non-leaf vertices contribute</p>
+          <div class="formula-box">
+            \[
+            2+3+\cdots+k = \frac{k(k+1)}{2}-1.
+            \]
+          </div>
+          <p>Applying the handshaking lemma gives</p>
+          <div class="formula-box">
+            \[
+            (n-k+1) + \left(\frac{k(k+1)}{2}-1\right) = 2(n-1).
+            \]
+          </div>
+          <p>Simplifying,</p>
+          <div class="formula-box">
+            \[
+            n-k+\frac{k(k+1)}{2} = 2n-2,
+            \]
+            \[
+            n = \frac{k(k+1)}{2}-k+2
+              = \frac{k(k-1)}{2}+2.
+            \]
+          </div>
+          <p>Therefore the required relation is</p>
+          <div class="formula-box">
+            \[
+            \boxed{n=\frac{k(k-1)}{2}+2.}
+            \]
+          </div>
+        </div>
+
+        <div class="summary-card">
+          <h3 class="card-title">Check with Small Values</h3>
+          <table class="mini-table">
+            <thead>
+              <tr>
+                <th>\(k\)</th>
+                <th>Predicted \(n\)</th>
+                <th>Leaves \(n-k+1\)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>2</td>
+                <td>3</td>
+                <td>2</td>
+              </tr>
+              <tr>
+                <td>3</td>
+                <td>5</td>
+                <td>3</td>
+              </tr>
+              <tr>
+                <td>4</td>
+                <td>8</td>
+                <td>5</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div id="takeaways" class="tab-content">
+        <h2 class="section-title">Takeaways</h2>
+
+        <div class="summary-card">
+          <h3 class="card-title">Proof Patterns to Remember</h3>
+          <ul>
+            <li>For a path, deleting an endpoint keeps the graph connected, while deleting an internal vertex splits the
+              path into two components.</li>
+            <li>For a connected graph with \(n\) vertices and \(n\) edges, compare it with a spanning tree of size
+              \(n-1\); one extra edge creates one and only one cycle.</li>
+            <li>For trees, the identity \(\sum \deg(v)=2(n-1)\) is often the fastest way to convert information about
+              leaves and internal degrees into an equation.</li>
+          </ul>
+        </div>
+
+        <div class="card">
+          <h3 class="card-title">Final Answers</h3>
+          <ol>
+            <li>A path \(P_n\) with \(n \ge 2\) has exactly two non-cut vertices, namely its endpoints.</li>
+            <li>A connected graph with \(n\) vertices and \(n\) edges is unicyclic, so it has exactly one cycle.</li>
+            <li>Under the stated interpretation of Question 3,
+              \[
+              n=\frac{k(k-1)}{2}+2.
+              \]</li>
+          </ol>
+        </div>
+      </div>
+    </div>
+
+    <footer>
+      Lecture 20 focuses on short structural proofs in graph theory: cut vertices, unicyclic graphs, and degree-counting
+      in trees.
+    </footer>
+  </div>
+
+  <button class="scroll-top" id="scrollTop" aria-label="Scroll to top">&#8593;</button>
+  <a href="index.html" class="fab-btn" title="Back to Index">🏠</a>
+
+  <script>
+    function switchTab(tabId, button) {
+      document.querySelectorAll('.tab-content').forEach((tab) => {
+        tab.classList.remove('active');
+      });
+
+      document.querySelectorAll('.tab-btn').forEach((btn) => {
+        btn.classList.remove('active');
+      });
+
+      document.getElementById(tabId).classList.add('active');
+      button.classList.add('active');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    const progressFill = document.getElementById('progressFill');
+    const scrollTopBtn = document.getElementById('scrollTop');
+
+    function updateProgress() {
+      const scrollTop = window.scrollY;
+      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+      const progress = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
+      progressFill.style.width = progress + '%';
+
+      if (scrollTop > 300) {
+        scrollTopBtn.classList.add('visible');
+      } else {
+        scrollTopBtn.classList.remove('visible');
+      }
+    }
+
+    scrollTopBtn.addEventListener('click', () => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     });
-});
-</script>
 
-<a href="index.html" class="fab-btn" title="Back to Index">🏠</a>
+    window.addEventListener('scroll', updateProgress);
+    updateProgress();
+
+    document.addEventListener('DOMContentLoaded', function () {
+      renderMathInElement(document.body, {
+        delimiters: [
+          { left: "\\[", right: "\\]", display: true },
+          { left: "\\(", right: "\\)", display: false }
+        ]
+      });
+    });
+  </script>
 </body>
+
 </html>

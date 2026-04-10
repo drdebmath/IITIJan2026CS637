@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <title>CS637 - Quiz 5 Practice Questions</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      line-height: 1.65;
+      background: linear-gradient(135deg, #082f49 0%, #0f766e 42%, #1d4ed8 100%);
+      min-height: 100vh;
+      padding: 20px;
+      color: #0f172a;
+    }
+
+    .container {
+      max-width: 1180px;
+      margin: 0 auto;
+      background: #ffffff;
+      border-radius: 18px;
+      box-shadow: 0 22px 70px rgba(15, 23, 42, 0.32);
+      overflow: hidden;
+    }
+
+    header {
+      background: linear-gradient(135deg, #0f172a 0%, #0f766e 45%, #2563eb 100%);
+      color: #ffffff;
+      padding: 42px 40px;
+      text-align: center;
+    }
+
+    h1 {
+      font-size: 2.5em;
+      margin-bottom: 10px;
+      font-weight: 800;
+      letter-spacing: 0.02em;
+    }
+
+    .subtitle {
+      font-size: 1.18em;
+      opacity: 0.96;
+    }
+
+    .instructor {
+      margin-top: 12px;
+      font-size: 1.02em;
+      opacity: 0.92;
+    }
+
+    .content {
+      padding: 40px;
+    }
+
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(180px, 1fr));
+      gap: 18px;
+      margin-bottom: 28px;
+    }
+
+    .info-card {
+      background: #f8fafc;
+      border: 1px solid #cbd5e1;
+      border-radius: 12px;
+      padding: 16px 18px;
+    }
+
+    .info-label {
+      display: block;
+      font-size: 0.84em;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #475569;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .info-value {
+      font-size: 1.02em;
+      color: #0f172a;
+      font-weight: 700;
+    }
+
+    .instructions-box {
+      background: #f8fafc;
+      border: 2px solid #0f766e;
+      padding: 22px;
+      margin-bottom: 30px;
+      border-radius: 14px;
+    }
+
+    .instructions-title {
+      display: block;
+      margin-bottom: 12px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #134e4a;
+      font-size: 0.92em;
+    }
+
+    .instructions-list {
+      list-style: none;
+      padding-left: 0;
+    }
+
+    .instructions-list li {
+      position: relative;
+      padding-left: 22px;
+      margin-bottom: 8px;
+      color: #334155;
+    }
+
+    .instructions-list li::before {
+      content: "*";
+      position: absolute;
+      left: 0;
+      color: #0f766e;
+      font-weight: 800;
+    }
+
+    .chapter-card {
+      background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+      border: 1px solid #dbeafe;
+      border-left: 6px solid #0f766e;
+      padding: 28px;
+      margin-bottom: 30px;
+      border-radius: 16px;
+      box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
+    }
+
+    .chapter-title {
+      font-size: 1.7em;
+      color: #0f172a;
+      margin-bottom: 16px;
+      font-weight: 800;
+    }
+
+    .section-block {
+      margin-top: 22px;
+      padding-top: 18px;
+      border-top: 2px solid #e2e8f0;
+    }
+
+    .section-block:first-of-type {
+      margin-top: 8px;
+      padding-top: 0;
+      border-top: none;
+    }
+
+    .section-title {
+      font-size: 1.18em;
+      color: #1d4ed8;
+      font-weight: 800;
+      margin-bottom: 12px;
+    }
+
+    .question-list {
+      margin-left: 24px;
+      color: #334155;
+    }
+
+    .question-list li {
+      margin-bottom: 14px;
+      padding-left: 2px;
+    }
+
+    .formula-box {
+      background: #ffffff;
+      border: 1px solid #cbd5e1;
+      border-radius: 10px;
+      padding: 14px 16px;
+      margin: 12px 0;
+      overflow-x: auto;
+    }
+
+    .tips-box {
+      background: #eff6ff;
+      border: 1px solid #bfdbfe;
+      border-radius: 14px;
+      padding: 24px;
+      margin-top: 28px;
+    }
+
+    .tips-title {
+      font-size: 1.12em;
+      font-weight: 800;
+      color: #1e3a8a;
+      margin-bottom: 12px;
+    }
+
+    ul {
+      margin-left: 22px;
+      margin-top: 10px;
+    }
+
+    li {
+      margin-bottom: 8px;
+    }
+
+    footer {
+      background: #0f172a;
+      color: #ffffff;
+      text-align: center;
+      padding: 26px;
+      font-size: 0.92em;
+    }
+
+    .fab-btn {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #3b82f6, #2563eb);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      cursor: pointer;
+      z-index: 1000;
+      border: none;
+      font-size: 24px;
+      transition: transform 0.2s, box-shadow 0.2s;
+      text-decoration: none;
+    }
+
+    .fab-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+    }
+
+    @media (max-width: 820px) {
+      .content {
+        padding: 28px 20px;
+      }
+
+      .info-grid {
+        grid-template-columns: 1fr;
+      }
+
+      h1 {
+        font-size: 2em;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <header>
+      <h1>CS 637: Mathematics-II</h1>
+      <div class="subtitle">Quiz 5 Practice Questions Aligned with the Graph Theory Lectures</div>
+      <div class="instructor">Instructor: Dr. Debasish Pattanayak</div>
+    </header>
+
+    <div class="content">
+      <div class="info-grid">
+        <div class="info-card">
+          <span class="info-label">Source</span>
+          <div class="info-value">Filtered from West plus course questions</div>
+        </div>
+        <div class="info-card">
+          <span class="info-label">Question Count</span>
+          <div class="info-value">35 lecture-aligned questions</div>
+        </div>
+        <div class="info-card">
+          <span class="info-label">Coverage</span>
+          <div class="info-value">Foundations, degree sequences, trees, spectra, Hamiltonicity, matchings</div>
+        </div>
+      </div>
+
+      <div class="instructions-box">
+        <span class="instructions-title">Study Note</span>
+        <ul class="instructions-list">
+          <li>This sheet keeps only those West-style questions that match the graph theory material covered in the lectures.</li>
+          <li>The first part is a filtered West-based bank, and the second part adds course-specific practice problems.</li>
+          <li>Try writing complete arguments, not just final answers.</li>
+        </ul>
+      </div>
+
+      <div class="chapter-card">
+        <h2 class="chapter-title">Filtered West Questions Covered in the Lectures</h2>
+
+        <div class="section-block">
+          <div class="section-title">Chapter 1: Fundamental Concepts</div>
+          <ol class="question-list">
+            <li>Define a simple graph. What distinguishes it from a multigraph and a pseudograph?</li>
+
+            <li>Let \(G\) be a graph with vertex set \(V = \{1, 2, 3, 4, 5\}\) and edge set \(E = \{12, 13, 24, 35, 45\}\). Draw \(G\), write its adjacency matrix, and determine whether \(G\) is bipartite.</li>
+
+            <li>The Petersen graph has 10 vertices and 15 edges. Verify that it is 3-regular and has girth 5.</li>
+
+            <li>Define the complete bipartite graph \(K_{m,n}\). How many edges does \(K_{m,n}\) have? For which values of \(m, n\) is \(K_{m,n}\) a regular graph?</li>
+
+            <li>Prove that \(K_n\) has \(\binom{n}{2}\) edges and is \((n-1)\)-regular.</li>
+
+            <li>A graph \(G\) has adjacency matrix \(A\). What does the \((i,j)\)-entry of \(A^2\) count? Prove your answer.</li>
+
+            <li>Prove that every closed odd walk in a graph contains an odd cycle.</li>
+
+            <li>Let \(G\) be a graph. Prove that \(G\) is bipartite if and only if it contains no odd cycle.</li>
+
+            <li>Show that in any graph \(G\), the number of vertices of odd degree is even.</li>
+
+            <li>State and prove the Handshaking Lemma:
+              <div class="formula-box">
+                \[
+                \sum_{v \in V(G)} d(v) = 2|E(G)|.
+                \]
+              </div>
+            </li>
+
+            <li>A sequence \((d_1, d_2, \ldots, d_n)\) of non-negative integers is graphic if it is the degree sequence of some simple graph. Use the Erdős-Gallai theorem to determine whether \((5, 4, 3, 3, 2, 2, 1)\) is graphic.</li>
+
+            <li>A \(k\)-regular bipartite graph with parts \(X\) and \(Y\) satisfies \(|X| = |Y|\). Prove this using degree counting.</li>
+          </ol>
+        </div>
+
+        <div class="section-block">
+          <div class="section-title">Chapter 3: Matchings and Factors</div>
+          <ol class="question-list" start="13">
+            <li>State and prove Hall's Marriage Theorem: a bipartite graph \(G\) with parts \(X\) and \(Y\) has a matching that saturates \(X\) if and only if \(|N(S)| \geq |S|\) for every \(S \subseteq X\).</li>
+
+            <li>Define a maximum matching, a perfect matching, and a maximal matching. Give an example showing that a maximal matching need not be maximum.</li>
+
+            <li>Prove that every \(k\)-regular bipartite graph, where \(k \geq 1\), has a perfect matching, using Hall's theorem.</li>
+          </ol>
+        </div>
+      </div>
+
+      <div class="chapter-card">
+        <h2 class="chapter-title">Additional Course-Based Practice</h2>
+
+        <div class="section-block">
+          <div class="section-title">Questions 16-35 Based on the Course Graph Theory Lectures</div>
+          <ol class="question-list" start="16">
+            <li>Define each of the following terms: graph, path, cycle, clique, bipartite graph, cut vertex, and bridge.</li>
+
+            <li>Let \(G\) have vertex set \(V=\{v_1,v_2,v_3,v_4\}\) and edge set
+              <div class="formula-box">
+                \[
+                E=\{v_1v_2,\; v_1v_3,\; v_2v_4,\; v_3v_4\}.
+                \]
+              </div>
+              Write the adjacency matrix and the degree of each vertex.
+            </li>
+
+            <li>For the same graph as in Question 17, write one possible incidence matrix. State clearly the order of the vertices and edges that you use.</li>
+
+            <li>Prove that a graph is bipartite if and only if it has no odd cycle.</li>
+
+            <li>Prove the handshaking lemma
+              <div class="formula-box">
+                \[
+                \sum_{v\in V(G)} \deg(v) = 2|E(G)|.
+                \]
+              </div>
+              Deduce that the number of odd-degree vertices in a graph is even.
+            </li>
+
+            <li>Prove that every tree on \(n\) vertices has exactly \(n-1\) edges. Then prove the converse: every connected graph on \(n\) vertices with \(n-1\) edges is a tree.</li>
+
+            <li>State two immediate necessary conditions for a nonnegative integer sequence
+              <div class="formula-box">
+                \[
+                d_1 \ge d_2 \ge \cdots \ge d_n
+                \]
+              </div>
+              to be graphical. Give one example of a sequence satisfying these necessary conditions but still not graphical.
+            </li>
+
+            <li>Use the Havel-Hakimi process to determine whether the sequence
+              <div class="formula-box">
+                \[
+                (4,3,3,2,2,2)
+                \]
+              </div>
+              is graphical. If it is graphical, construct one realizing graph.
+            </li>
+
+            <li>Let \(A\) be the adjacency matrix of a simple undirected graph \(G\) with eigenvalues \(\lambda_1,\dots,\lambda_n\). Prove that
+              <div class="formula-box">
+                \[
+                \sum_{i=1}^n \lambda_i = 0
+                \qquad \text{and} \qquad
+                \sum_{i=1}^n \lambda_i^2 = 2|E(G)|.
+                \]
+              </div>
+            </li>
+
+            <li>State the meaning of the \((i,j)\)-entry of \(A^k\). Then explain how this fact can be used to test whether there is a walk of length \(k\) from \(v_i\) to \(v_j\).</li>
+
+            <li>Prove that the path graph \(P_n\) with \(n \ge 2\) has exactly two non-cut vertices.</li>
+
+            <li>Prove that a connected graph with \(n\) vertices and \(n\) edges has exactly one cycle.</li>
+
+            <li>Let \(T\) be a tree with \(n\) vertices. Suppose \(T\) has \(n-k+1\) leaves and exactly one vertex of each degree \(2,3,\dots,k\). Find the relation between \(n\) and \(k\).</li>
+
+            <li>Prove by induction that every finite connected simple graph in which each vertex has degree \(2\) is a cycle.</li>
+
+            <li>Prove the same statement as in Question 29 by contradiction using a minimal counterexample and suppression of a degree-\(2\) vertex.</li>
+
+            <li>State Dirac's theorem. Then prove it using a maximum non-Hamiltonian graph. Your proof should explain clearly why the contradiction arises.</li>
+
+            <li>For each of the following values of \(n\), determine the minimum degree threshold given by Dirac's theorem and explain what conclusion it gives about Hamiltonicity:
+              <div class="formula-box">
+                \[
+                n=6,\qquad n=7,\qquad n=10.
+                \]
+              </div>
+            </li>
+
+            <li>Define matching, maximal matching, maximum matching, perfect matching, saturated vertex, and unsaturated vertex. Then explain why every maximum matching is maximal, but not every maximal matching is maximum.</li>
+
+            <li>Consider the bipartite graph \(G=(X \cup Y,E)\), where
+              <div class="formula-box">
+                \[
+                X=\{x_1,x_2,x_3,x_4\}, \qquad Y=\{y_1,y_2,y_3,y_4,y_5\},
+                \]
+                \[
+                N(x_1)=\{y_1,y_2\},\quad
+                N(x_2)=\{y_2,y_3\},\quad
+                N(x_3)=\{y_3,y_4\},\quad
+                N(x_4)=\{y_1,y_4,y_5\}.
+                \]
+              </div>
+              Check Hall's condition for subsets of \(X\), and determine whether there exists a matching saturating all vertices of \(X\).
+            </li>
+
+            <li>State Hall's Marriage Theorem and prove both directions:
+              <ul>
+                <li>Show that Hall's condition is necessary.</li>
+                <li>Show that Hall's condition is sufficient using induction on \(|X|\).</li>
+              </ul>
+            </li>
+          </ol>
+        </div>
+      </div>
+
+      <div class="tips-box">
+        <div class="tips-title">Tips for Study</div>
+        <ul>
+          <li>Questions 1 to 15 are the West-based questions that best match the lecture coverage.</li>
+          <li>Questions 16 to 35 are course-specific practice questions based directly on Lectures 18 to 21.</li>
+          <li>For revision, start with definitions and counting, then move to structural proofs, Dirac's theorem, and Hall's theorem.</li>
+        </ul>
+      </div>
+    </div>
+
+    <footer>
+      Quiz 5 practice bank filtered to lecture-covered topics and expanded with course-based graph theory practice.
+    </footer>
+  </div>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      renderMathInElement(document.body, {
+        delimiters: [
+          { left: "\\[", right: "\\]", display: true },
+          { left: "\\(", right: "\\)", display: false }
+        ]
+      });
+    });
+  </script>
+
+  <a href="index.html" class="fab-btn" title="Back to Index">🏠</a>
+</body>
+
+</html>

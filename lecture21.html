@@ -1,8 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="utf-8">
-  <title>CS 637 – Lecture 21 Definitions</title>
+  <title>CS 637 - Lecture 21: 2-Regular Graphs, Dirac's Theorem, and Matchings</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
@@ -10,108 +11,899 @@
   <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
 
   <style>
+    :root {
+      --primary: #7c2d12;
+      --secondary: #0f766e;
+      --accent: #1d4ed8;
+      --accent-soft: #eff6ff;
+      --ink: #1f2937;
+      --muted: #64748b;
+      --surface: #ffffff;
+      --surface-soft: #f8fafc;
+      --shadow-sm: 0 2px 8px rgba(15, 23, 42, 0.08);
+      --shadow-lg: 0 18px 52px rgba(15, 23, 42, 0.2);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
     body {
-      font-family: "Times New Roman", serif;
-      margin: 40px;
-      line-height: 1.5;
-      background-color: #ffffff;
-      color: #000000;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      line-height: 1.7;
+      background:
+        radial-gradient(circle at top left, rgba(124, 45, 18, 0.18), transparent 28%),
+        radial-gradient(circle at top right, rgba(29, 78, 216, 0.16), transparent 26%),
+        linear-gradient(135deg, #111827 0%, #1f2937 48%, #0f172a 100%);
+      min-height: 100vh;
+      padding: 20px;
+      color: var(--ink);
+      overflow-x: hidden;
     }
-    h1, h2 {
+
+    .container {
+      max-width: 1180px;
+      margin: 0 auto;
+      background: var(--surface);
+      border-radius: 22px;
+      box-shadow: 0 25px 80px rgba(0, 0, 0, 0.35);
+      overflow: hidden;
+      position: relative;
+    }
+
+    .progress-bar {
+      position: sticky;
+      top: 0;
+      height: 4px;
+      background: #e2e8f0;
+      z-index: 101;
+    }
+
+    .progress-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--primary), var(--secondary), var(--accent));
+      transition: width 0.2s ease;
+    }
+
+    header {
+      color: white;
+      padding: 52px 40px 44px;
       text-align: center;
+      background: linear-gradient(135deg, #7c2d12 0%, #0f766e 55%, #1d4ed8 100%);
+      background-size: 200% 200%;
+      animation: gradientShift 16s ease infinite;
     }
+
+    @keyframes gradientShift {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
     h1 {
-      font-size: 1.8em;
-      margin-bottom: 0.2em;
+      font-size: 2.8em;
+      margin-bottom: 12px;
+      font-weight: 800;
     }
-    h2 {
-      font-size: 1.2em;
-      margin-top: 2em;
-      margin-bottom: 0.5em;
-    }
-    .definition {
-      margin-bottom: 1em;
-    }
-    .term {
-      font-weight: bold;
-    }
-    .number {
-      font-weight: bold;
-    }
-    .instructor {
-      margin-top: 8px;
-      font-size: 0.95rem;
-      color: #64748b;
-    }
-    .instructor a {
-      color: #0ea5e9;
-      text-decoration: none;
+
+    .subtitle {
+      font-size: 1.28em;
+      opacity: 0.97;
+      margin-bottom: 18px;
       font-weight: 500;
     }
-    .instructor a:hover {
-      text-decoration: underline;
+
+    .instructor {
+      font-size: 1.05em;
+      opacity: 0.96;
     }
+
+    .instructor a {
+      color: #fef3c7;
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .nav-wrapper {
+      position: sticky;
+      top: 4px;
+      z-index: 100;
+      background: white;
+      border-bottom: 2px solid #e2e8f0;
+    }
+
+    .nav-tabs {
+      display: flex;
+      overflow-x: auto;
+      padding: 0 16px;
+      scrollbar-width: thin;
+    }
+
+    .tab-btn {
+      border: none;
+      background: none;
+      padding: 16px 22px;
+      cursor: pointer;
+      color: var(--muted);
+      font-size: 1em;
+      font-weight: 700;
+      white-space: nowrap;
+      border-bottom: 3px solid transparent;
+      transition: all 0.25s ease;
+    }
+
+    .tab-btn.active {
+      color: var(--primary);
+      border-bottom-color: var(--primary);
+    }
+
+    .content {
+      padding: 48px 40px;
+      min-height: 680px;
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+      animation: fadeUp 0.4s ease-out;
+    }
+
+    @keyframes fadeUp {
+      from {
+        opacity: 0;
+        transform: translateY(16px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .section-title {
+      font-size: 2em;
+      margin-bottom: 28px;
+      padding-bottom: 12px;
+      border-bottom: 4px solid var(--secondary);
+      color: var(--ink);
+    }
+
+    .card,
+    .theorem-card,
+    .proof-card,
+    .idea-card,
+    .remark-card,
+    .summary-card {
+      padding: 24px;
+      margin-bottom: 24px;
+      border-radius: 14px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .card {
+      background: var(--surface-soft);
+      border-left: 5px solid var(--primary);
+    }
+
+    .theorem-card {
+      background: #eff6ff;
+      border-left: 5px solid var(--accent);
+    }
+
+    .proof-card {
+      background: #ecfdf5;
+      border-left: 5px solid var(--secondary);
+    }
+
+    .idea-card {
+      background: #fff7ed;
+      border-left: 5px solid var(--primary);
+    }
+
+    .remark-card {
+      background: #f5f3ff;
+      border-left: 5px solid #7c3aed;
+    }
+
+    .summary-card {
+      background: #f8fafc;
+      border-left: 5px solid #0f766e;
+    }
+
+    .card-title {
+      font-size: 1.28em;
+      font-weight: 800;
+      margin-bottom: 14px;
+      color: var(--ink);
+    }
+
+    .formula-box {
+      margin: 16px 0;
+      padding: 16px 18px;
+      border: 1px solid #dbeafe;
+      border-radius: 12px;
+      background: white;
+      overflow-x: auto;
+    }
+
+    .mini-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 16px;
+      background: white;
+      border-radius: 12px;
+      overflow: hidden;
+      font-size: 0.97em;
+    }
+
+    .mini-table th,
+    .mini-table td {
+      border: 1px solid #e2e8f0;
+      padding: 12px 14px;
+      text-align: left;
+      vertical-align: top;
+    }
+
+    .mini-table th {
+      background: #eff6ff;
+      font-weight: 700;
+    }
+
+    .two-col {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 20px;
+    }
+
+    .figure-box {
+      margin-top: 16px;
+      padding: 18px;
+      border-radius: 14px;
+      background: white;
+      border: 1px solid #dbeafe;
+    }
+
+    .figure-caption {
+      margin-top: 10px;
+      color: var(--muted);
+      font-size: 0.95em;
+    }
+
+    .badge-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: white;
+      border: 1px solid #cbd5e1;
+      font-size: 0.95em;
+      font-weight: 600;
+      color: var(--ink);
+    }
+
+    p + p {
+      margin-top: 12px;
+    }
+
+    ul,
+    ol {
+      margin-left: 24px;
+      margin-top: 14px;
+    }
+
+    li {
+      margin-bottom: 10px;
+    }
+
+    .highlight {
+      color: var(--primary);
+      font-weight: 700;
+    }
+
     footer {
-      margin-top: 3em;
+      background: #0f172a;
+      color: white;
       text-align: center;
-      font-size: 0.85em;
-      color: #333;
+      padding: 28px;
+      font-size: 0.95em;
+    }
+
+    .fab-btn,
+    .scroll-top {
+      position: fixed;
+      right: 28px;
+      border: none;
+      border-radius: 999px;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: var(--shadow-lg);
+      z-index: 120;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      text-decoration: none;
+    }
+
+    .fab-btn {
+      width: 60px;
+      height: 60px;
+      bottom: 28px;
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      font-size: 28px;
+    }
+
+    .scroll-top {
+      width: 52px;
+      height: 52px;
+      bottom: 100px;
+      background: linear-gradient(135deg, var(--secondary), #0284c7);
+      font-size: 20px;
+      opacity: 0;
+      visibility: hidden;
+    }
+
+    .scroll-top.visible {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .fab-btn:hover,
+    .scroll-top:hover {
+      transform: translateY(-3px);
+    }
+
+    @media (max-width: 900px) {
+      .two-col {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 768px) {
+      body {
+        padding: 12px;
+      }
+
+      header {
+        padding: 40px 22px 34px;
+      }
+
+      .content {
+        padding: 32px 20px;
+      }
+
+      h1 {
+        font-size: 2.1em;
+      }
+
+      .subtitle {
+        font-size: 1.12em;
+      }
+
+      .fab-btn {
+        width: 54px;
+        height: 54px;
+        right: 18px;
+        bottom: 18px;
+      }
+
+      .scroll-top {
+        right: 18px;
+        bottom: 82px;
+      }
     }
   </style>
-
-<style>
-.fab-btn {
-  position: fixed;
-  bottom: 24px;
-  right: 24px;
-  width: 56px;
-  height: 56px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #3b82f6, #2563eb);
-  color: white;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-  cursor: pointer;
-  z-index: 1000;
-  border: none;
-  font-size: 24px;
-  transition: transform 0.2s, box-shadow 0.2s;
-  text-decoration: none;
-}
-.fab-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(0,0,0,0.3);
-}
-</style>
-
 </head>
 
 <body>
+  <div class="container">
+    <div class="progress-bar">
+      <div class="progress-fill" id="progressFill"></div>
+    </div>
 
-<h1>CS 637: Mathematics-II</h1>
-<div class="instructor">
-  <strong>Instructor:</strong> <a href="https://drdebmath.github.io" target="_blank">Dr. Debasish Pattanayak</a>
-</div>
-<h2>Lecture 21 – Matchings and Bipartite Graphs</h2>
+    <header>
+      <h1>CS 637: Mathematics-II</h1>
+      <div class="subtitle">Lecture 21: 2-Regular Graphs, Dirac's Theorem, and Matchings</div>
+      <div class="instructor">
+        <strong>Instructor:</strong> <a href="https://drdebmath.github.io/" target="_blank">Dr. Debasish Pattanayak</a>
+      </div>
+    </header>
 
-<footer>
-  
-</footer>
+    <div class="nav-wrapper">
+      <div class="nav-tabs">
+        <button class="tab-btn active" onclick="switchTab('overview', this)">Overview</button>
+        <button class="tab-btn" onclick="switchTab('regular', this)">2-Regular Graphs</button>
+        <button class="tab-btn" onclick="switchTab('dirac', this)">Dirac</button>
+        <button class="tab-btn" onclick="switchTab('matching', this)">Matching Basics</button>
+        <button class="tab-btn" onclick="switchTab('hall', this)">Hall's Theorem</button>
+        <button class="tab-btn" onclick="switchTab('takeaways', this)">Takeaways</button>
+      </div>
+    </div>
 
-<script>
-document.addEventListener("DOMContentLoaded", function() {
-    renderMathInElement(document.body, {
-        delimiters: [
-            {left: "31952", right: "31952", display: true},
-            {left: "\[", right: "\]", display: true},
-            {left: "\(", right: "\)", display: false}
-        ]
+    <div class="content">
+      <div id="overview" class="tab-content active">
+        <h2 class="section-title">Lecture Roadmap</h2>
+
+        <div class="card">
+          <h3 class="card-title">Topics for Today</h3>
+          <ol>
+            <li>If every vertex of a graph has degree \(2\), then each connected component is a cycle.</li>
+            <li>Dirac's theorem: a simple graph on \(n \ge 3\) vertices with minimum degree at least \(n/2\) is Hamiltonian.</li>
+            <li>Definitions of matching, maximal matching, maximum matching, saturation, and Hall's marriage theorem with proof.</li>
+          </ol>
+        </div>
+
+        <div class="idea-card">
+          <h3 class="card-title">Three Reusable Proof Ideas</h3>
+          <div class="badge-row">
+            <span class="badge">Contraction of degree-2 vertices</span>
+            <span class="badge">Maximum non-Hamiltonian graph</span>
+            <span class="badge">Induction on one bipartition</span>
+            <span class="badge">Neighborhood counting</span>
+            <span class="badge">Saturation by matchings</span>
+          </div>
+        </div>
+
+        <div class="summary-card">
+          <h3 class="card-title">Where These Results Fit</h3>
+          <p>The first theorem classifies finite connected \(2\)-regular graphs. Dirac's theorem is one of the main
+            sufficient conditions for Hamiltonicity. Hall's theorem gives an exact criterion for when a bipartite graph
+            has a matching that saturates an entire side.</p>
+        </div>
+      </div>
+
+      <div id="regular" class="tab-content">
+        <h2 class="section-title">If Every Vertex Has Degree 2, Each Component Is a Cycle</h2>
+
+        <div class="theorem-card">
+          <h3 class="card-title">Theorem</h3>
+          <p>Let \(G\) be a finite simple graph in which every vertex has degree \(2\). Then every connected component
+            of \(G\) is a cycle.</p>
+          <p>So it is enough to prove the connected case: <span class="highlight">every connected \(2\)-regular simple graph is a cycle</span>.</p>
+        </div>
+
+        <div class="two-col">
+          <div class="card">
+            <h3 class="card-title">Degree-2 Contraction</h3>
+            <p>Let \(v\) be a vertex with neighbors \(u\) and \(w\). We <strong>suppress</strong> or <strong>contract</strong> the degree-2 vertex \(v\) by deleting \(v\) and its two incident edges, then adding the edge \(uw\).</p>
+            <div class="formula-box">
+              \[
+              u - v - w
+              \quad \longrightarrow \quad
+              u - w.
+              \]
+            </div>
+            <p>In a connected \(2\)-regular simple graph with more than \(3\) vertices, the neighbors \(u\) and \(w\)
+              cannot already be adjacent. Otherwise \(u,v,w\) would form a triangle, and \(u\) and \(w\) would already
+              use up their two incident edges, forcing the whole connected component to be exactly that triangle.</p>
+          </div>
+
+          <div class="card">
+            <h3 class="card-title">What Contraction Preserves</h3>
+            <ul>
+              <li>Connectedness is preserved, because any walk that used \(u-v-w\) can use \(uw\) instead.</li>
+              <li>Every remaining vertex still has degree \(2\).</li>
+              <li>The number of vertices drops by \(1\), which makes induction possible.</li>
+            </ul>
+            <div class="figure-box">
+              <svg viewBox="0 0 560 170" style="width: 100%; height: auto;" aria-label="Suppression of a degree-2 vertex">
+                <circle cx="90" cy="85" r="18" fill="#1d4ed8"></circle>
+                <circle cx="190" cy="85" r="18" fill="#f97316"></circle>
+                <circle cx="290" cy="85" r="18" fill="#1d4ed8"></circle>
+                <line x1="108" y1="85" x2="172" y2="85" stroke="#64748b" stroke-width="5" stroke-linecap="round"></line>
+                <line x1="208" y1="85" x2="272" y2="85" stroke="#64748b" stroke-width="5" stroke-linecap="round"></line>
+                <text x="84" y="120" font-size="18" fill="#1f2937">u</text>
+                <text x="184" y="120" font-size="18" fill="#1f2937">v</text>
+                <text x="284" y="120" font-size="18" fill="#1f2937">w</text>
+                <text x="350" y="92" font-size="28" fill="#7c2d12">→</text>
+                <circle cx="430" cy="85" r="18" fill="#1d4ed8"></circle>
+                <circle cx="520" cy="85" r="18" fill="#1d4ed8"></circle>
+                <line x1="448" y1="85" x2="502" y2="85" stroke="#64748b" stroke-width="5" stroke-linecap="round"></line>
+                <text x="424" y="120" font-size="18" fill="#1f2937">u</text>
+                <text x="514" y="120" font-size="18" fill="#1f2937">w</text>
+              </svg>
+              <div class="figure-caption">Suppressing a degree-2 vertex reduces the graph while keeping the same structural shape.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="proof-card">
+          <h3 class="card-title">Proof by Induction</h3>
+          <p>We prove that every connected \(2\)-regular simple graph on \(n \ge 3\) vertices is the cycle \(C_n\).</p>
+          <p><strong>Base case:</strong> If \(n=3\), then each of the three vertices has degree \(2\), so every vertex is adjacent to the other two. Hence the graph is \(C_3\).</p>
+          <p><strong>Induction step:</strong> Assume every connected \(2\)-regular simple graph on \(n\) vertices is a cycle. Let \(G\) be a connected \(2\)-regular simple graph on \(n+1\) vertices.</p>
+          <p>Choose any vertex \(v\), and let its neighbors be \(u\) and \(w\). Since \(n+1>3\), the vertices \(u\) and \(w\) are not adjacent, by the observation above. Suppress \(v\): delete \(v\), delete \(uv\) and \(vw\), and add the edge \(uw\). Call the new graph \(G'\).</p>
+          <p>Then \(G'\) is connected, simple, and every vertex of \(G'\) still has degree \(2\). Also \(G'\) has \(n\) vertices. By the induction hypothesis, \(G'\) is a cycle \(C_n\).</p>
+          <p>Now reverse the suppression: replace the edge \(uw\) of that cycle by the path \(u-v-w\). This produces a single cycle through all \(n+1\) vertices, so \(G\) is \(C_{n+1}\).</p>
+          <p>This completes the induction proof.</p>
+        </div>
+
+        <div class="proof-card">
+          <h3 class="card-title">Proof by Contradiction Using a Minimal Counterexample</h3>
+          <p>Assume, for contradiction, that there exists a connected \(2\)-regular simple graph that is not a cycle.
+            Among all such counterexamples, choose one with the fewest vertices, and call it \(H\).</p>
+          <p>The graph \(H\) cannot have \(3\) vertices, because the only connected \(2\)-regular simple graph on \(3\) vertices is \(C_3\). So \(|V(H)|>3\).</p>
+          <p>Pick a vertex \(v\) of \(H\), with neighbors \(u\) and \(w\). Since \(|V(H)|>3\), the vertices \(u\) and \(w\) are not adjacent. Suppress \(v\) to obtain a smaller connected \(2\)-regular simple graph \(H'\).</p>
+          <p>Because \(H\) was chosen with the fewest vertices among all counterexamples, the smaller graph \(H'\) cannot be a counterexample. Therefore \(H'\) must be a cycle.</p>
+          <p>But if \(H'\) is a cycle, then reversing the suppression of \(v\) simply replaces one edge by a two-edge path, and the result is again a cycle. Hence \(H\) is a cycle.</p>
+          <p>This contradicts the choice of \(H\) as a non-cycle. Therefore no counterexample exists, and every connected \(2\)-regular simple graph is a cycle.</p>
+        </div>
+
+        <div class="remark-card">
+          <h3 class="card-title">Why the Contradiction Appears</h3>
+          <p>The contradiction comes from the fact that contraction reduces the graph but preserves the hypotheses. A
+            minimal counterexample should remain a counterexample after every reversible simplification, but suppressing
+            a degree-2 vertex makes it smaller. The smaller graph must be a cycle, and then undoing the contraction
+            shows the original graph was a cycle too. That directly violates the assumption that it was a counterexample.</p>
+        </div>
+      </div>
+
+      <div id="dirac" class="tab-content">
+        <h2 class="section-title">Dirac's Theorem on Hamiltonian Graphs</h2>
+
+        <div class="theorem-card">
+          <h3 class="card-title">Dirac's Theorem</h3>
+          <p>Let \(G\) be a simple graph on \(n \ge 3\) vertices. If the minimum degree satisfies</p>
+          <div class="formula-box">
+            \[
+            \delta(G) \ge \frac{n}{2},
+            \]
+          </div>
+          <p>then \(G\) is Hamiltonian.</p>
+        </div>
+
+        <div class="idea-card">
+          <h3 class="card-title">Proof Strategy: A Maximum Non-Hamiltonian Graph</h3>
+          <p>Assume the theorem is false. Then there exists a non-Hamiltonian graph on \(n\) vertices with minimum degree at least \(n/2\). Among all such graphs, choose one with the <strong>maximum possible number of edges</strong>.</p>
+          <p>This choice is the key: every missing edge becomes "dangerous," because if we add it, the graph can no longer remain a non-Hamiltonian counterexample.</p>
+        </div>
+
+        <div class="proof-card">
+          <h3 class="card-title">Detailed Proof</h3>
+          <p>Assume, for contradiction, that Dirac's theorem is false. Choose a counterexample \(G\) with the maximum possible number of edges among all non-Hamiltonian simple graphs on \(n\) vertices satisfying \(\delta(G)\ge n/2\).</p>
+          <p>The graph \(G\) is not complete, because every complete graph on at least \(3\) vertices is Hamiltonian. So there exist two nonadjacent vertices \(u\) and \(v\).</p>
+          <p>Now add the missing edge \(uv\), obtaining the graph \(G+uv\). By the maximal choice of \(G\), the graph \(G+uv\) must be Hamiltonian. Let \(C\) be a Hamiltonian cycle in \(G+uv\).</p>
+          <p>The cycle \(C\) must use the new edge \(uv\). Otherwise \(C\) would already be a Hamiltonian cycle of \(G\), contradicting that \(G\) is non-Hamiltonian.</p>
+          <p>Delete the edge \(uv\) from \(C\). What remains is a Hamiltonian path in \(G\) with endpoints \(u\) and \(v\). Write this path as</p>
+          <div class="formula-box">
+            \[
+            P: \quad x_1,x_2,\dots,x_n,
+            \qquad x_1=u,\; x_n=v.
+            \]
+          </div>
+          <p>Now define two index sets:</p>
+          <div class="formula-box">
+            \[
+            I=\{\,i \in \{1,2,\dots,n-2\} : x_1x_{i+1}\in E(G)\,\},
+            \]
+            \[
+            J=\{\,i \in \{1,2,\dots,n-2\} : x_ix_n\in E(G)\,\}.
+            \]
+          </div>
+          <p>Because \(x_1\) is not adjacent to \(x_n\), every neighbor of \(x_1\) appears among \(x_2,\dots,x_{n-1}\). Hence</p>
+          <div class="formula-box">
+            \[
+            |I|=\deg(x_1).
+            \]
+          </div>
+          <p>For \(x_n\), the set \(J\) records all neighbors among \(x_1,\dots,x_{n-2}\). The vertex \(x_{n-1}\) is also a neighbor of \(x_n\) because it is adjacent to \(x_n\) on the path, so</p>
+          <div class="formula-box">
+            \[
+            |J|=\deg(x_n)-1.
+            \]
+          </div>
+          <p>Therefore</p>
+          <div class="formula-box">
+            \[
+            |I|+|J|
+            =
+            \deg(x_1)+\deg(x_n)-1
+            \ge
+            \frac{n}{2}+\frac{n}{2}-1
+            =
+            n-1.
+            \]
+          </div>
+          <p>But both \(I\) and \(J\) are subsets of the set \(\{1,2,\dots,n-2\}\), which has only \(n-2\) elements. Hence \(I\cap J\neq \varnothing\). Choose \(i \in I\cap J\).</p>
+          <p>Then we have the two edges</p>
+          <div class="formula-box">
+            \[
+            x_1x_{i+1}\in E(G)
+            \qquad \text{and} \qquad
+            x_ix_n\in E(G).
+            \]
+          </div>
+          <p>These edges let us close the Hamiltonian path into a Hamiltonian cycle:</p>
+          <div class="formula-box">
+            \[
+            x_1,x_2,\dots,x_i,x_n,x_{n-1},\dots,x_{i+1},x_1.
+            \]
+          </div>
+          <p>This uses every vertex exactly once and all its edges belong to \(G\): the forward segment uses path edges, the backward segment uses path edges in reverse, and the two extra edges are \(x_ix_n\) and \(x_{i+1}x_1\).</p>
+          <p>So \(G\) contains a Hamiltonian cycle after all. This contradicts the assumption that \(G\) was non-Hamiltonian.</p>
+          <p>Therefore no counterexample exists, and Dirac's theorem is proved.</p>
+        </div>
+
+        <div class="remark-card">
+          <h3 class="card-title">Why the Contradiction Is Derived</h3>
+          <p>The contradiction is not just that we found a cycle. We found a <strong>Hamiltonian</strong> cycle in the very graph \(G\) that we assumed was non-Hamiltonian.</p>
+          <ul>
+            <li>Maximality of \(G\) forces every missing edge to create a Hamiltonian cycle after addition.</li>
+            <li>Removing that newly added edge gives a Hamiltonian path whose endpoints have many neighbors.</li>
+            <li>The degree lower bound \(\delta(G)\ge n/2\) makes those endpoint neighborhoods overlap in the path order.</li>
+            <li>That overlap lets us "rotate" the path into a Hamiltonian cycle already inside \(G\).</li>
+          </ul>
+          <p>So the assumption that a maximum non-Hamiltonian counterexample exists destroys itself.</p>
+        </div>
+      </div>
+
+      <div id="matching" class="tab-content">
+        <h2 class="section-title">Matching: Definitions and Basic Notions</h2>
+
+        <div class="card">
+          <h3 class="card-title">Core Definitions</h3>
+          <table class="mini-table">
+            <thead>
+              <tr>
+                <th>Term</th>
+                <th>Meaning</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Matching</td>
+                <td>A <strong>matching</strong> is a subset of edges \(M \subseteq E(G)\) such that no two edges of \(M\) share a common endpoint.</td>
+              </tr>
+              <tr>
+                <td>Saturated vertex</td>
+                <td>A vertex is <strong>saturated</strong> by \(M\) if it is incident with some edge of \(M\).</td>
+              </tr>
+              <tr>
+                <td>Unsaturated vertex</td>
+                <td>A vertex not incident with any edge of \(M\) is unsaturated, or free.</td>
+              </tr>
+              <tr>
+                <td>Maximal matching</td>
+                <td>\(M\) is <strong>maximal</strong> if no edge can be added to \(M\) while keeping the matching property.</td>
+              </tr>
+              <tr>
+                <td>Maximum matching</td>
+                <td>\(M\) is <strong>maximum</strong> if it has the largest possible cardinality among all matchings in \(G\).</td>
+              </tr>
+              <tr>
+                <td>Perfect matching</td>
+                <td>A matching that saturates every vertex of the graph.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="idea-card">
+          <h3 class="card-title">Maximal versus Maximum</h3>
+          <p>These two words sound similar, but they mean different things.</p>
+          <ul>
+            <li><strong>Maximum</strong> means largest size.</li>
+            <li><strong>Maximal</strong> means inclusion-wise impossible to extend.</li>
+          </ul>
+          <p>Every maximum matching is maximal, but a maximal matching need not be maximum.</p>
+        </div>
+
+        <div class="proof-card">
+          <h3 class="card-title">A Small Example</h3>
+          <p>Consider the path</p>
+          <div class="formula-box">
+            \[
+            a-b-c-d.
+            \]
+          </div>
+          <p>The matching \(\{bc\}\) is maximal, because no further edge can be added to it. But it is not maximum,
+            since \(\{ab,cd\}\) is a larger matching of size \(2\).</p>
+          <p>In the matching \(\{ab,cd\}\), every vertex is saturated, so it is also a perfect matching.</p>
+        </div>
+
+        <div class="summary-card">
+          <h3 class="card-title">Matching Language for Bipartite Graphs</h3>
+          <p>In a bipartite graph \(G=(X \cup Y,E)\), Hall's theorem asks when there is a matching that saturates every
+            vertex of \(X\). The matching need not saturate all of \(Y\); it only has to cover the chosen side.</p>
+        </div>
+      </div>
+
+      <div id="hall" class="tab-content">
+        <h2 class="section-title">Hall's Marriage Theorem and Its Proof</h2>
+
+        <div class="theorem-card">
+          <h3 class="card-title">Neighborhood of a Set</h3>
+          <p>Let \(G=(X \cup Y,E)\) be a bipartite graph. For \(S \subseteq X\), define the neighborhood</p>
+          <div class="formula-box">
+            \[
+            N(S)=\{y \in Y : \text{there exists } x \in S \text{ with } xy \in E\}.
+            \]
+          </div>
+        </div>
+
+        <div class="theorem-card">
+          <h3 class="card-title">Hall's Marriage Theorem</h3>
+          <p>A bipartite graph \(G=(X \cup Y,E)\) has a matching that saturates every vertex of \(X\) if and only if</p>
+          <div class="formula-box">
+            \[
+            |N(S)| \ge |S|
+            \qquad \text{for every } S \subseteq X.
+            \]
+          </div>
+          <p>This condition is called <strong>Hall's condition</strong>.</p>
+        </div>
+
+        <div class="proof-card">
+          <h3 class="card-title">Proof: Necessity</h3>
+          <p>Assume there is a matching \(M\) that saturates every vertex of \(X\). Take any subset \(S \subseteq X\).</p>
+          <p>Each vertex of \(S\) is matched by \(M\) to a distinct vertex of \(Y\), because different matching edges cannot share an endpoint. All these matched vertices lie in \(N(S)\).</p>
+          <p>Therefore \(N(S)\) contains at least \(|S|\) distinct vertices, so</p>
+          <div class="formula-box">
+            \[
+            |N(S)| \ge |S|.
+            \]
+          </div>
+          <p>Hence Hall's condition is necessary.</p>
+        </div>
+
+        <div class="proof-card">
+          <h3 class="card-title">Proof: Sufficiency by Induction on \(|X|\)</h3>
+          <p>Assume Hall's condition holds for every subset of \(X\). We prove that there is a matching saturating \(X\) by induction on \(|X|\).</p>
+          <p><strong>Base case:</strong> If \(|X|=1\), say \(X=\{x\}\), then Hall's condition gives \(|N(\{x\})|\ge 1\). So \(x\) has a neighbor \(y\), and the single edge \(xy\) is a matching saturating \(X\).</p>
+          <p><strong>Induction step:</strong> Assume the theorem holds for all smaller left parts. We consider two cases.</p>
+        </div>
+
+        <div class="two-col">
+          <div class="card">
+            <h3 class="card-title">Case 1: Strict Inequality for Every Proper Nonempty Set</h3>
+            <p>Suppose</p>
+            <div class="formula-box">
+              \[
+              |N(S)| \ge |S|+1
+              \]
+            </div>
+            <p>for every nonempty proper subset \(S \subsetneq X\).</p>
+            <p>Choose any \(x \in X\), and choose any neighbor \(y \in N(\{x\})\). Remove \(x\) and \(y\), obtaining a smaller bipartite graph \(G'\) with left part \(X' = X \setminus \{x\}\).</p>
+            <p>We claim that Hall's condition still holds in \(G'\). Let \(A \subseteq X'\). If \(|N_{G'}(A)| < |A|\), then in the original graph \(G\), the only possible extra neighbor for \(A\) is \(y\). Hence</p>
+            <div class="formula-box">
+              \[
+              |N_G(A)| \le |N_{G'}(A)|+1 \le |A|.
+              \]
+            </div>
+            <p>This contradicts the strict inequality for nonempty proper subsets. Therefore \(G'\) satisfies Hall's condition, so by induction it has a matching saturating \(X'\). Adding the edge \(xy\) gives a matching saturating all of \(X\).</p>
+          </div>
+
+          <div class="card">
+            <h3 class="card-title">Case 2: Equality for Some Proper Nonempty Set</h3>
+            <p>Suppose there exists a nonempty proper subset \(S \subsetneq X\) such that</p>
+            <div class="formula-box">
+              \[
+              |N(S)| = |S|.
+              \]
+            </div>
+            <p>First look at the induced bipartite subgraph on \(S \cup N(S)\). Hall's condition still holds there for every subset of \(S\), because neighborhoods inside this subgraph are the same as in \(G\). By induction, this subgraph has a matching \(M_1\) that saturates \(S\).</p>
+            <p>Now remove \(S\) and \(N(S)\) from the graph. Let the remaining bipartite graph be \(H\) with left part \(X \setminus S\) and right part \(Y \setminus N(S)\).</p>
+            <p>We claim Hall's condition also holds in \(H\). Let \(A \subseteq X \setminus S\). If \(|N_H(A)| < |A|\), then in the original graph</p>
+            <div class="formula-box">
+              \[
+              N_G(A \cup S) \subseteq N_H(A) \cup N(S),
+              \]
+            </div>
+            <p>so</p>
+            <div class="formula-box">
+              \[
+              |N_G(A \cup S)| \le |N_H(A)| + |N(S)| < |A| + |S| = |A \cup S|.
+              \]
+            </div>
+            <p>This contradicts Hall's condition in \(G\). Hence \(H\) satisfies Hall's condition, and by induction it has a matching \(M_2\) that saturates \(X \setminus S\).</p>
+            <p>The matchings \(M_1\) and \(M_2\) use disjoint vertex sets, so \(M_1 \cup M_2\) is a matching saturating all of \(X\).</p>
+          </div>
+        </div>
+
+        <div class="remark-card">
+          <h3 class="card-title">Conclusion of the Proof</h3>
+          <p>In both cases, Hall's condition lets us construct a matching that saturates every vertex of \(X\). So the condition is sufficient.</p>
+          <p>Combining necessity and sufficiency proves Hall's marriage theorem.</p>
+        </div>
+
+        <div class="summary-card">
+          <h3 class="card-title">Why Hall's Condition Is the Right One</h3>
+          <p>If some subset \(S \subseteq X\) has fewer than \(|S|\) neighbors, then there are not enough vertices in
+            \(Y\) available to match the vertices of \(S\) distinctly. Hall's theorem says this obvious obstruction is
+            not only necessary, but also the only obstruction.</p>
+        </div>
+      </div>
+
+      <div id="takeaways" class="tab-content">
+        <h2 class="section-title">Takeaways</h2>
+
+        <div class="summary-card">
+          <h3 class="card-title">Main Results</h3>
+          <ol>
+            <li>A finite connected simple graph in which every vertex has degree \(2\) is a cycle; therefore each connected component of a \(2\)-regular graph is a cycle.</li>
+            <li>Dirac's theorem proves Hamiltonicity from the degree condition \(\delta(G)\ge n/2\).</li>
+            <li>Hall's theorem characterizes exactly when a bipartite graph has a matching saturating one side.</li>
+          </ol>
+        </div>
+
+        <div class="card">
+          <h3 class="card-title">Proof Patterns to Remember</h3>
+          <ul>
+            <li>Contraction is powerful when it preserves the structural hypothesis while shrinking the graph.</li>
+            <li>Choosing a counterexample with the maximum number of edges often forces every missing edge to carry extra information.</li>
+            <li>In bipartite matching, neighborhood sizes encode the feasibility of saturating a side.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <footer>
+      Lecture 21 combines structural graph classification, Hamiltonicity via degree conditions, and the beginnings of matching theory.
+    </footer>
+  </div>
+
+  <button class="scroll-top" id="scrollTop" aria-label="Scroll to top">&#8593;</button>
+  <a href="index.html" class="fab-btn" title="Back to Index">🏠</a>
+
+  <script>
+    function switchTab(tabId, button) {
+      document.querySelectorAll('.tab-content').forEach((tab) => {
+        tab.classList.remove('active');
+      });
+
+      document.querySelectorAll('.tab-btn').forEach((btn) => {
+        btn.classList.remove('active');
+      });
+
+      document.getElementById(tabId).classList.add('active');
+      button.classList.add('active');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    const progressFill = document.getElementById('progressFill');
+    const scrollTopBtn = document.getElementById('scrollTop');
+
+    function updateProgress() {
+      const scrollTop = window.scrollY;
+      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+      const progress = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
+      progressFill.style.width = progress + '%';
+
+      if (scrollTop > 300) {
+        scrollTopBtn.classList.add('visible');
+      } else {
+        scrollTopBtn.classList.remove('visible');
+      }
+    }
+
+    scrollTopBtn.addEventListener('click', () => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     });
-});
-</script>
 
-<a href="index.html" class="fab-btn" title="Back to Index">🏠</a>
+    window.addEventListener('scroll', updateProgress);
+    updateProgress();
+
+    document.addEventListener('DOMContentLoaded', function () {
+      renderMathInElement(document.body, {
+        delimiters: [
+          { left: "\\[", right: "\\]", display: true },
+          { left: "\\(", right: "\\)", display: false }
+        ]
+      });
+    });
+  </script>
 </body>
+
 </html>
