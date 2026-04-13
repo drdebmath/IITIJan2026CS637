@@ -1,8 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="utf-8">
-  <title>CS 637 - Lecture 22: Matchings and Bipartite Graphs</title>
+  <title>CS 637 - Lecture 22: Order, Covers, Konig's Theorem, and Domination</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
@@ -10,108 +11,980 @@
   <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
 
   <style>
+    :root {
+      --primary: #92400e;
+      --secondary: #0f766e;
+      --accent: #2563eb;
+      --accent-soft: #eff6ff;
+      --ink: #1f2937;
+      --muted: #64748b;
+      --surface: #ffffff;
+      --surface-soft: #f8fafc;
+      --shadow-sm: 0 2px 8px rgba(15, 23, 42, 0.08);
+      --shadow-lg: 0 18px 52px rgba(15, 23, 42, 0.2);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
     body {
-      font-family: "Times New Roman", serif;
-      margin: 40px;
-      line-height: 1.5;
-      background-color: #ffffff;
-      color: #000000;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      line-height: 1.7;
+      background:
+        radial-gradient(circle at top left, rgba(146, 64, 14, 0.18), transparent 28%),
+        radial-gradient(circle at top right, rgba(37, 99, 235, 0.15), transparent 26%),
+        linear-gradient(135deg, #111827 0%, #1f2937 48%, #0f172a 100%);
+      min-height: 100vh;
+      padding: 20px;
+      color: var(--ink);
+      overflow-x: hidden;
     }
-    h1, h2 {
+
+    .container {
+      max-width: 1180px;
+      margin: 0 auto;
+      background: var(--surface);
+      border-radius: 22px;
+      box-shadow: 0 25px 80px rgba(0, 0, 0, 0.35);
+      overflow: hidden;
+      position: relative;
+    }
+
+    .progress-bar {
+      position: sticky;
+      top: 0;
+      height: 4px;
+      background: #e2e8f0;
+      z-index: 101;
+    }
+
+    .progress-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--primary), var(--secondary), var(--accent));
+      transition: width 0.2s ease;
+    }
+
+    header {
+      color: white;
+      padding: 52px 40px 44px;
       text-align: center;
+      background: linear-gradient(135deg, #92400e 0%, #0f766e 55%, #2563eb 100%);
+      background-size: 200% 200%;
+      animation: gradientShift 16s ease infinite;
     }
+
+    @keyframes gradientShift {
+      0% {
+        background-position: 0% 50%;
+      }
+
+      50% {
+        background-position: 100% 50%;
+      }
+
+      100% {
+        background-position: 0% 50%;
+      }
+    }
+
     h1 {
-      font-size: 1.8em;
-      margin-bottom: 0.2em;
+      font-size: 2.8em;
+      margin-bottom: 12px;
+      font-weight: 800;
     }
-    h2 {
-      font-size: 1.2em;
-      margin-top: 2em;
-      margin-bottom: 0.5em;
-    }
-    .definition {
-      margin-bottom: 1em;
-    }
-    .term {
-      font-weight: bold;
-    }
-    .number {
-      font-weight: bold;
-    }
-    .instructor {
-      margin-top: 8px;
-      font-size: 0.95rem;
-      color: #64748b;
-    }
-    .instructor a {
-      color: #0ea5e9;
-      text-decoration: none;
+
+    .subtitle {
+      font-size: 1.28em;
+      opacity: 0.97;
+      margin-bottom: 18px;
       font-weight: 500;
     }
-    .instructor a:hover {
-      text-decoration: underline;
+
+    .instructor {
+      font-size: 1.05em;
+      opacity: 0.96;
     }
+
+    .instructor a {
+      color: #fef3c7;
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .nav-wrapper {
+      position: sticky;
+      top: 4px;
+      z-index: 100;
+      background: white;
+      border-bottom: 2px solid #e2e8f0;
+    }
+
+    .nav-tabs {
+      display: flex;
+      overflow-x: auto;
+      padding: 0 16px;
+      scrollbar-width: thin;
+    }
+
+    .tab-btn {
+      border: none;
+      background: none;
+      padding: 16px 22px;
+      cursor: pointer;
+      color: var(--muted);
+      font-size: 1em;
+      font-weight: 700;
+      white-space: nowrap;
+      border-bottom: 3px solid transparent;
+      transition: all 0.25s ease;
+    }
+
+    .tab-btn.active {
+      color: var(--primary);
+      border-bottom-color: var(--primary);
+    }
+
+    .content {
+      padding: 48px 40px;
+      min-height: 680px;
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+      animation: fadeUp 0.4s ease-out;
+    }
+
+    @keyframes fadeUp {
+      from {
+        opacity: 0;
+        transform: translateY(16px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .section-title {
+      font-size: 2em;
+      margin-bottom: 28px;
+      padding-bottom: 12px;
+      border-bottom: 4px solid var(--secondary);
+      color: var(--ink);
+    }
+
+    .card,
+    .theorem-card,
+    .proof-card,
+    .idea-card,
+    .remark-card,
+    .summary-card {
+      padding: 24px;
+      margin-bottom: 24px;
+      border-radius: 14px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .card {
+      background: var(--surface-soft);
+      border-left: 5px solid var(--primary);
+    }
+
+    .theorem-card {
+      background: #eff6ff;
+      border-left: 5px solid var(--accent);
+    }
+
+    .proof-card {
+      background: #ecfdf5;
+      border-left: 5px solid var(--secondary);
+    }
+
+    .idea-card {
+      background: #fff7ed;
+      border-left: 5px solid var(--primary);
+    }
+
+    .remark-card {
+      background: #f5f3ff;
+      border-left: 5px solid #7c3aed;
+    }
+
+    .summary-card {
+      background: #f8fafc;
+      border-left: 5px solid #0f766e;
+    }
+
+    .card-title {
+      font-size: 1.28em;
+      font-weight: 800;
+      margin-bottom: 14px;
+      color: var(--ink);
+    }
+
+    .formula-box {
+      margin: 16px 0;
+      padding: 16px 18px;
+      border: 1px solid #dbeafe;
+      border-radius: 12px;
+      background: white;
+      overflow-x: auto;
+    }
+
+    .mini-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 16px;
+      background: white;
+      border-radius: 12px;
+      overflow: hidden;
+      font-size: 0.97em;
+    }
+
+    .mini-table th,
+    .mini-table td {
+      border: 1px solid #e2e8f0;
+      padding: 12px 14px;
+      text-align: left;
+      vertical-align: top;
+    }
+
+    .mini-table th {
+      background: #eff6ff;
+      font-weight: 700;
+    }
+
+    .two-col {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 20px;
+    }
+
+    .figure-box {
+      margin-top: 16px;
+      padding: 18px;
+      border-radius: 14px;
+      background: white;
+      border: 1px solid #dbeafe;
+    }
+
+    .figure-caption {
+      margin-top: 10px;
+      color: var(--muted);
+      font-size: 0.95em;
+    }
+
+    .badge-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: white;
+      border: 1px solid #cbd5e1;
+      font-size: 0.95em;
+      font-weight: 600;
+      color: var(--ink);
+    }
+
+    p + p {
+      margin-top: 12px;
+    }
+
+    ul,
+    ol {
+      margin-left: 24px;
+      margin-top: 14px;
+    }
+
+    li {
+      margin-bottom: 10px;
+    }
+
+    .highlight {
+      color: var(--primary);
+      font-weight: 700;
+    }
+
     footer {
-      margin-top: 3em;
+      background: #0f172a;
+      color: white;
       text-align: center;
-      font-size: 0.85em;
-      color: #333;
+      padding: 28px;
+      font-size: 0.95em;
+    }
+
+    .fab-btn,
+    .scroll-top {
+      position: fixed;
+      right: 28px;
+      border: none;
+      border-radius: 999px;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: var(--shadow-lg);
+      z-index: 120;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      text-decoration: none;
+    }
+
+    .fab-btn {
+      width: 60px;
+      height: 60px;
+      bottom: 28px;
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      font-size: 28px;
+    }
+
+    .scroll-top {
+      width: 52px;
+      height: 52px;
+      bottom: 100px;
+      background: linear-gradient(135deg, var(--secondary), #0284c7);
+      font-size: 20px;
+      opacity: 0;
+      visibility: hidden;
+    }
+
+    .scroll-top.visible {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .fab-btn:hover,
+    .scroll-top:hover {
+      transform: translateY(-3px);
+    }
+
+    @media (max-width: 900px) {
+      .two-col {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 768px) {
+      body {
+        padding: 12px;
+      }
+
+      header {
+        padding: 40px 22px 34px;
+      }
+
+      .content {
+        padding: 32px 20px;
+      }
+
+      h1 {
+        font-size: 2.1em;
+      }
+
+      .subtitle {
+        font-size: 1.12em;
+      }
+
+      .fab-btn {
+        width: 54px;
+        height: 54px;
+        right: 18px;
+        bottom: 18px;
+      }
+
+      .scroll-top {
+        right: 18px;
+        bottom: 82px;
+      }
     }
   </style>
-
-<style>
-.fab-btn {
-  position: fixed;
-  bottom: 24px;
-  right: 24px;
-  width: 56px;
-  height: 56px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #3b82f6, #2563eb);
-  color: white;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-  cursor: pointer;
-  z-index: 1000;
-  border: none;
-  font-size: 24px;
-  transition: transform 0.2s, box-shadow 0.2s;
-  text-decoration: none;
-}
-.fab-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(0,0,0,0.3);
-}
-</style>
-
 </head>
 
 <body>
+  <div class="container">
+    <div class="progress-bar">
+      <div class="progress-fill" id="progressFill"></div>
+    </div>
 
-<h1>CS 637: Mathematics-II</h1>
-<div class="instructor">
-  <strong>Instructor:</strong> <a href="https://drdebmath.github.io" target="_blank">Dr. Debasish Pattanayak</a>
-</div>
-<h2>Lecture 22 – Matchings and Bipartite Graphs</h2>
+    <header>
+      <h1>CS 637: Mathematics-II</h1>
+      <div class="subtitle">Lecture 22: Order, Vertex Covers, Konig's Theorem, Gallai, and Domination</div>
+      <div class="instructor">
+        <strong>Instructor:</strong> <a href="https://drdebmath.github.io/" target="_blank">Dr. Debasish Pattanayak</a>
+      </div>
+    </header>
 
-<footer>
-  
-</footer>
+    <div class="nav-wrapper">
+      <div class="nav-tabs">
+        <button class="tab-btn active" onclick="switchTab('overview', this)">Overview</button>
+        <button class="tab-btn" onclick="switchTab('order', this)">Order</button>
+        <button class="tab-btn" onclick="switchTab('cover', this)">Matching vs Cover</button>
+        <button class="tab-btn" onclick="switchTab('konig', this)">Konig</button>
+        <button class="tab-btn" onclick="switchTab('minmax', this)">Min-Max</button>
+        <button class="tab-btn" onclick="switchTab('gallai', this)">Gallai</button>
+        <button class="tab-btn" onclick="switchTab('domination', this)">Domination</button>
+        <button class="tab-btn" onclick="switchTab('takeaways', this)">Takeaways</button>
+      </div>
+    </div>
 
-<script>
-document.addEventListener("DOMContentLoaded", function() {
-    renderMathInElement(document.body, {
-        delimiters: [
-            {left: "31952", right: "31952", display: true},
-            {left: "\[", right: "\]", display: true},
-            {left: "\(", right: "\)", display: false}
-        ]
+    <div class="content">
+      <div id="overview" class="tab-content active">
+        <h2 class="section-title">Lecture Roadmap</h2>
+
+        <div class="card">
+          <h3 class="card-title">Topics for Today</h3>
+          <ol>
+            <li>The <strong>order</strong> of a graph and the main parameters we will measure against it.</li>
+            <li>The basic inequality between a matching and a vertex cover.</li>
+            <li>Konig's theorem: in a bipartite graph, maximum matching size equals minimum vertex cover size.</li>
+            <li>The meaning of a <strong>min-max theorem</strong> and some standard examples.</li>
+            <li>Gallai's identity relating independent sets and vertex covers.</li>
+            <li>A basic upper bound for domination number in terms of minimum degree.</li>
+          </ol>
+        </div>
+
+        <div class="idea-card">
+          <h3 class="card-title">The Unifying Theme</h3>
+          <p>Much of this lecture is about a recurring graph-theoretic tension:</p>
+          <div class="formula-box">
+            \[
+            \text{maximize a packing}
+            \qquad \text{versus} \qquad
+            \text{minimize an obstruction or cover.}
+            \]
+          </div>
+          <p>Matchings pack disjoint edges. Vertex covers hit every edge. Independent sets avoid every edge.
+            Dominating sets cover vertices through adjacency. Once the parameters are named carefully, many proofs become
+            short and conceptual.</p>
+        </div>
+
+        <div class="summary-card">
+          <h3 class="card-title">Parameters to Track</h3>
+          <div class="badge-row">
+            <span class="badge">\(n = |V(G)|\): order</span>
+            <span class="badge">\(m = |E(G)|\): size</span>
+            <span class="badge">\(\nu(G)\): matching number</span>
+            <span class="badge">\(\tau(G)\): vertex cover number</span>
+            <span class="badge">\(\alpha(G)\): independence number</span>
+            <span class="badge">\(\gamma(G)\): domination number</span>
+            <span class="badge">\(\delta(G)\): minimum degree</span>
+          </div>
+        </div>
+      </div>
+
+      <div id="order" class="tab-content">
+        <h2 class="section-title">Order of a Graph and Why It Matters</h2>
+
+        <div class="card">
+          <h3 class="card-title">Definitions</h3>
+          <p>If \(G=(V,E)\) is a finite graph, then its <strong>order</strong> is the number of vertices:</p>
+          <div class="formula-box">
+            \[
+            n(G)=|V(G)|.
+            \]
+          </div>
+          <p>Many books simply write \(n\), and some older texts use \(p\). The number of edges is called the
+            <strong>size</strong> of the graph and is written \(m(G)=|E(G)|\) or just \(m\).</p>
+        </div>
+
+        <div class="two-col">
+          <div class="theorem-card">
+            <h3 class="card-title">Handshake Lemma</h3>
+            <p>The degree sum equals twice the number of edges:</p>
+            <div class="formula-box">
+              \[
+              \sum_{v \in V(G)} \deg(v)=2|E(G)|.
+              \]
+            </div>
+            <p>This is often the first way order and size interact. It lets us pass from a local condition on degrees
+              to a global statement about the graph.</p>
+          </div>
+
+          <div class="card">
+            <h3 class="card-title">Why Order Appears in This Lecture</h3>
+            <ul>
+              <li>Gallai's identity has the form \(\alpha(G)+\tau(G)=n(G)\).</li>
+              <li>Domination bounds are measured against the total number of vertices.</li>
+              <li>Min-max theorems often say a packing number plus a complementary covering number is controlled by \(n\).</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3 class="card-title">Examples</h3>
+          <table class="mini-table">
+            <thead>
+              <tr>
+                <th>Graph</th>
+                <th>Order \(n\)</th>
+                <th>Size \(m\)</th>
+                <th>Comment</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>\(P_5\)</td>
+                <td>5</td>
+                <td>4</td>
+                <td>A path on five vertices.</td>
+              </tr>
+              <tr>
+                <td>\(C_6\)</td>
+                <td>6</td>
+                <td>6</td>
+                <td>A cycle has order equal to its size.</td>
+              </tr>
+              <tr>
+                <td>\(K_{3,4}\)</td>
+                <td>7</td>
+                <td>12</td>
+                <td>Complete bipartite graph with \(3 \cdot 4\) edges.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div id="cover" class="tab-content">
+        <h2 class="section-title">Relationship Between Matching and Vertex Cover</h2>
+
+        <div class="card">
+          <h3 class="card-title">Definitions</h3>
+          <p>A <strong>vertex cover</strong> of \(G\) is a set \(C \subseteq V(G)\) such that every edge of \(G\) has at
+            least one endpoint in \(C\). The minimum size of a vertex cover is denoted by \(\tau(G)\).</p>
+          <p>A maximum matching has size \(\nu(G)\).</p>
+        </div>
+
+        <div class="theorem-card">
+          <h3 class="card-title">Basic Inequality</h3>
+          <p>For every graph \(G\),</p>
+          <div class="formula-box">
+            \[
+            \nu(G) \le \tau(G).
+            \]
+          </div>
+        </div>
+
+        <div class="proof-card">
+          <h3 class="card-title">Proof</h3>
+          <p>Let \(M\) be any matching and let \(C\) be any vertex cover. Every edge of \(M\) must be covered by some
+            vertex of \(C\).</p>
+          <p>Because the edges of a matching are pairwise disjoint, two different edges of \(M\) cannot be covered by
+            the same endpoint. So \(C\) must contain at least one distinct vertex for each edge of \(M\).</p>
+          <div class="formula-box">
+            \[
+            |M| \le |C|.
+            \]
+          </div>
+          <p>Now maximize over all matchings and minimize over all vertex covers. This gives \(\nu(G) \le \tau(G)\).</p>
+        </div>
+
+        <div class="two-col">
+          <div class="card">
+            <h3 class="card-title">What the Inequality Means</h3>
+            <p>A matching is a <strong>packing</strong> problem: we try to place as many pairwise disjoint edges as possible.</p>
+            <p>A vertex cover is a <strong>covering</strong> problem: we try to hit every edge using as few vertices as possible.</p>
+            <p>The inequality \(\nu(G) \le \tau(G)\) is the obvious direction in the packing-versus-covering story.</p>
+          </div>
+
+          <div class="remark-card">
+            <h3 class="card-title">Equality Need Not Hold in General</h3>
+            <p>Take the triangle \(K_3\).</p>
+            <ul>
+              <li>A maximum matching has size \(1\), so \(\nu(K_3)=1\).</li>
+              <li>A minimum vertex cover has size \(2\), so \(\tau(K_3)=2\).</li>
+            </ul>
+            <p>Thus equality fails for non-bipartite graphs. The bipartite case is special.</p>
+          </div>
+        </div>
+      </div>
+
+      <div id="konig" class="tab-content">
+        <h2 class="section-title">Bipartite Graphs: Maximum Matching Equals Minimum Vertex Cover</h2>
+
+        <div class="theorem-card">
+          <h3 class="card-title">Konig's Theorem</h3>
+          <p>If \(G=(X \cup Y,E)\) is bipartite, then</p>
+          <div class="formula-box">
+            \[
+            \nu(G)=\tau(G).
+            \]
+          </div>
+        </div>
+
+        <div class="idea-card">
+          <h3 class="card-title">Proof Strategy</h3>
+          <p>We already know \(\nu(G)\le\tau(G)\). So the whole job is to start from a <strong>maximum matching</strong>
+            and build a <strong>vertex cover of the same size</strong>.</p>
+          <p>The construction uses alternating paths, exactly the same language that appears in matching theory more generally.</p>
+        </div>
+
+        <div class="proof-card">
+          <h3 class="card-title">Alternating-Path Construction</h3>
+          <p>Let \(M\) be a maximum matching in the bipartite graph \(G=(X \cup Y,E)\). Let \(U \subseteq X\) be the set
+            of vertices of \(X\) not saturated by \(M\).</p>
+          <p>Starting from the vertices of \(U\), follow <strong>alternating paths</strong> that begin with an edge not in
+            \(M\), then an edge in \(M\), and so on. Let \(Z\) be the set of all vertices reachable this way. Write</p>
+          <div class="formula-box">
+            \[
+            Z_X = Z \cap X,
+            \qquad
+            Z_Y = Z \cap Y.
+            \]
+          </div>
+          <p>Now define</p>
+          <div class="formula-box">
+            \[
+            C=(X \setminus Z_X)\cup Z_Y.
+            \]
+          </div>
+          <p>We claim that \(C\) is a vertex cover and that \(|C|=|M|\).</p>
+        </div>
+
+        <div class="two-col">
+          <div class="proof-card">
+            <h3 class="card-title">Why \(C\) Covers Every Edge</h3>
+            <p>Take any edge \(xy\) with \(x \in X\) and \(y \in Y\). Suppose neither endpoint lies in \(C\). Then
+              \(x \in Z_X\) and \(y \notin Z_Y\).</p>
+            <p>If \(xy \notin M\), then an alternating path reaching \(x\) can be extended across \(xy\), so \(y\) would
+              lie in \(Z_Y\), contradiction.</p>
+            <p>If \(xy \in M\), then whenever \(x \in Z_X\), its matched partner must lie in \(Z_Y\). Again we get
+              \(y \in Z_Y\), contradiction.</p>
+            <p>So every edge has at least one endpoint in \(C\), which means \(C\) is a vertex cover.</p>
+          </div>
+
+          <div class="proof-card">
+            <h3 class="card-title">Why \(|C|=|M|\)</h3>
+            <p>No vertex of \(Z_Y\) is unmatched, because then an alternating path from \(U\) to that unmatched vertex
+              would be an augmenting path, contradicting the assumption that \(M\) is maximum.</p>
+            <p>Each matched edge of \(M\) contributes exactly one vertex to \(C\):</p>
+            <ul>
+              <li>If its \(X\)-endpoint lies in \(Z_X\), then its \(Y\)-endpoint lies in \(Z_Y\), so the cover takes the \(Y\)-endpoint.</li>
+              <li>If its \(X\)-endpoint does not lie in \(Z_X\), then its \(Y\)-endpoint does not lie in \(Z_Y\), so the cover takes the \(X\)-endpoint.</li>
+            </ul>
+            <p>Unmatched vertices of \(X\) lie in \(Z_X\), so they are not counted in \(C\). Hence \(C\) contains
+              exactly one endpoint from each edge of \(M\), and therefore</p>
+            <div class="formula-box">
+              \[
+              |C|=|M|.
+              \]
+            </div>
+          </div>
+        </div>
+
+        <div class="summary-card">
+          <h3 class="card-title">Conclusion</h3>
+          <p>Since \(C\) is a vertex cover, \(\tau(G)\le |C|=|M|=\nu(G)\). Combined with the general inequality
+            \(\nu(G)\le \tau(G)\), we obtain</p>
+          <div class="formula-box">
+            \[
+            \nu(G)=\tau(G).
+            \]
+          </div>
+        </div>
+      </div>
+
+      <div id="minmax" class="tab-content">
+        <h2 class="section-title">Min-Max Theorems and Examples</h2>
+
+        <div class="card">
+          <h3 class="card-title">General Idea</h3>
+          <p>A <strong>min-max theorem</strong> says that the largest size of one kind of object equals the smallest size
+            of another kind of object that blocks it.</p>
+          <div class="formula-box">
+            \[
+            \max(\text{packing}) = \min(\text{covering or obstruction}).
+            \]
+          </div>
+          <p>Usually the easy part is the inequality \(\max \le \min\). The real work is proving equality by building a
+            witness on the minimizing side from an optimal maximizing object, or vice versa.</p>
+        </div>
+
+        <div class="card">
+          <h3 class="card-title">Examples</h3>
+          <table class="mini-table">
+            <thead>
+              <tr>
+                <th>Theorem</th>
+                <th>Maximum Side</th>
+                <th>Minimum Side</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Konig</td>
+                <td>Maximum matching in a bipartite graph</td>
+                <td>Minimum vertex cover</td>
+              </tr>
+              <tr>
+                <td>Max-flow min-cut</td>
+                <td>Largest feasible \(s\)-\(t\) flow value</td>
+                <td>Smallest \(s\)-\(t\) cut capacity</td>
+              </tr>
+              <tr>
+                <td>Menger (edge version)</td>
+                <td>Maximum number of edge-disjoint \(s\)-\(t\) paths</td>
+                <td>Minimum size of an \(s\)-\(t\) edge cut</td>
+              </tr>
+              <tr>
+                <td>Menger (vertex version)</td>
+                <td>Maximum number of internally disjoint \(u\)-\(v\) paths</td>
+                <td>Minimum number of vertices separating \(u\) and \(v\)</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="idea-card">
+          <h3 class="card-title">A Useful Mental Template</h3>
+          <ol>
+            <li>Name the <strong>packing parameter</strong>.</li>
+            <li>Name the <strong>covering parameter</strong>.</li>
+            <li>Prove the obvious inequality \(\max \le \min\).</li>
+            <li>Find a structure that turns an optimal object on one side into an equally good object on the other.</li>
+          </ol>
+          <p>Konig's theorem is the cleanest example of this template in elementary matching theory.</p>
+        </div>
+      </div>
+
+      <div id="gallai" class="tab-content">
+        <h2 class="section-title">Gallai's Theorem</h2>
+
+        <div class="theorem-card">
+          <h3 class="card-title">Gallai's Identity</h3>
+          <p>For every graph \(G\) of order \(n\),</p>
+          <div class="formula-box">
+            \[
+            \alpha(G)+\tau(G)=n,
+            \]
+          </div>
+          <p>where \(\alpha(G)\) is the size of a maximum independent set and \(\tau(G)\) is the size of a minimum
+            vertex cover.</p>
+        </div>
+
+        <div class="proof-card">
+          <h3 class="card-title">Proof</h3>
+          <p>Let \(I\) be an independent set. Then no edge has both endpoints in \(I\). Therefore every edge has at
+            least one endpoint in \(V(G)\setminus I\), so \(V(G)\setminus I\) is a vertex cover.</p>
+          <p>This shows that for every independent set \(I\),</p>
+          <div class="formula-box">
+            \[
+            |I| \le n-\tau(G).
+            \]
+          </div>
+          <p>Taking the largest possible independent set gives</p>
+          <div class="formula-box">
+            \[
+            \alpha(G) \le n-\tau(G).
+            \]
+          </div>
+          <p>Conversely, let \(C\) be a vertex cover. If two vertices outside \(C\) were adjacent, that edge would have
+            no endpoint in \(C\), impossible. Hence \(V(G)\setminus C\) is an independent set, so</p>
+          <div class="formula-box">
+            \[
+            n-\tau(G)=|V(G)\setminus C| \le \alpha(G).
+            \]
+          </div>
+          <p>The two inequalities combine to give \(\alpha(G)=n-\tau(G)\), or equivalently</p>
+          <div class="formula-box">
+            \[
+            \alpha(G)+\tau(G)=n.
+            \]
+          </div>
+        </div>
+
+        <div class="two-col">
+          <div class="summary-card">
+            <h3 class="card-title">Interpretation</h3>
+            <p>Independent sets and vertex covers are complements of one another. Gallai's theorem makes that precise at
+              the level of optimum sizes.</p>
+            <p>So the order \(n\) of the graph is not just background notation. It is the total amount of vertex mass
+              split between an optimal sparse set and an optimal covering set.</p>
+          </div>
+
+          <div class="remark-card">
+            <h3 class="card-title">Bipartite Consequence</h3>
+            <p>In a bipartite graph, Konig plus Gallai gives</p>
+            <div class="formula-box">
+              \[
+              \alpha(G)=n-\nu(G).
+              \]
+            </div>
+            <p>So once we know the maximum matching size in a bipartite graph, we immediately know its minimum vertex
+              cover size and maximum independent set size.</p>
+          </div>
+        </div>
+
+        <div class="remark-card">
+          <h3 class="card-title">Remark on Terminology</h3>
+          <p>Some texts also attach Gallai's name to the edge-cover identity \(\nu(G)+\rho(G)=n\) for graphs without
+            isolated vertices. In this lecture we are using the independent-set and vertex-cover form.</p>
+        </div>
+      </div>
+
+      <div id="domination" class="tab-content">
+        <h2 class="section-title">Dominating Set Size and Minimum Degree</h2>
+
+        <div class="card">
+          <h3 class="card-title">Definition</h3>
+          <p>A set \(D \subseteq V(G)\) is a <strong>dominating set</strong> if every vertex of \(G\) either belongs to
+            \(D\) or is adjacent to a vertex of \(D\). The minimum size of a dominating set is the
+            <strong>domination number</strong>, denoted \(\gamma(G)\).</p>
+        </div>
+
+        <div class="theorem-card">
+          <h3 class="card-title">A Basic Degree Bound</h3>
+          <p>If \(G\) has order \(n\) and minimum degree \(\delta(G)=\delta\), then</p>
+          <div class="formula-box">
+            \[
+            \gamma(G)\le n-\delta.
+            \]
+          </div>
+        </div>
+
+        <div class="proof-card">
+          <h3 class="card-title">Proof</h3>
+          <p>Choose any vertex \(v\). Let \(N(v)\) be its open neighborhood, and consider the set</p>
+          <div class="formula-box">
+            \[
+            D=V(G)\setminus N(v).
+            \]
+          </div>
+          <p>The set \(D\) contains the vertex \(v\) itself. Every vertex in \(N(v)\) is adjacent to \(v\), so it is
+            dominated by \(D\). Every vertex outside \(N(v)\) already lies in \(D\). Hence \(D\) is a dominating set.</p>
+          <p>Therefore</p>
+          <div class="formula-box">
+            \[
+            \gamma(G)\le |D| = n-\deg(v).
+            \]
+          </div>
+          <p>Since \(\deg(v)\ge \delta\), we get</p>
+          <div class="formula-box">
+            \[
+            \gamma(G)\le n-\delta.
+            \]
+          </div>
+        </div>
+
+        <div class="two-col">
+          <div class="card">
+            <h3 class="card-title">Quick Example</h3>
+            <p>For the complete graph \(K_n\), we have \(\delta=n-1\). The bound gives</p>
+            <div class="formula-box">
+              \[
+              \gamma(K_n)\le n-(n-1)=1,
+              \]
+            </div>
+            <p>which is exact, since any single vertex dominates the whole graph.</p>
+          </div>
+
+          <div class="remark-card">
+            <h3 class="card-title">How Sharp Is This?</h3>
+            <p>The estimate \(\gamma(G)\le n-\delta\) is easy and useful, but it is often not best possible. For
+              example, when \(\delta \ge 1\), a stronger theorem of Ore gives \(\gamma(G)\le n/2\).</p>
+            <p>Still, the present bound is a good first illustration of how local degree information forces a global
+              covering property.</p>
+          </div>
+        </div>
+      </div>
+
+      <div id="takeaways" class="tab-content">
+        <h2 class="section-title">Takeaways</h2>
+
+        <div class="summary-card">
+          <h3 class="card-title">Main Results</h3>
+          <ol>
+            <li>The order of a graph is \(n=|V(G)|\), and many optimization identities are measured against it.</li>
+            <li>For every graph, \(\nu(G)\le \tau(G)\).</li>
+            <li>For every bipartite graph, Konig's theorem gives \(\nu(G)=\tau(G)\).</li>
+            <li>Gallai's identity gives \(\alpha(G)+\tau(G)=n\).</li>
+            <li>A graph of order \(n\) and minimum degree \(\delta\) satisfies \(\gamma(G)\le n-\delta\).</li>
+          </ol>
+        </div>
+
+        <div class="card">
+          <h3 class="card-title">Proof Patterns to Remember</h3>
+          <ul>
+            <li>Compare a packing and a cover by observing that each packed object needs a distinct witness in any cover.</li>
+            <li>In bipartite graphs, alternating paths convert a maximum matching into a minimum vertex cover.</li>
+            <li>Complementation turns independent sets into vertex covers and vice versa.</li>
+            <li>To build a dominating set, sometimes it is easier to keep one useful vertex and delete its neighborhood.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <footer>
+      Lecture 22 connects graph order, covering parameters, min-max principles, Gallai's identity, and domination bounds.
+    </footer>
+  </div>
+
+  <button class="scroll-top" id="scrollTop" aria-label="Scroll to top">&#8593;</button>
+  <a href="index.html" class="fab-btn" title="Back to Index">&#127968;</a>
+
+  <script>
+    function switchTab(tabId, button) {
+      document.querySelectorAll(".tab-content").forEach((tab) => {
+        tab.classList.remove("active");
+      });
+
+      document.querySelectorAll(".tab-btn").forEach((btn) => {
+        btn.classList.remove("active");
+      });
+
+      document.getElementById(tabId).classList.add("active");
+      button.classList.add("active");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    const progressFill = document.getElementById("progressFill");
+    const scrollTopBtn = document.getElementById("scrollTop");
+
+    function updateProgress() {
+      const scrollTop = window.scrollY;
+      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+      const progress = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
+      progressFill.style.width = progress + "%";
+
+      if (scrollTop > 300) {
+        scrollTopBtn.classList.add("visible");
+      } else {
+        scrollTopBtn.classList.remove("visible");
+      }
+    }
+
+    scrollTopBtn.addEventListener("click", () => {
+      window.scrollTo({ top: 0, behavior: "smooth" });
     });
-});
-</script>
 
-<a href="index.html" class="fab-btn" title="Back to Index">🏠</a>
+    window.addEventListener("scroll", updateProgress);
+    updateProgress();
+
+    document.addEventListener("DOMContentLoaded", function () {
+      renderMathInElement(document.body, {
+        delimiters: [
+          { left: "\\[", right: "\\]", display: true },
+          { left: "\\(", right: "\\)", display: false }
+        ]
+      });
+    });
+  </script>
 </body>
+
 </html>
