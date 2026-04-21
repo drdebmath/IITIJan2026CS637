@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="utf-8">
   <title>CS 637 - Lecture 23: Planar Graphs and Structural Constraints</title>
@@ -10,108 +11,1127 @@
   <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
 
   <style>
+    :root {
+      --primary: #9a3412;
+      --secondary: #166534;
+      --accent: #0f766e;
+      --accent-soft: #ecfeff;
+      --ink: #1f2937;
+      --muted: #64748b;
+      --surface: #ffffff;
+      --surface-soft: #f8fafc;
+      --shadow-sm: 0 2px 8px rgba(15, 23, 42, 0.08);
+      --shadow-lg: 0 18px 52px rgba(15, 23, 42, 0.2);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
     body {
-      font-family: "Times New Roman", serif;
-      margin: 40px;
-      line-height: 1.5;
-      background-color: #ffffff;
-      color: #000000;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      line-height: 1.7;
+      background:
+        radial-gradient(circle at top left, rgba(154, 52, 18, 0.18), transparent 28%),
+        radial-gradient(circle at top right, rgba(22, 101, 52, 0.16), transparent 26%),
+        linear-gradient(135deg, #111827 0%, #1f2937 48%, #0f172a 100%);
+      min-height: 100vh;
+      padding: 20px;
+      color: var(--ink);
+      overflow-x: hidden;
     }
-    h1, h2 {
+
+    .container {
+      max-width: 1180px;
+      margin: 0 auto;
+      background: var(--surface);
+      border-radius: 22px;
+      box-shadow: 0 25px 80px rgba(0, 0, 0, 0.35);
+      overflow: hidden;
+      position: relative;
+    }
+
+    .progress-bar {
+      position: sticky;
+      top: 0;
+      height: 4px;
+      background: #e2e8f0;
+      z-index: 101;
+    }
+
+    .progress-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--primary), var(--secondary), var(--accent));
+      transition: width 0.2s ease;
+    }
+
+    header {
+      color: white;
+      padding: 52px 40px 44px;
       text-align: center;
+      background: linear-gradient(135deg, #9a3412 0%, #166534 52%, #0f766e 100%);
+      background-size: 200% 200%;
+      animation: gradientShift 16s ease infinite;
     }
+
+    @keyframes gradientShift {
+      0% {
+        background-position: 0% 50%;
+      }
+
+      50% {
+        background-position: 100% 50%;
+      }
+
+      100% {
+        background-position: 0% 50%;
+      }
+    }
+
     h1 {
-      font-size: 1.8em;
-      margin-bottom: 0.2em;
+      font-size: 2.8em;
+      margin-bottom: 12px;
+      font-weight: 800;
     }
-    h2 {
-      font-size: 1.2em;
-      margin-top: 2em;
-      margin-bottom: 0.5em;
-    }
-    .definition {
-      margin-bottom: 1em;
-    }
-    .term {
-      font-weight: bold;
-    }
-    .number {
-      font-weight: bold;
-    }
-    .instructor {
-      margin-top: 8px;
-      font-size: 0.95rem;
-      color: #64748b;
-    }
-    .instructor a {
-      color: #0ea5e9;
-      text-decoration: none;
+
+    .subtitle {
+      font-size: 1.28em;
+      opacity: 0.97;
+      margin-bottom: 18px;
       font-weight: 500;
     }
-    .instructor a:hover {
-      text-decoration: underline;
+
+    .instructor {
+      font-size: 1.05em;
+      opacity: 0.96;
     }
+
+    .instructor a {
+      color: #fef3c7;
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .nav-wrapper {
+      position: sticky;
+      top: 4px;
+      z-index: 100;
+      background: white;
+      border-bottom: 2px solid #e2e8f0;
+    }
+
+    .nav-tabs {
+      display: flex;
+      overflow-x: auto;
+      padding: 0 16px;
+      scrollbar-width: thin;
+    }
+
+    .tab-btn {
+      border: none;
+      background: none;
+      padding: 16px 22px;
+      cursor: pointer;
+      color: var(--muted);
+      font-size: 1em;
+      font-weight: 700;
+      white-space: nowrap;
+      border-bottom: 3px solid transparent;
+      transition: all 0.25s ease;
+    }
+
+    .tab-btn.active {
+      color: var(--primary);
+      border-bottom-color: var(--primary);
+    }
+
+    .content {
+      padding: 48px 40px;
+      min-height: 680px;
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+      animation: fadeUp 0.4s ease-out;
+    }
+
+    @keyframes fadeUp {
+      from {
+        opacity: 0;
+        transform: translateY(16px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .section-title {
+      font-size: 2em;
+      margin-bottom: 28px;
+      padding-bottom: 12px;
+      border-bottom: 4px solid var(--secondary);
+      color: var(--ink);
+    }
+
+    .card,
+    .theorem-card,
+    .proof-card,
+    .idea-card,
+    .remark-card,
+    .summary-card {
+      padding: 24px;
+      margin-bottom: 24px;
+      border-radius: 14px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .card {
+      background: var(--surface-soft);
+      border-left: 5px solid var(--primary);
+    }
+
+    .theorem-card {
+      background: #ecfeff;
+      border-left: 5px solid var(--accent);
+    }
+
+    .proof-card {
+      background: #ecfdf5;
+      border-left: 5px solid var(--secondary);
+    }
+
+    .idea-card {
+      background: #fff7ed;
+      border-left: 5px solid var(--primary);
+    }
+
+    .remark-card {
+      background: #f5f3ff;
+      border-left: 5px solid #7c3aed;
+    }
+
+    .summary-card {
+      background: #f8fafc;
+      border-left: 5px solid #166534;
+    }
+
+    .card-title {
+      font-size: 1.28em;
+      font-weight: 800;
+      margin-bottom: 14px;
+      color: var(--ink);
+    }
+
+    .formula-box {
+      margin: 16px 0;
+      padding: 16px 18px;
+      border: 1px solid #c7f9f3;
+      border-radius: 12px;
+      background: white;
+      overflow-x: auto;
+    }
+
+    .mini-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 16px;
+      background: white;
+      border-radius: 12px;
+      overflow: hidden;
+      font-size: 0.97em;
+    }
+
+    .mini-table th,
+    .mini-table td {
+      border: 1px solid #e2e8f0;
+      padding: 12px 14px;
+      text-align: left;
+      vertical-align: top;
+    }
+
+    .mini-table th {
+      background: #ecfeff;
+      font-weight: 700;
+    }
+
+    .two-col {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 20px;
+    }
+
+    .figure-box {
+      margin-top: 16px;
+      padding: 18px;
+      border-radius: 14px;
+      background: white;
+      border: 1px solid #d1fae5;
+    }
+
+    .figure-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+      align-items: center;
+    }
+
+    .figure-svg {
+      width: 100%;
+      height: auto;
+      display: block;
+      border-radius: 10px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      padding: 10px;
+    }
+
+    .figure-caption {
+      margin-top: 10px;
+      color: var(--muted);
+      font-size: 0.95em;
+    }
+
+    .badge-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: white;
+      border: 1px solid #cbd5e1;
+      font-size: 0.95em;
+      font-weight: 600;
+      color: var(--ink);
+    }
+
+    p + p {
+      margin-top: 12px;
+    }
+
+    ul,
+    ol {
+      margin-left: 24px;
+      margin-top: 14px;
+    }
+
+    li {
+      margin-bottom: 10px;
+    }
+
+    .highlight {
+      color: var(--primary);
+      font-weight: 700;
+    }
+
     footer {
-      margin-top: 3em;
+      background: #0f172a;
+      color: white;
       text-align: center;
-      font-size: 0.85em;
-      color: #333;
+      padding: 28px;
+      font-size: 0.95em;
+    }
+
+    .fab-btn,
+    .scroll-top {
+      position: fixed;
+      right: 28px;
+      border: none;
+      border-radius: 999px;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: var(--shadow-lg);
+      z-index: 120;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      text-decoration: none;
+    }
+
+    .fab-btn {
+      width: 60px;
+      height: 60px;
+      bottom: 28px;
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      font-size: 28px;
+    }
+
+    .scroll-top {
+      width: 52px;
+      height: 52px;
+      bottom: 100px;
+      background: linear-gradient(135deg, var(--secondary), #0f766e);
+      font-size: 20px;
+      opacity: 0;
+      visibility: hidden;
+    }
+
+    .scroll-top.visible {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .fab-btn:hover,
+    .scroll-top:hover {
+      transform: translateY(-3px);
+    }
+
+    @media (max-width: 900px) {
+      .two-col,
+      .figure-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 768px) {
+      body {
+        padding: 12px;
+      }
+
+      header {
+        padding: 40px 22px 34px;
+      }
+
+      .content {
+        padding: 32px 20px;
+      }
+
+      h1 {
+        font-size: 2.1em;
+      }
+
+      .subtitle {
+        font-size: 1.12em;
+      }
+
+      .fab-btn {
+        width: 54px;
+        height: 54px;
+        right: 18px;
+        bottom: 18px;
+      }
+
+      .scroll-top {
+        right: 18px;
+        bottom: 82px;
+      }
     }
   </style>
-
-<style>
-.fab-btn {
-  position: fixed;
-  bottom: 24px;
-  right: 24px;
-  width: 56px;
-  height: 56px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #3b82f6, #2563eb);
-  color: white;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-  cursor: pointer;
-  z-index: 1000;
-  border: none;
-  font-size: 24px;
-  transition: transform 0.2s, box-shadow 0.2s;
-  text-decoration: none;
-}
-.fab-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(0,0,0,0.3);
-}
-</style>
-
 </head>
 
 <body>
+  <div class="container">
+    <div class="progress-bar">
+      <div class="progress-fill" id="progressFill"></div>
+    </div>
 
-<h1>CS 637: Mathematics-II</h1>
-<div class="instructor">
-  <strong>Instructor:</strong> <a href="https://drdebmath.github.io" target="_blank">Dr. Debasish Pattanayak</a>
-</div>
-<h2>Lecture 23 – Planar Graphs and Structural Constraints</h2>
+    <header>
+      <h1>CS 637: Mathematics-II</h1>
+      <div class="subtitle">Lecture 23: Planar Graphs and Structural Constraints</div>
+      <div class="instructor">
+        <strong>Instructor:</strong> <a href="https://drdebmath.github.io/" target="_blank">Dr. Debasish Pattanayak</a>
+      </div>
+    </header>
 
-<footer>
-  
-</footer>
+    <div class="nav-wrapper">
+      <div class="nav-tabs">
+        <button class="tab-btn active" onclick="switchTab('overview', this)">Overview</button>
+        <button class="tab-btn" onclick="switchTab('euler', this)">Euler</button>
+        <button class="tab-btn" onclick="switchTab('wagner', this)">Wagner</button>
+        <button class="tab-btn" onclick="switchTab('duality', this)">Duality</button>
+        <button class="tab-btn" onclick="switchTab('separator', this)">Separator</button>
+        <button class="tab-btn" onclick="switchTab('coloring', this)">Coloring</button>
+        <button class="tab-btn" onclick="switchTab('embedding', this)">Embedding</button>
+        <button class="tab-btn" onclick="switchTab('testing', this)">Testing</button>
+        <button class="tab-btn" onclick="switchTab('takeaways', this)">Takeaways</button>
+      </div>
+    </div>
 
-<script>
-document.addEventListener("DOMContentLoaded", function() {
-    renderMathInElement(document.body, {
-        delimiters: [
-            {left: "31952", right: "31952", display: true},
-            {left: "\[", right: "\]", display: true},
-            {left: "\(", right: "\)", display: false}
-        ]
+    <div class="content">
+      <div id="overview" class="tab-content active">
+        <h2 class="section-title">Lecture Roadmap</h2>
+
+        <div class="card">
+          <h3 class="card-title">Topics for Today</h3>
+          <ol>
+            <li>Wagner's theorem and its proof through forbidden minors.</li>
+            <li>Euler's formula and the most common corollaries for edge bounds and degrees.</li>
+            <li>Duality of plane graphs and the cycle-cut correspondence.</li>
+            <li>The planar separator theorem and the main idea of the proof.</li>
+            <li>The 5-color theorem and its standard inductive proof with Kempe chains.</li>
+            <li>The 4-color theorem and the ideas behind the computer-assisted proof.</li>
+            <li>Straight-line embeddings of planar graphs.</li>
+            <li>How planarity is tested in theory and in algorithms.</li>
+          </ol>
+        </div>
+
+        <div class="idea-card">
+          <h3 class="card-title">The Unifying Theme</h3>
+          <p>Planar graphs are special for three different reasons at once.</p>
+          <div class="formula-box">
+            \[
+            \text{planarity}
+            =
+            \text{sparsity from counting}
+            +
+            \text{topology from embeddings}
+            +
+            \text{algorithmic structure.}
+            \]
+          </div>
+          <p>Euler's formula gives quantitative control. Duality converts faces into vertices and cycles into cuts.
+            Separator theorems explain why many hard problems become easier on planar inputs. Coloring and embedding
+            results show that the geometry of the plane is restrictive but also constructive.</p>
+        </div>
+
+        <div class="summary-card">
+          <h3 class="card-title">Vocabulary We Will Use</h3>
+          <div class="badge-row">
+            <span class="badge">plane graph: a fixed crossing-free drawing</span>
+            <span class="badge">planar graph: a graph admitting such a drawing</span>
+            <span class="badge">\(f\): number of faces</span>
+            <span class="badge">minor: delete and contract</span>
+            <span class="badge">\(G^*\): planar dual</span>
+            <span class="badge">separator: small set breaking the graph</span>
+            <span class="badge">triangulation: every face is a triangle</span>
+            <span class="badge">straight-line embedding</span>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3 class="card-title">Plane Versus Planar</h3>
+          <p>A <strong>plane graph</strong> is an actual drawing in the plane with no edge crossings. A
+            <strong>planar graph</strong> is an abstract graph for which at least one such drawing exists.</p>
+          <p>Duality depends on the embedding, so it belongs to the language of plane graphs. Wagner's theorem,
+            separator theorems, coloring, and planarity testing are statements about planar graphs as abstract
+            objects.</p>
+        </div>
+      </div>
+
+      <div id="euler" class="tab-content">
+        <h2 class="section-title">Euler's Formula and Its Common Corollaries</h2>
+
+        <div class="theorem-card">
+          <h3 class="card-title">Euler's Formula</h3>
+          <p>If \(G\) is a connected plane graph with \(n\) vertices, \(m\) edges, and \(f\) faces, then</p>
+          <div class="formula-box">
+            \[
+            n - m + f = 2.
+            \]
+          </div>
+        </div>
+
+        <div class="proof-card">
+          <h3 class="card-title">Proof</h3>
+          <p>If \(G\) has a cycle, delete one edge from that cycle. The graph stays connected, the number of vertices
+            stays the same, the number of edges drops by \(1\), and the two faces on either side of the deleted edge
+            merge into one, so the number of faces also drops by \(1\). Therefore \(n-m+f\) is unchanged.</p>
+          <p>Repeat until no cycle remains. What remains is a tree \(T\) on the same vertex set. A tree has
+            \(m(T)=n(T)-1\), and a connected plane tree has exactly one face, namely the unbounded face. So</p>
+          <div class="formula-box">
+            \[
+            n-(n-1)+1=2.
+            \]
+          </div>
+          <p>Since the quantity stayed invariant during every deletion, the original connected plane graph also satisfies
+            \(n-m+f=2\).</p>
+        </div>
+
+        <div class="card">
+          <h3 class="card-title">Most Used Corollaries</h3>
+          <table class="mini-table">
+            <thead>
+              <tr>
+                <th>Hypothesis</th>
+                <th>Conclusion</th>
+                <th>Why It Matters</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Simple planar, \(n \ge 3\)</td>
+                <td>\(m \le 3n-6\)</td>
+                <td>Planar graphs are sparse.</td>
+              </tr>
+              <tr>
+                <td>Simple bipartite planar, \(n \ge 3\)</td>
+                <td>\(m \le 2n-4\)</td>
+                <td>Rules out \(K_{3,3}\).</td>
+              </tr>
+              <tr>
+                <td>Simple planar</td>
+                <td>Average degree \(&lt;6\)</td>
+                <td>There exists a vertex of degree at most \(5\).</td>
+              </tr>
+              <tr>
+                <td>Simple bipartite planar</td>
+                <td>Average degree \(&lt;4\)</td>
+                <td>Much stronger sparsity in the bipartite case.</td>
+              </tr>
+              <tr>
+                <td>Simple planar</td>
+                <td>Graph is \(5\)-degenerate</td>
+                <td>Starts inductive coloring arguments.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="two-col">
+          <div class="proof-card">
+            <h3 class="card-title">Deriving \(m \le 3n-6\)</h3>
+            <p>In a simple plane graph every face has length at least \(3\). If we sum face lengths, each edge is
+              counted twice, so</p>
+            <div class="formula-box">
+              \[
+              2m \ge 3f.
+              \]
+            </div>
+            <p>Using Euler's formula \(f=2-n+m\), we obtain</p>
+            <div class="formula-box">
+              \[
+              2m \ge 3(2-n+m)
+              \quad \Longrightarrow \quad
+              m \le 3n-6.
+              \]
+            </div>
+          </div>
+
+          <div class="proof-card">
+            <h3 class="card-title">Deriving \(m \le 2n-4\) for Bipartite Planar Graphs</h3>
+            <p>A bipartite graph has no odd cycle, so in a plane embedding every face has length at least \(4\). Hence</p>
+            <div class="formula-box">
+              \[
+              2m \ge 4f.
+              \]
+            </div>
+            <p>Substitute \(f=2-n+m\):</p>
+            <div class="formula-box">
+              \[
+              2m \ge 4(2-n+m)
+              \quad \Longrightarrow \quad
+              m \le 2n-4.
+              \]
+            </div>
+            <p>This immediately shows that \(K_{3,3}\) is non-planar because it has \(n=6\) and \(m=9>8\).</p>
+          </div>
+        </div>
+
+        <div class="remark-card">
+          <h3 class="card-title">Degree Consequences</h3>
+          <p>From \(m \le 3n-6\) we get</p>
+          <div class="formula-box">
+            \[
+            \frac{1}{n}\sum_{v \in V(G)} \deg(v)=\frac{2m}{n}&lt;6.
+            \]
+          </div>
+          <p>Therefore some vertex has degree at most \(5\). Repeating this argument on every subgraph shows that every
+            planar graph is \(5\)-degenerate. That tiny counting fact powers the 5-color theorem and many planar graph
+            algorithms.</p>
+        </div>
+      </div>
+
+      <div id="wagner" class="tab-content">
+        <h2 class="section-title">Wagner's Theorem and Forbidden Minors</h2>
+
+        <div class="card">
+          <h3 class="card-title">Definitions</h3>
+          <p>A graph \(H\) is a <strong>minor</strong> of \(G\) if it can be obtained from a subgraph of \(G\) by
+            repeatedly contracting edges. A <strong>subdivision</strong> of a graph is obtained by replacing edges by
+            internally disjoint paths.</p>
+          <p>Kuratowski's theorem is phrased with subdivisions. Wagner's theorem is phrased with minors.</p>
+        </div>
+
+        <div class="theorem-card">
+          <h3 class="card-title">Wagner's Theorem</h3>
+          <p>A finite graph \(G\) is planar if and only if it contains neither \(K_5\) nor \(K_{3,3}\) as a minor.</p>
+        </div>
+
+        <div class="two-col">
+          <div class="proof-card">
+            <h3 class="card-title">Planar Graphs Are Closed Under Taking Minors</h3>
+            <p>Deleting a vertex or edge from a planar drawing clearly preserves planarity. Contracting an edge in a
+              planar drawing can be done inside a tiny neighborhood of that edge, so no crossing is introduced.</p>
+            <p>Hence every minor of a planar graph is planar.</p>
+          </div>
+
+          <div class="proof-card">
+            <h3 class="card-title">Why \(K_5\) and \(K_{3,3}\) Are Not Planar</h3>
+            <p>\(K_5\) has \(n=5\) and \(m=10\), but a simple planar graph on five vertices can have at most
+              \(3n-6=9\) edges.</p>
+            <p>\(K_{3,3}\) is bipartite with \(n=6\) and \(m=9\), but a simple bipartite planar graph on six vertices
+              can have at most \(2n-4=8\) edges.</p>
+          </div>
+        </div>
+
+        <div class="proof-card">
+          <h3 class="card-title">Proof of Wagner's Theorem</h3>
+          <p>If \(G\) is planar, then by the closure statement above every minor of \(G\) is also planar. Since neither
+            \(K_5\) nor \(K_{3,3}\) is planar, \(G\) cannot contain either as a minor.</p>
+          <p>Conversely, assume \(G\) is non-planar. By Kuratowski's theorem, \(G\) contains a subgraph \(H\) that is a
+            subdivision of \(K_5\) or of \(K_{3,3}\). Contract each subdivided path in \(H\) to a single edge. The
+            result is exactly \(K_5\) or \(K_{3,3}\). Therefore \(G\) contains \(K_5\) or \(K_{3,3}\) as a minor.</p>
+          <p>So \(G\) is planar exactly when these two forbidden minors do not appear.</p>
+        </div>
+
+        <div class="remark-card">
+          <h3 class="card-title">Kuratowski Versus Wagner</h3>
+          <table class="mini-table">
+            <thead>
+              <tr>
+                <th>Theorem</th>
+                <th>Obstructions</th>
+                <th>Operation Allowed</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Kuratowski</td>
+                <td>\(K_5\), \(K_{3,3}\)</td>
+                <td>Subdivisions</td>
+              </tr>
+              <tr>
+                <td>Wagner</td>
+                <td>\(K_5\), \(K_{3,3}\)</td>
+                <td>Minors</td>
+              </tr>
+            </tbody>
+          </table>
+          <p>The two theorems are equivalent in strength. Kuratowski is more geometric; Wagner fits better with the
+            language of structural graph theory.</p>
+        </div>
+      </div>
+
+      <div id="duality" class="tab-content">
+        <h2 class="section-title">Duality of Plane Graphs</h2>
+
+        <div class="card">
+          <h3 class="card-title">Definition of the Dual</h3>
+          <p>Let \(G\) be a connected plane graph. Put one vertex in each face of \(G\). For every edge \(e\) of
+            \(G\), draw an edge \(e^*\) between the two face-vertices on either side of \(e\), crossing \(e\) exactly
+            once. The resulting plane graph is the <strong>dual graph</strong> \(G^*\).</p>
+          <p>Bridges in \(G\) become loops in \(G^*\), and parallel edges may appear even when \(G\) is simple.</p>
+        </div>
+
+        <div class="figure-box">
+          <div class="figure-grid">
+            <svg class="figure-svg" viewBox="0 0 180 140" aria-label="Plane embedding of K4 with four faces">
+              <line x1="90" y1="18" x2="24" y2="118" stroke="#0f172a" stroke-width="3" />
+              <line x1="90" y1="18" x2="156" y2="118" stroke="#0f172a" stroke-width="3" />
+              <line x1="24" y1="118" x2="156" y2="118" stroke="#0f172a" stroke-width="3" />
+              <line x1="90" y1="64" x2="90" y2="18" stroke="#0f172a" stroke-width="3" />
+              <line x1="90" y1="64" x2="24" y2="118" stroke="#0f172a" stroke-width="3" />
+              <line x1="90" y1="64" x2="156" y2="118" stroke="#0f172a" stroke-width="3" />
+              <circle cx="90" cy="18" r="6" fill="#9a3412" />
+              <circle cx="24" cy="118" r="6" fill="#9a3412" />
+              <circle cx="156" cy="118" r="6" fill="#9a3412" />
+              <circle cx="90" cy="64" r="6" fill="#9a3412" />
+              <text x="98" y="22" font-size="13" fill="#111827">a</text>
+              <text x="10" y="134" font-size="13" fill="#111827">b</text>
+              <text x="162" y="134" font-size="13" fill="#111827">c</text>
+              <text x="98" y="61" font-size="13" fill="#111827">d</text>
+              <text x="87" y="42" font-size="12" fill="#166534">f1</text>
+              <text x="55" y="92" font-size="12" fill="#166534">f2</text>
+              <text x="116" y="92" font-size="12" fill="#166534">f3</text>
+              <text x="86" y="132" font-size="12" fill="#166534">f4</text>
+            </svg>
+
+            <svg class="figure-svg" viewBox="0 0 180 140" aria-label="Dual graph of K4, also isomorphic to K4">
+              <line x1="90" y1="18" x2="24" y2="118" stroke="#0f172a" stroke-width="3" />
+              <line x1="90" y1="18" x2="156" y2="118" stroke="#0f172a" stroke-width="3" />
+              <line x1="24" y1="118" x2="156" y2="118" stroke="#0f172a" stroke-width="3" />
+              <line x1="90" y1="74" x2="90" y2="18" stroke="#0f172a" stroke-width="3" />
+              <line x1="90" y1="74" x2="24" y2="118" stroke="#0f172a" stroke-width="3" />
+              <line x1="90" y1="74" x2="156" y2="118" stroke="#0f172a" stroke-width="3" />
+              <circle cx="90" cy="18" r="6" fill="#0f766e" />
+              <circle cx="24" cy="118" r="6" fill="#0f766e" />
+              <circle cx="156" cy="118" r="6" fill="#0f766e" />
+              <circle cx="90" cy="74" r="6" fill="#0f766e" />
+              <text x="98" y="22" font-size="13" fill="#111827">f4</text>
+              <text x="7" y="134" font-size="13" fill="#111827">f2</text>
+              <text x="162" y="134" font-size="13" fill="#111827">f3</text>
+              <text x="98" y="71" font-size="13" fill="#111827">f1</text>
+            </svg>
+          </div>
+          <div class="figure-caption">A tetrahedral embedding of \(K_4\) is self-dual: the faces on the left become
+            the vertices on the right.</div>
+        </div>
+
+        <div class="two-col">
+          <div class="theorem-card">
+            <h3 class="card-title">Basic Identities</h3>
+            <p>For a connected plane graph \(G\),</p>
+            <div class="formula-box">
+              \[
+              |V(G^*)| = f(G), \qquad |E(G^*)| = |E(G)|, \qquad |F(G^*)| = |V(G)|.
+              \]
+            </div>
+            <p>In particular, Euler's formula for \(G\) and for \(G^*\) are the same statement with vertices and faces
+              interchanged.</p>
+          </div>
+
+          <div class="remark-card">
+            <h3 class="card-title">The Dual Depends on the Embedding</h3>
+            <p>If a planar graph has two non-equivalent plane embeddings, their dual graphs need not be isomorphic.</p>
+            <p>So duality is a property of a <strong>plane graph</strong>, not only of the underlying abstract planar
+              graph.</p>
+          </div>
+        </div>
+
+        <div class="proof-card">
+          <h3 class="card-title">Cycle-Cut Duality</h3>
+          <p>Let \(X \subseteq E(G)\). Then \(X\) is the edge set of a cycle in \(G\) if and only if
+            \(X^*=\{e^*: e \in X\}\) is a bond, that is, a minimal cut, in \(G^*\). Dually, bonds in \(G\) correspond to
+            cycles in \(G^*\).</p>
+          <p>A cycle in the plane separates inside from outside. Every dual edge crossing that cycle goes from one side
+            to the other, so deleting those dual edges disconnects the dual. Minimality comes from the fact that each
+            edge on the cycle is needed to keep the two sides separated. Reversing the argument gives the converse.</p>
+        </div>
+
+        <div class="summary-card">
+          <h3 class="card-title">Spanning Trees and Dual Trees</h3>
+          <p>If \(T\) is a spanning tree of a connected plane graph \(G\), then the set of dual edges corresponding to
+            \(E(G)\setminus E(T)\) forms a spanning tree of \(G^*\).</p>
+          <p>Why? Because \(T\) is connected and spanning, the complement \(E(G)\setminus E(T)\) cannot contain a bond
+            of \(G\); otherwise deleting that bond would disconnect \(G\) while the tree \(T\) still survives inside
+            the remaining graph. By cycle-cut duality, the complementary dual edges therefore contain no cycle in
+            \(G^*\).</p>
+          <p>They also have
+            \[
+            m-(n-1)=f-1=|V(G^*)|-1
+            \]
+            edges, so an acyclic subgraph of \(G^*\) with exactly \(|V(G^*)|-1\) edges must be a spanning tree.</p>
+        </div>
+      </div>
+
+      <div id="separator" class="tab-content">
+        <h2 class="section-title">Planar Separator Theorem</h2>
+
+        <div class="theorem-card">
+          <h3 class="card-title">Planar Separator Theorem</h3>
+          <p>There is a constant \(c\) such that every \(n\)-vertex planar graph \(G\) has a vertex set \(S\) with</p>
+          <div class="formula-box">
+            \[
+            |S| \le c\sqrt{n},
+            \]
+          </div>
+          <p>and every connected component of \(G-S\) contains at most \(2n/3\) vertices.</p>
+        </div>
+
+        <div class="card">
+          <h3 class="card-title">Why This Is Powerful</h3>
+          <ul>
+            <li>It gives divide-and-conquer algorithms on planar graphs.</li>
+            <li>It is one reason many NP-hard problems become subexponential or fixed-parameter tractable on planar inputs.</li>
+            <li>It is the structural opposite of expander behavior: planar graphs cannot stay globally tangled at every scale.</li>
+          </ul>
+        </div>
+
+        <div class="proof-card">
+          <h3 class="card-title">Proof Sketch (Lipton-Tarjan Method)</h3>
+          <ol>
+            <li><strong>Triangulate first.</strong> Add edges until the graph becomes a triangulation \(H\). Any
+              separator found in \(H\) is also a separator in the original graph \(G\).</li>
+            <li><strong>Take BFS layers.</strong> Root a BFS tree \(T\) at a vertex \(r\), and let
+              \(L_0, L_1, \dots, L_h\) be the level sets.</li>
+            <li><strong>Find a balanced fundamental cycle.</strong> In a triangulation, one can choose a non-tree edge
+              \(xy\) so that the simple cycle formed by the tree path \(rTx\), the tree path \(rTy\), and the edge
+              \(xy\) leaves at most \(2n/3\) vertices on each side. This is the geometric heart of the proof.</li>
+            <li><strong>Shorten the separator using light layers.</strong> Let \(\ell=\lceil \sqrt{n} \rceil\). Among
+              any \(\ell\) consecutive BFS levels, some level has at most \(n/\ell\) vertices. Choose one light level
+              just inside the cycle and one just outside it. Replace long arcs of the cycle by these light layers.</li>
+            <li><strong>Count.</strong> The two light layers contribute at most \(2n/\ell\) vertices, and the middle
+              part contributes \(O(\ell)\) vertices. Thus
+              \(|S| = O(\ell + n/\ell) = O(\sqrt{n})\). The balance survives, so every remaining component has at most
+              \(2n/3\) vertices.</li>
+          </ol>
+        </div>
+
+        <div class="remark-card">
+          <h3 class="card-title">What to Remember From the Proof</h3>
+          <p>The theorem is not proved by a single counting identity. It combines planar geometry, BFS layering, and a
+            balancing argument. The full technical proof is longer than fits on one board, but the mechanism is worth
+            remembering:</p>
+          <div class="formula-box">
+            \[
+            \text{balanced cycle} + \text{light layers} \Longrightarrow \text{small balanced separator.}
+            \]
+          </div>
+        </div>
+      </div>
+
+      <div id="coloring" class="tab-content">
+        <h2 class="section-title">Coloring Planar Graphs</h2>
+
+        <div class="card">
+          <h3 class="card-title">Coloring Language</h3>
+          <p>A proper \(k\)-coloring assigns one of \(k\) colors to each vertex so that adjacent vertices receive
+            different colors. The least possible \(k\) is the chromatic number \(\chi(G)\).</p>
+        </div>
+
+        <div class="theorem-card">
+          <h3 class="card-title">5-Color Theorem</h3>
+          <p>Every planar graph is \(5\)-colorable.</p>
+        </div>
+
+        <div class="proof-card">
+          <h3 class="card-title">Proof</h3>
+          <p>We use induction on \(n=|V(G)|\). By the Euler corollary, \(G\) has a vertex \(v\) of degree at most \(5\).
+            By induction, \(G-v\) has a proper \(5\)-coloring.</p>
+          <p>If the neighbors of \(v\) use fewer than five colors, give \(v\) a missing color and we are done. So only
+            one case remains: \(\deg(v)=5\) and its five neighbors \(v_1,v_2,v_3,v_4,v_5\) appear around \(v\) in the
+            plane with five distinct colors \(1,2,3,4,5\).</p>
+          <p>Look at the subgraph induced by colors \(1\) and \(3\). If \(v_1\) and \(v_3\) lie in different connected
+            components of that subgraph, swap colors \(1\) and \(3\) on the component containing \(v_1\). Then color
+            \(1\) disappears from \(v_1\)'s side, so color \(1\) becomes available for \(v\).</p>
+          <p>So suppose \(v_1\) and \(v_3\) are connected by a \(1\)-\(3\) Kempe chain. Together with the edges
+            \(vv_1\) and \(vv_3\), that chain forms a Jordan curve. Therefore \(v_2\) and \(v_4\) lie on opposite sides
+            of that curve and cannot be connected by a \(2\)-\(4\) Kempe chain. Swap colors \(2\) and \(4\) on the
+            component containing \(v_2\). Then color \(2\) becomes free for \(v\).</p>
+          <p>In every case the coloring extends from \(G-v\) to \(G\). Hence every planar graph is \(5\)-colorable.</p>
+        </div>
+
+        <div class="two-col">
+          <div class="remark-card">
+            <h3 class="card-title">Why Kempe Chains Matter</h3>
+            <p>Kempe's original proof of the 4-color theorem was wrong, but the chain-switching idea survives perfectly
+              in the proof of the 5-color theorem.</p>
+            <p>The extra fifth color gives enough room to make the Jordan curve argument work cleanly.</p>
+          </div>
+
+          <div class="theorem-card">
+            <h3 class="card-title">4-Color Theorem</h3>
+            <p>Every planar graph is \(4\)-colorable.</p>
+          </div>
+        </div>
+
+        <div class="idea-card">
+          <h3 class="card-title">Ideas Behind the 4-Color Theorem</h3>
+          <ol>
+            <li>Assume a smallest counterexample exists.</li>
+            <li>Use Euler-type counting and a <strong>discharging argument</strong> to prove that every planar graph
+              contains at least one configuration from a finite unavoidable list.</li>
+            <li>Show that each configuration on the list is <strong>reducible</strong>, meaning it cannot occur in a
+              minimal counterexample.</li>
+            <li>The contradiction shows that no counterexample exists.</li>
+          </ol>
+          <p>The famous 1976 Appel-Haken proof used a large computer check of reducible configurations. Later proofs
+            streamlined the list, and Gonthier gave a fully formalized proof in 2005.</p>
+        </div>
+
+        <div class="summary-card">
+          <h3 class="card-title">What Changes From Five to Four?</h3>
+          <p>For five colors, the local degree bound \(\deg(v)\le 5\) plus Kempe chains already finishes the argument.
+            For four colors, the same naive Kempe-chain strategy can fail. That is why the proof needs a global
+            reducibility-and-discharging framework instead of a short induction alone.</p>
+        </div>
+      </div>
+
+      <div id="embedding" class="tab-content">
+        <h2 class="section-title">Straight-Line Embeddings of Planar Graphs</h2>
+
+        <div class="theorem-card">
+          <h3 class="card-title">Fary's Theorem</h3>
+          <p>Every simple planar graph admits a plane embedding in which every edge is drawn as a straight-line segment.</p>
+        </div>
+
+        <div class="proof-card">
+          <h3 class="card-title">Constructive Idea</h3>
+          <p>One route to the theorem is to triangulate the graph and then work with a \(3\)-connected piece. Such
+            graphs admit a <strong>canonical ordering</strong> of the vertices. Starting from an outer triangle, place
+            the vertices one by one so that each new vertex sees a contiguous block of vertices on the outer face.</p>
+          <p>Because the placement is controlled geometrically, every new incident edge can be drawn as a straight
+            segment without crossings. At the end, deleting the extra triangulating edges leaves a straight-line drawing
+            of the original graph.</p>
+          <p>The full proof is technical, but the theorem says something beautifully strong: crossings are never needed
+            merely because we insist on straight edges.</p>
+        </div>
+
+        <div class="two-col">
+          <div class="card">
+            <h3 class="card-title">Algorithmic Versions</h3>
+            <ul>
+              <li>Tutte's barycentric method gives convex straight-line drawings for \(3\)-connected planar graphs.</li>
+              <li>Schnyder's theory yields grid embeddings of planar graphs on an \((n-2)\times(n-2)\) grid.</li>
+              <li>Modern planarity algorithms usually output a combinatorial embedding first, then convert it into
+                straight-line coordinates.</li>
+            </ul>
+          </div>
+
+          <div class="remark-card">
+            <h3 class="card-title">Why This Matters</h3>
+            <p>Fary's theorem turns an abstract topological embedding problem into a geometric drawing problem. It is
+              one of the reasons planar graph visualization can be algorithmic rather than purely hand-crafted.</p>
+          </div>
+        </div>
+      </div>
+
+      <div id="testing" class="tab-content">
+        <h2 class="section-title">How to Test Whether a Graph Is Planar</h2>
+
+        <div class="card">
+          <h3 class="card-title">Fast Necessary Checks</h3>
+          <ul>
+            <li>If a simple graph with \(n \ge 3\) has more than \(3n-6\) edges, it is not planar.</li>
+            <li>If a simple bipartite graph with \(n \ge 3\) has more than \(2n-4\) edges, it is not planar.</li>
+            <li>If you can exhibit a \(K_5\) or \(K_{3,3}\) minor, then the graph is not planar.</li>
+          </ul>
+          <p>These tests are useful, but they are not sufficient. The Petersen graph, for example, satisfies
+            \(m \le 3n-6\) and is still non-planar.</p>
+        </div>
+
+        <div class="theorem-card">
+          <h3 class="card-title">Exact Planarity Testing</h3>
+          <p>Planarity can be tested in linear time. Classical algorithms go back to Hopcroft-Tarjan, and a practical
+            modern implementation is the Boyer-Myrvold algorithm.</p>
+        </div>
+
+        <div class="idea-card">
+          <h3 class="card-title">What the Algorithms Maintain</h3>
+          <ol>
+            <li>Run a depth-first search and compute lowpoint information.</li>
+            <li>Incrementally assemble a <strong>rotation system</strong>, meaning a cyclic order of edges around each
+              vertex that would define a plane embedding.</li>
+            <li>Check whether the partial embedding constraints stay compatible as back edges are inserted.</li>
+            <li>If yes, output an embedding. If not, extract a Kuratowski subdivision as a certificate of
+              non-planarity.</li>
+          </ol>
+        </div>
+
+        <div class="summary-card">
+          <h3 class="card-title">A Practical Testing Workflow</h3>
+          <table class="mini-table">
+            <thead>
+              <tr>
+                <th>Stage</th>
+                <th>Tool</th>
+                <th>Typical Output</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Quick rejection</td>
+                <td>Euler edge bounds</td>
+                <td>Immediate non-planarity in dense cases</td>
+              </tr>
+              <tr>
+                <td>Structural diagnosis</td>
+                <td>Minor or subdivision search</td>
+                <td>\(K_5\) or \(K_{3,3}\) witness</td>
+              </tr>
+              <tr>
+                <td>Definitive test</td>
+                <td>Linear-time embedding algorithm</td>
+                <td>Embedding or Kuratowski certificate</td>
+              </tr>
+              <tr>
+                <td>Drawing stage</td>
+                <td>Straight-line embedding routine</td>
+                <td>Crossing-free coordinates</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div id="takeaways" class="tab-content">
+        <h2 class="section-title">Takeaways</h2>
+
+        <div class="summary-card">
+          <h3 class="card-title">Main Results</h3>
+          <ol>
+            <li>Euler's formula \(n-m+f=2\) is the source of the standard sparsity bounds for planar graphs.</li>
+            <li>Wagner's theorem characterizes planar graphs by the forbidden minors \(K_5\) and \(K_{3,3}\).</li>
+            <li>Duality turns faces into vertices and cycles into cuts.</li>
+            <li>Planar graphs have balanced separators of order \(O(\sqrt{n})\).</li>
+            <li>Every planar graph is \(5\)-colorable, and in fact every planar graph is \(4\)-colorable.</li>
+            <li>Every simple planar graph has a straight-line embedding.</li>
+            <li>Planarity can be tested in linear time and certified either by an embedding or by a Kuratowski witness.</li>
+          </ol>
+        </div>
+
+        <div class="card">
+          <h3 class="card-title">Proof Patterns to Remember</h3>
+          <ul>
+            <li>Count edges and faces globally, then force a low-degree local configuration.</li>
+            <li>Translate a topological obstruction into a forbidden minor or subdivision.</li>
+            <li>Use the embedding itself: inside versus outside, Jordan curves, and dual edges crossing primal edges.</li>
+            <li>When a proof becomes too global for induction alone, look for separators or discharging.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <footer>
+      Lecture 23 connects Euler's formula, forbidden minors, duality, separators, coloring, embeddings, and planarity testing.
+    </footer>
+  </div>
+
+  <button class="scroll-top" id="scrollTop" aria-label="Scroll to top">&#8593;</button>
+  <a href="index.html" class="fab-btn" title="Back to Index">&#127968;</a>
+
+  <script>
+    function switchTab(tabId, button) {
+      document.querySelectorAll(".tab-content").forEach((tab) => {
+        tab.classList.remove("active");
+      });
+
+      document.querySelectorAll(".tab-btn").forEach((btn) => {
+        btn.classList.remove("active");
+      });
+
+      document.getElementById(tabId).classList.add("active");
+      button.classList.add("active");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    const progressFill = document.getElementById("progressFill");
+    const scrollTopBtn = document.getElementById("scrollTop");
+
+    function updateProgress() {
+      const scrollTop = window.scrollY;
+      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+      const progress = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
+      progressFill.style.width = progress + "%";
+
+      if (scrollTop > 300) {
+        scrollTopBtn.classList.add("visible");
+      } else {
+        scrollTopBtn.classList.remove("visible");
+      }
+    }
+
+    scrollTopBtn.addEventListener("click", () => {
+      window.scrollTo({ top: 0, behavior: "smooth" });
     });
-});
-</script>
 
-<a href="index.html" class="fab-btn" title="Back to Index">🏠</a>
+    window.addEventListener("scroll", updateProgress);
+    updateProgress();
+
+    document.addEventListener("DOMContentLoaded", function () {
+      renderMathInElement(document.body, {
+        delimiters: [
+          { left: "\\[", right: "\\]", display: true },
+          { left: "\\(", right: "\\)", display: false }
+        ]
+      });
+    });
+  </script>
 </body>
+
 </html>

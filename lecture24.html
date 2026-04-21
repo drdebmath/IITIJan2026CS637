@@ -1,8 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="utf-8">
-  <title>CS 637 - Lecture 24: Complexity of Graph Problems</title>
+  <title>CS 637 - Lecture 24: Random Walks, Hitting Times, and Basic Properties</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
@@ -10,108 +11,1010 @@
   <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
 
   <style>
+    :root {
+      --primary: #1d4ed8;
+      --secondary: #047857;
+      --accent: #b45309;
+      --accent-soft: #eff6ff;
+      --ink: #1f2937;
+      --muted: #64748b;
+      --surface: #ffffff;
+      --surface-soft: #f8fafc;
+      --shadow-sm: 0 2px 8px rgba(15, 23, 42, 0.08);
+      --shadow-lg: 0 18px 52px rgba(15, 23, 42, 0.2);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
     body {
-      font-family: "Times New Roman", serif;
-      margin: 40px;
-      line-height: 1.5;
-      background-color: #ffffff;
-      color: #000000;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      line-height: 1.7;
+      background:
+        radial-gradient(circle at top left, rgba(29, 78, 216, 0.2), transparent 28%),
+        radial-gradient(circle at top right, rgba(180, 83, 9, 0.16), transparent 26%),
+        linear-gradient(135deg, #111827 0%, #1f2937 48%, #0f172a 100%);
+      min-height: 100vh;
+      padding: 20px;
+      color: var(--ink);
+      overflow-x: hidden;
     }
-    h1, h2 {
+
+    .container {
+      max-width: 1180px;
+      margin: 0 auto;
+      background: var(--surface);
+      border-radius: 22px;
+      box-shadow: 0 25px 80px rgba(0, 0, 0, 0.35);
+      overflow: hidden;
+      position: relative;
+    }
+
+    .progress-bar {
+      position: sticky;
+      top: 0;
+      height: 4px;
+      background: #e2e8f0;
+      z-index: 101;
+    }
+
+    .progress-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--primary), var(--secondary), var(--accent));
+      transition: width 0.2s ease;
+    }
+
+    header {
+      color: white;
+      padding: 52px 40px 44px;
       text-align: center;
+      background: linear-gradient(135deg, #1d4ed8 0%, #047857 54%, #b45309 100%);
+      background-size: 200% 200%;
+      animation: gradientShift 16s ease infinite;
     }
+
+    @keyframes gradientShift {
+      0% {
+        background-position: 0% 50%;
+      }
+
+      50% {
+        background-position: 100% 50%;
+      }
+
+      100% {
+        background-position: 0% 50%;
+      }
+    }
+
     h1 {
-      font-size: 1.8em;
-      margin-bottom: 0.2em;
+      font-size: 2.8em;
+      margin-bottom: 12px;
+      font-weight: 800;
     }
-    h2 {
-      font-size: 1.2em;
-      margin-top: 2em;
-      margin-bottom: 0.5em;
-    }
-    .definition {
-      margin-bottom: 1em;
-    }
-    .term {
-      font-weight: bold;
-    }
-    .number {
-      font-weight: bold;
-    }
-    .instructor {
-      margin-top: 8px;
-      font-size: 0.95rem;
-      color: #64748b;
-    }
-    .instructor a {
-      color: #0ea5e9;
-      text-decoration: none;
+
+    .subtitle {
+      font-size: 1.28em;
+      opacity: 0.97;
+      margin-bottom: 18px;
       font-weight: 500;
     }
-    .instructor a:hover {
-      text-decoration: underline;
+
+    .instructor {
+      font-size: 1.05em;
+      opacity: 0.96;
     }
+
+    .instructor a {
+      color: #fef3c7;
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .nav-wrapper {
+      position: sticky;
+      top: 4px;
+      z-index: 100;
+      background: white;
+      border-bottom: 2px solid #e2e8f0;
+    }
+
+    .nav-tabs {
+      display: flex;
+      overflow-x: auto;
+      padding: 0 16px;
+      scrollbar-width: thin;
+    }
+
+    .tab-btn {
+      border: none;
+      background: none;
+      padding: 16px 22px;
+      cursor: pointer;
+      color: var(--muted);
+      font-size: 1em;
+      font-weight: 700;
+      white-space: nowrap;
+      border-bottom: 3px solid transparent;
+      transition: all 0.25s ease;
+    }
+
+    .tab-btn.active {
+      color: var(--primary);
+      border-bottom-color: var(--primary);
+    }
+
+    .content {
+      padding: 48px 40px;
+      min-height: 680px;
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+      animation: fadeUp 0.4s ease-out;
+    }
+
+    @keyframes fadeUp {
+      from {
+        opacity: 0;
+        transform: translateY(16px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .section-title {
+      font-size: 2em;
+      margin-bottom: 28px;
+      padding-bottom: 12px;
+      border-bottom: 4px solid var(--secondary);
+      color: var(--ink);
+    }
+
+    .card,
+    .theorem-card,
+    .proof-card,
+    .idea-card,
+    .remark-card,
+    .summary-card {
+      padding: 24px;
+      margin-bottom: 24px;
+      border-radius: 14px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .card {
+      background: var(--surface-soft);
+      border-left: 5px solid var(--primary);
+    }
+
+    .theorem-card {
+      background: #eff6ff;
+      border-left: 5px solid var(--primary);
+    }
+
+    .proof-card {
+      background: #ecfdf5;
+      border-left: 5px solid var(--secondary);
+    }
+
+    .idea-card {
+      background: #fff7ed;
+      border-left: 5px solid var(--accent);
+    }
+
+    .remark-card {
+      background: #f5f3ff;
+      border-left: 5px solid #7c3aed;
+    }
+
+    .summary-card {
+      background: #f8fafc;
+      border-left: 5px solid #0f766e;
+    }
+
+    .card-title {
+      font-size: 1.28em;
+      font-weight: 800;
+      margin-bottom: 14px;
+      color: var(--ink);
+    }
+
+    .formula-box {
+      margin: 16px 0;
+      padding: 16px 18px;
+      border: 1px solid #dbeafe;
+      border-radius: 12px;
+      background: white;
+      overflow-x: auto;
+    }
+
+    .mini-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 16px;
+      background: white;
+      border-radius: 12px;
+      overflow: hidden;
+      font-size: 0.97em;
+    }
+
+    .mini-table th,
+    .mini-table td {
+      border: 1px solid #e2e8f0;
+      padding: 12px 14px;
+      text-align: left;
+      vertical-align: top;
+    }
+
+    .mini-table th {
+      background: #eff6ff;
+      font-weight: 700;
+    }
+
+    .two-col {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 20px;
+    }
+
+    .badge-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: white;
+      border: 1px solid #cbd5e1;
+      font-size: 0.95em;
+      font-weight: 600;
+      color: var(--ink);
+    }
+
+    p + p {
+      margin-top: 12px;
+    }
+
+    ul,
+    ol {
+      margin-left: 24px;
+      margin-top: 14px;
+    }
+
+    li {
+      margin-bottom: 10px;
+    }
+
     footer {
-      margin-top: 3em;
+      background: #0f172a;
+      color: white;
       text-align: center;
-      font-size: 0.85em;
-      color: #333;
+      padding: 28px;
+      font-size: 0.95em;
+    }
+
+    .fab-btn,
+    .scroll-top {
+      position: fixed;
+      right: 28px;
+      border: none;
+      border-radius: 999px;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: var(--shadow-lg);
+      z-index: 120;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      text-decoration: none;
+    }
+
+    .fab-btn {
+      width: 60px;
+      height: 60px;
+      bottom: 28px;
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      font-size: 28px;
+    }
+
+    .scroll-top {
+      width: 52px;
+      height: 52px;
+      bottom: 100px;
+      background: linear-gradient(135deg, var(--secondary), #0284c7);
+      font-size: 20px;
+      opacity: 0;
+      visibility: hidden;
+    }
+
+    .scroll-top.visible {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .fab-btn:hover,
+    .scroll-top:hover {
+      transform: translateY(-3px);
+    }
+
+    @media (max-width: 900px) {
+      .two-col {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 768px) {
+      body {
+        padding: 12px;
+      }
+
+      header {
+        padding: 40px 22px 34px;
+      }
+
+      .content {
+        padding: 32px 20px;
+      }
+
+      h1 {
+        font-size: 2.1em;
+      }
+
+      .subtitle {
+        font-size: 1.12em;
+      }
+
+      .fab-btn {
+        width: 54px;
+        height: 54px;
+        right: 18px;
+        bottom: 18px;
+      }
+
+      .scroll-top {
+        right: 18px;
+        bottom: 82px;
+      }
     }
   </style>
-
-<style>
-.fab-btn {
-  position: fixed;
-  bottom: 24px;
-  right: 24px;
-  width: 56px;
-  height: 56px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #3b82f6, #2563eb);
-  color: white;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-  cursor: pointer;
-  z-index: 1000;
-  border: none;
-  font-size: 24px;
-  transition: transform 0.2s, box-shadow 0.2s;
-  text-decoration: none;
-}
-.fab-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(0,0,0,0.3);
-}
-</style>
-
 </head>
 
 <body>
+  <div class="container">
+    <div class="progress-bar">
+      <div class="progress-fill" id="progressFill"></div>
+    </div>
 
-<h1>CS 637: Mathematics-II</h1>
-<div class="instructor">
-  <strong>Instructor:</strong> <a href="https://drdebmath.github.io" target="_blank">Dr. Debasish Pattanayak</a>
-</div>
-<h2>Lecture 24 – Complexity of Graph Problems</h2>
+    <header>
+      <h1>CS 637: Mathematics-II</h1>
+      <div class="subtitle">Lecture 24: Random Walks, Hitting Times, and Basic Properties</div>
+      <div class="instructor">
+        <strong>Instructor:</strong> <a href="https://drdebmath.github.io/" target="_blank">Dr. Debasish Pattanayak</a>
+      </div>
+    </header>
 
-<footer>
-  
-</footer>
+    <div class="nav-wrapper">
+      <div class="nav-tabs">
+        <button class="tab-btn active" onclick="switchTab('overview', this)">Overview</button>
+        <button class="tab-btn" onclick="switchTab('walk', this)">Walk Model</button>
+        <button class="tab-btn" onclick="switchTab('hitting', this)">Hitting Times</button>
+        <button class="tab-btn" onclick="switchTab('stationary', this)">Stationary</button>
+        <button class="tab-btn" onclick="switchTab('properties', this)">Properties</button>
+        <button class="tab-btn" onclick="switchTab('examples', this)">Examples</button>
+        <button class="tab-btn" onclick="switchTab('takeaways', this)">Takeaways</button>
+      </div>
+    </div>
 
-<script>
-document.addEventListener("DOMContentLoaded", function() {
-    renderMathInElement(document.body, {
-        delimiters: [
-            {left: "31952", right: "31952", display: true},
-            {left: "\[", right: "\]", display: true},
-            {left: "\(", right: "\)", display: false}
-        ]
+    <div class="content">
+      <div id="overview" class="tab-content active">
+        <h2 class="section-title">Lecture Roadmap</h2>
+
+        <div class="card">
+          <h3 class="card-title">Topics for Today</h3>
+          <ol>
+            <li>The definition of a simple random walk on a graph and its transition matrix.</li>
+            <li>The expected time to reach a vertex or a set of vertices.</li>
+            <li>Stationary distribution, return times, and reversibility.</li>
+            <li>Some interesting qualitative properties: periodicity, convergence, and commute behavior.</li>
+            <li>Concrete calculations on complete graphs, cycles, and stars.</li>
+          </ol>
+        </div>
+
+        <div class="idea-card">
+          <h3 class="card-title">The Unifying Theme</h3>
+          <p>A random walk is a process with very simple local rules:</p>
+          <div class="formula-box">
+            \[
+            \text{from the current vertex, choose a neighbor uniformly at random.}
+            \]
+          </div>
+          <p>But the quantities it creates are global. Expected hitting times remember the geometry of the graph,
+            stationary distributions remember the degree sequence, and long-run behavior distinguishes bipartite from
+            non-bipartite structure.</p>
+        </div>
+
+        <div class="summary-card">
+          <h3 class="card-title">Notation to Track</h3>
+          <div class="badge-row">
+            <span class="badge">\(X_t\): position at time \(t\)</span>
+            <span class="badge">\(P(u,v)\): one-step transition probability</span>
+            <span class="badge">\(\tau_v\): hitting time of vertex \(v\)</span>
+            <span class="badge">\(\tau_A\): hitting time of a set \(A\)</span>
+            <span class="badge">\(H_{uv}=\mathbb{E}_u[\tau_v]\)</span>
+            <span class="badge">\(\pi\): stationary distribution</span>
+            <span class="badge">\(m=|E(G)|\)</span>
+            <span class="badge">\(\deg(v)\): degree of \(v\)</span>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3 class="card-title">Setting</h3>
+          <p>Throughout, we usually work with a finite connected undirected graph \(G=(V,E)\). Connectivity ensures
+            that every vertex is reachable from every other vertex, so the walk can explore the whole graph.</p>
+          <p>When we later mention convergence to stationarity, we will also point out the bipartite obstruction. That
+            issue is not a technical nuisance; it is one of the most important structural features of random walks on
+            graphs.</p>
+        </div>
+      </div>
+
+      <div id="walk" class="tab-content">
+        <h2 class="section-title">Simple Random Walk on a Graph</h2>
+
+        <div class="card">
+          <h3 class="card-title">Definition</h3>
+          <p>A <strong>simple random walk</strong> on \(G\) is a sequence of random vertices
+            \(X_0, X_1, X_2, \dots\) such that if \(X_t=u\), then \(X_{t+1}\) is chosen uniformly from the neighbors of
+            \(u\).</p>
+          <div class="formula-box">
+            \[
+            P(u,v)=
+            \begin{cases}
+            \dfrac{1}{\deg(u)}, & \text{if } uv \in E(G), \\
+            0, & \text{otherwise}.
+            \end{cases}
+            \]
+          </div>
+        </div>
+
+        <div class="theorem-card">
+          <h3 class="card-title">Markov Property</h3>
+          <p>The next position depends only on the current position, not on the earlier history:</p>
+          <div class="formula-box">
+            \[
+            \Pr(X_{t+1}=v \mid X_t=u, X_{t-1}, \dots, X_0)=P(u,v).
+            \]
+          </div>
+          <p>So a random walk on a graph is a finite-state Markov chain.</p>
+        </div>
+
+        <div class="two-col">
+          <div class="card">
+            <h3 class="card-title">Transition Matrix View</h3>
+            <p>If the vertices are indexed as \(v_1,\dots,v_n\), the matrix \(P\) with entries \(P(v_i,v_j)\) is the
+              transition matrix of the walk.</p>
+            <p>The \(t\)-step probabilities are given by matrix powers:</p>
+            <div class="formula-box">
+              \[
+              \Pr_u(X_t=v) = (P^t)_{uv}.
+              \]
+            </div>
+            <p>This is why linear algebra becomes unavoidable once we start asking long-run questions.</p>
+          </div>
+
+          <div class="remark-card">
+            <h3 class="card-title">Three Standard Examples</h3>
+            <table class="mini-table">
+              <thead>
+                <tr>
+                  <th>Graph</th>
+                  <th>Walk Rule</th>
+                  <th>Comment</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>\(K_n\)</td>
+                  <td>Move to any other vertex with probability \(1/(n-1)\)</td>
+                  <td>Everything is perfectly symmetric.</td>
+                </tr>
+                <tr>
+                  <td>\(C_n\)</td>
+                  <td>Move left or right with probability \(1/2\)</td>
+                  <td>Behaves like a walk on a circle.</td>
+                </tr>
+                <tr>
+                  <td>Star \(K_{1,d}\)</td>
+                  <td>Leaves must jump to the center</td>
+                  <td>Shows strong degree imbalance.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="proof-card">
+          <h3 class="card-title">Connected Graphs Give Irreducible Walks</h3>
+          <p>If \(G\) is connected and \(u,v \in V(G)\), then there is a path from \(u\) to \(v\). Following that path
+            has positive probability, because every step along the path has positive probability. Hence for some
+            \(t\),</p>
+          <div class="formula-box">
+            \[
+            (P^t)_{uv} > 0.
+            \]
+          </div>
+          <p>This is exactly the irreducibility condition for the Markov chain.</p>
+        </div>
+      </div>
+
+      <div id="hitting" class="tab-content">
+        <h2 class="section-title">Time to Reach Vertices: Hitting Times</h2>
+
+        <div class="card">
+          <h3 class="card-title">Definitions</h3>
+          <p>For a vertex \(v\), the <strong>hitting time</strong> of \(v\) is</p>
+          <div class="formula-box">
+            \[
+            \tau_v = \min \{ t \ge 0 : X_t = v \}.
+            \]
+          </div>
+          <p>More generally, for a set \(A \subseteq V(G)\),</p>
+          <div class="formula-box">
+            \[
+            \tau_A = \min \{ t \ge 0 : X_t \in A \}.
+            \]
+          </div>
+          <p>The expected hitting time from \(u\) to \(v\) is denoted by</p>
+          <div class="formula-box">
+            \[
+            H_{uv} = \mathbb{E}_u[\tau_v].
+            \]
+          </div>
+        </div>
+
+        <div class="theorem-card">
+          <h3 class="card-title">First-Step Equations</h3>
+          <p>Fix a target vertex \(v\). Then</p>
+          <div class="formula-box">
+            \[
+            H_{vv}=0,
+            \qquad
+            H_{uv} = 1 + \frac{1}{\deg(u)} \sum_{x \sim u} H_{xv}
+            \quad \text{for } u \neq v.
+            \]
+          </div>
+          <p>So expected hitting times are obtained by solving a linear system.</p>
+        </div>
+
+        <div class="proof-card">
+          <h3 class="card-title">Proof</h3>
+          <p>If we start at \(v\), the hitting time is already \(0\), so \(H_{vv}=0\).</p>
+          <p>Now suppose \(u \neq v\). The walk takes one step immediately. From \(u\), each neighbor \(x\) is chosen
+            with probability \(1/\deg(u)\). After that first step, the remaining expected time to hit \(v\) is
+            \(H_{xv}\). Conditioning on the first step gives</p>
+          <div class="formula-box">
+            \[
+            H_{uv}
+            =
+            1 + \sum_{x \sim u} \frac{1}{\deg(u)} H_{xv}
+            =
+            1 + \frac{1}{\deg(u)} \sum_{x \sim u} H_{xv}.
+            \]
+          </div>
+          <p>This is the required recurrence.</p>
+        </div>
+
+        <div class="two-col">
+          <div class="proof-card">
+            <h3 class="card-title">Example: Complete Graph \(K_n\)</h3>
+            <p>Fix a target vertex \(v\). By symmetry, every other vertex has the same hitting time \(h\) to \(v\).</p>
+            <p>From a non-target vertex, with probability \(1/(n-1)\) we hit \(v\) in one step, and with probability
+              \((n-2)/(n-1)\) we move to another non-target vertex and start over. Hence</p>
+            <div class="formula-box">
+              \[
+              h = 1 + \frac{n-2}{n-1} h.
+              \]
+            </div>
+            <p>Solving gives</p>
+            <div class="formula-box">
+              \[
+              H_{uv}=n-1 \qquad (u \neq v).
+              \]
+            </div>
+          </div>
+
+          <div class="remark-card">
+            <h3 class="card-title">A Useful General Principle</h3>
+            <p>Whenever the graph has strong symmetry, the system for hitting times collapses to only a few unknowns.
+              That is exactly what happened in \(K_n\), and later it will happen again for cycles and stars.</p>
+            <p>On arbitrary graphs the system is larger, but the same first-step idea still does all the conceptual
+              work.</p>
+          </div>
+        </div>
+      </div>
+
+      <div id="stationary" class="tab-content">
+        <h2 class="section-title">Stationary Distribution and Return Time</h2>
+
+        <div class="theorem-card">
+          <h3 class="card-title">Stationary Distribution of the Simple Random Walk</h3>
+          <p>For a connected undirected graph with \(m\) edges, the distribution</p>
+          <div class="formula-box">
+            \[
+            \pi(v)=\frac{\deg(v)}{2m}
+            \]
+          </div>
+          <p>is stationary for the simple random walk.</p>
+        </div>
+
+        <div class="proof-card">
+          <h3 class="card-title">Proof by Detailed Balance</h3>
+          <p>If \(uv \in E(G)\), then</p>
+          <div class="formula-box">
+            \[
+            \pi(u)P(u,v)
+            =
+            \frac{\deg(u)}{2m} \cdot \frac{1}{\deg(u)}
+            =
+            \frac{1}{2m}
+            =
+            \frac{\deg(v)}{2m} \cdot \frac{1}{\deg(v)}
+            =
+            \pi(v)P(v,u).
+            \]
+          </div>
+          <p>If \(uv \notin E(G)\), both sides are \(0\). Therefore the detailed balance equations hold for every pair
+            \(u,v\):</p>
+          <div class="formula-box">
+            \[
+            \pi(u)P(u,v)=\pi(v)P(v,u).
+            \]
+          </div>
+          <p>Summing over \(u\) gives</p>
+          <div class="formula-box">
+            \[
+            \sum_{u \in V(G)} \pi(u)P(u,v)=\pi(v),
+            \]
+          </div>
+          <p>so \(\pi\) is stationary.</p>
+        </div>
+
+        <div class="two-col">
+          <div class="card">
+            <h3 class="card-title">Immediate Consequences</h3>
+            <ul>
+              <li>If \(G\) is \(d\)-regular, then \(\pi\) is uniform.</li>
+              <li>Higher-degree vertices are seen more often in the long run.</li>
+              <li>Under stationarity, each oriented edge is used with probability \(1/(2m)\) at each step.</li>
+            </ul>
+          </div>
+
+          <div class="remark-card">
+            <h3 class="card-title">Reversibility</h3>
+            <p>The detailed balance identity means that the chain looks statistically the same when time is reversed
+              under the stationary distribution. This is called <strong>reversibility</strong>.</p>
+            <p>For random walks on undirected graphs, reversibility is the bridge from probability to electrical network
+              ideas.</p>
+          </div>
+        </div>
+
+        <div class="theorem-card">
+          <h3 class="card-title">Expected Return Time</h3>
+          <p>Let</p>
+          <div class="formula-box">
+            \[
+            \tau_v^+ = \min \{ t \ge 1 : X_t = v \}.
+            \]
+          </div>
+          <p>Then for the simple random walk on a connected graph,</p>
+          <div class="formula-box">
+            \[
+            \mathbb{E}_v[\tau_v^+] = \frac{1}{\pi(v)} = \frac{2m}{\deg(v)}.
+            \]
+          </div>
+        </div>
+
+        <div class="proof-card">
+          <h3 class="card-title">Proof Idea</h3>
+          <p>In stationarity, the long-run fraction of time spent at \(v\) is \(\pi(v)\). So if we watch the walk for a
+            very long time, the mean gap between successive visits to \(v\) must be the reciprocal frequency
+            \(1/\pi(v)\).</p>
+          <p>For the simple random walk, \(\pi(v)=\deg(v)/(2m)\), so the average return time is \(2m/\deg(v)\). Thus
+            highly connected vertices are revisited more quickly on average.</p>
+        </div>
+      </div>
+
+      <div id="properties" class="tab-content">
+        <h2 class="section-title">Some Interesting Properties of Random Walks</h2>
+
+        <div class="card">
+          <h3 class="card-title">A Short List Worth Remembering</h3>
+          <table class="mini-table">
+            <thead>
+              <tr>
+                <th>Property</th>
+                <th>Statement</th>
+                <th>Meaning</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Irreducibility</td>
+                <td>Connected graph \(\Longrightarrow\) every vertex can reach every other with positive probability</td>
+                <td>The walk can explore the whole graph.</td>
+              </tr>
+              <tr>
+                <td>Reversibility</td>
+                <td>\(\pi(u)P(u,v)=\pi(v)P(v,u)\)</td>
+                <td>Time reversal is tractable.</td>
+              </tr>
+              <tr>
+                <td>Stationarity</td>
+                <td>\(\pi(v)=\deg(v)/(2m)\)</td>
+                <td>Degree controls long-run mass.</td>
+              </tr>
+              <tr>
+                <td>Return time</td>
+                <td>\(\mathbb{E}_v[\tau_v^+]=2m/\deg(v)\)</td>
+                <td>Large-degree vertices are revisited faster.</td>
+              </tr>
+              <tr>
+                <td>Commute time</td>
+                <td>\(H_{uv}+H_{vu}\) is symmetric in \(u,v\)</td>
+                <td>Round-trip travel has a hidden symmetry.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="two-col">
+          <div class="theorem-card">
+            <h3 class="card-title">Periodicity and Bipartite Obstruction</h3>
+            <p>If \(G\) is bipartite with parts \(A\) and \(B\), then every step flips the walk from one part to the
+              other. So starting in \(A\), all even times lie in \(A\) and all odd times lie in \(B\).</p>
+            <p>Therefore the walk cannot converge pointwise to a stationary distribution unless the graph has some
+              laziness built in. The parity oscillation never disappears.</p>
+          </div>
+
+          <div class="theorem-card">
+            <h3 class="card-title">Non-Bipartite Graphs Converge</h3>
+            <p>If \(G\) is finite, connected, and non-bipartite, then the simple random walk is irreducible and
+              aperiodic, and hence</p>
+            <div class="formula-box">
+              \[
+              \Pr_u(X_t=v) \to \pi(v)
+              \qquad \text{as } t \to \infty.
+              \]
+            </div>
+            <p>This is the basic convergence theorem for finite Markov chains.</p>
+          </div>
+        </div>
+
+        <div class="remark-card">
+          <h3 class="card-title">Every Vertex Is Visited Infinitely Often</h3>
+          <p>Because the chain is finite and connected, the simple random walk is positive recurrent. In particular,
+            every vertex is visited infinitely many times with probability \(1\).</p>
+          <p>So on a finite connected graph, a vertex may take a while to appear, but it is never lost forever.</p>
+        </div>
+
+        <div class="idea-card">
+          <h3 class="card-title">Commute Time</h3>
+          <p>The <strong>commute time</strong> between \(u\) and \(v\) is</p>
+          <div class="formula-box">
+            \[
+            C_{uv}=H_{uv}+H_{vu}.
+            \]
+          </div>
+          <p>It is automatically symmetric, and in fact a deep theorem says</p>
+          <div class="formula-box">
+            \[
+            C_{uv}=2m \, R_{\mathrm{eff}}(u,v),
+            \]
+          </div>
+          <p>where \(R_{\mathrm{eff}}(u,v)\) is the effective electrical resistance between \(u\) and \(v\). This is one
+            of the most beautiful connections between graph theory, probability, and physics.</p>
+        </div>
+      </div>
+
+      <div id="examples" class="tab-content">
+        <h2 class="section-title">Worked Examples</h2>
+
+        <div class="proof-card">
+          <h3 class="card-title">Cycle \(C_n\): Hitting a Fixed Vertex</h3>
+          <p>Label the cycle \(0,1,\dots,n-1\), and let the target be \(0\). Write \(h_k=H_{k0}\). Then</p>
+          <div class="formula-box">
+            \[
+            h_0=0,
+            \qquad
+            h_k = 1 + \frac{h_{k-1}+h_{k+1}}{2}
+            \quad (1 \le k \le n-1),
+            \]
+          </div>
+          <p>where the indices are read modulo \(n\). Rearranging gives</p>
+          <div class="formula-box">
+            \[
+            h_{k+1}-2h_k+h_{k-1}=-2.
+            \]
+          </div>
+          <p>The quadratic function \(h_k=k(n-k)\) satisfies this recurrence and the boundary conditions
+            \(h_0=h_n=0\). Therefore</p>
+          <div class="formula-box">
+            \[
+            H_{k0}=k(n-k).
+            \]
+          </div>
+          <p>The expected time is largest when the starting point is opposite the target, giving a worst case of about
+            \(n^2/4\).</p>
+        </div>
+
+        <div class="two-col">
+          <div class="proof-card">
+            <h3 class="card-title">Star \(K_{1,d}\): Center to a Chosen Leaf</h3>
+            <p>Let \(c\) be the center and \(t\) a fixed target leaf. Write \(h_c=H_{ct}\), and let \(h_o\) be the
+              hitting time from any other leaf to \(t\).</p>
+            <p>From any non-target leaf, the next step must go to the center, so</p>
+            <div class="formula-box">
+              \[
+              h_o=1+h_c.
+              \]
+            </div>
+            <p>From the center, with probability \(1/d\) we go directly to \(t\), and with probability \((d-1)/d\) we
+              go to another leaf. Hence</p>
+            <div class="formula-box">
+              \[
+              h_c = 1 + \frac{d-1}{d} h_o.
+              \]
+            </div>
+            <p>Solving gives</p>
+            <div class="formula-box">
+              \[
+              H_{ct}=2d-1,
+              \qquad
+              H_{ot}=2d.
+              \]
+            </div>
+          </div>
+
+          <div class="card">
+            <h3 class="card-title">Comparison Table</h3>
+            <table class="mini-table">
+              <thead>
+                <tr>
+                  <th>Graph</th>
+                  <th>Stationary Distribution</th>
+                  <th>Typical Hitting Fact</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>\(K_n\)</td>
+                  <td>Uniform</td>
+                  <td>\(H_{uv}=n-1\) for \(u \neq v\)</td>
+                </tr>
+                <tr>
+                  <td>\(C_n\)</td>
+                  <td>Uniform</td>
+                  <td>\(H_{k0}=k(n-k)\)</td>
+                </tr>
+                <tr>
+                  <td>Star \(K_{1,d}\)</td>
+                  <td>\(\pi(c)=1/2,\ \pi(\text{leaf})=1/(2d)\)</td>
+                  <td>\(H_{ct}=2d-1\)</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="summary-card">
+          <h3 class="card-title">What the Examples Teach</h3>
+          <ul>
+            <li>Symmetry can collapse a large linear system to a one-variable equation.</li>
+            <li>Degree imbalance distorts stationary behavior sharply, as the star graph shows.</li>
+            <li>Even on a very regular graph like a cycle, hitting times grow quadratically with distance scale.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div id="takeaways" class="tab-content">
+        <h2 class="section-title">Takeaways</h2>
+
+        <div class="summary-card">
+          <h3 class="card-title">Main Results</h3>
+          <ol>
+            <li>A simple random walk chooses a uniformly random neighbor at each step.</li>
+            <li>Hitting times satisfy first-step linear equations.</li>
+            <li>For an undirected graph, the stationary distribution is \(\pi(v)=\deg(v)/(2m)\).</li>
+            <li>The expected return time to \(v\) is \(2m/\deg(v)\).</li>
+            <li>Bipartite graphs create parity oscillation, while connected non-bipartite graphs converge to stationarity.</li>
+            <li>Commute time reveals a deep connection with effective resistance.</li>
+          </ol>
+        </div>
+
+        <div class="card">
+          <h3 class="card-title">Proof Patterns to Remember</h3>
+          <ul>
+            <li>Condition on the first step to derive equations for expectations.</li>
+            <li>Use symmetry to reduce many unknowns to a small number.</li>
+            <li>Verify stationarity through detailed balance rather than direct summation whenever possible.</li>
+            <li>Look at parity in bipartite graphs before making any convergence claim.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <footer>
+      Lecture 24 introduces random walks, expected hitting times, stationary distributions, and basic structural properties.
+    </footer>
+  </div>
+
+  <button class="scroll-top" id="scrollTop" aria-label="Scroll to top">&#8593;</button>
+  <a href="index.html" class="fab-btn" title="Back to Index">&#127968;</a>
+
+  <script>
+    function switchTab(tabId, button) {
+      document.querySelectorAll(".tab-content").forEach((tab) => {
+        tab.classList.remove("active");
+      });
+
+      document.querySelectorAll(".tab-btn").forEach((btn) => {
+        btn.classList.remove("active");
+      });
+
+      document.getElementById(tabId).classList.add("active");
+      button.classList.add("active");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    const progressFill = document.getElementById("progressFill");
+    const scrollTopBtn = document.getElementById("scrollTop");
+
+    function updateProgress() {
+      const scrollTop = window.scrollY;
+      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+      const progress = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
+      progressFill.style.width = progress + "%";
+
+      if (scrollTop > 300) {
+        scrollTopBtn.classList.add("visible");
+      } else {
+        scrollTopBtn.classList.remove("visible");
+      }
+    }
+
+    scrollTopBtn.addEventListener("click", () => {
+      window.scrollTo({ top: 0, behavior: "smooth" });
     });
-});
-</script>
 
-<a href="index.html" class="fab-btn" title="Back to Index">🏠</a>
+    window.addEventListener("scroll", updateProgress);
+    updateProgress();
+
+    document.addEventListener("DOMContentLoaded", function () {
+      renderMathInElement(document.body, {
+        delimiters: [
+          { left: "\\[", right: "\\]", display: true },
+          { left: "\\(", right: "\\)", display: false }
+        ]
+      });
+    });
+  </script>
 </body>
+
 </html>
