@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>CS 637 - Tutorial 7 Update</title>
+  <title>CS 637 - Tutorial 7</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
@@ -10,113 +10,441 @@
   <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
 
   <style>
+    :root {
+      --primary: #1e40af;
+      --secondary: #059669;
+      --accent: #dc2626;
+      --ink: #1f2937;
+      --muted: #64748b;
+      --surface: #ffffff;
+      --surface-soft: #f8fafc;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
     body {
-      font-family: "Times New Roman", serif;
-      margin: 40px;
-      line-height: 1.5;
-      background-color: #ffffff;
-      color: #000000;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      line-height: 1.7;
+      background: linear-gradient(135deg, #1e3a8a 0%, #1e293b 100%);
+      min-height: 100vh;
+      padding: 20px;
+      color: var(--ink);
     }
-    h1, h2 {
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      background: var(--surface);
+      border-radius: 16px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      overflow: hidden;
+    }
+
+    header {
+      color: white;
+      padding: 40px;
       text-align: center;
+      background: linear-gradient(135deg, #1e40af 0%, #059669 100%);
     }
+
     h1 {
-      font-size: 1.8em;
-      margin-bottom: 0.2em;
+      font-size: 2.2em;
+      margin-bottom: 8px;
     }
-    h2 {
-      font-size: 1.2em;
-      margin-top: 2em;
-      margin-bottom: 0.5em;
+
+    .subtitle {
+      font-size: 1.1em;
+      opacity: 0.95;
     }
-    .definition {
-      margin-bottom: 1em;
-    }
-    .term {
-      font-weight: bold;
-    }
-    .number {
-      font-weight: bold;
-    }
+
     .instructor {
+      font-size: 0.95em;
       margin-top: 8px;
-      font-size: 0.95rem;
-      color: #64748b;
     }
+
     .instructor a {
-      color: #0ea5e9;
+      color: #fef3c7;
       text-decoration: none;
-      font-weight: 500;
+      font-weight: 600;
     }
-    .instructor a:hover {
-      text-decoration: underline;
+
+    .content {
+      padding: 40px;
     }
+
+    h2 {
+      font-size: 1.4em;
+      margin-top: 1.5em;
+      margin-bottom: 0.8em;
+      padding-bottom: 8px;
+      border-bottom: 3px solid var(--primary);
+      color: var(--primary);
+    }
+
+    h3 {
+      font-size: 1.1em;
+      margin-top: 1.2em;
+      margin-bottom: 0.5em;
+      color: var(--ink);
+    }
+
+    .question {
+      background: var(--surface-soft);
+      padding: 20px;
+      margin-bottom: 16px;
+      border-radius: 10px;
+      border-left: 4px solid var(--primary);
+    }
+
+    .question-number {
+      font-weight: 800;
+      color: var(--primary);
+      margin-right: 8px;
+    }
+
+    .answer-box {
+      background: #ecfdf5;
+      padding: 16px;
+      margin-top: 12px;
+      border-radius: 8px;
+      border-left: 3px solid var(--secondary);
+      display: none;
+    }
+
+    .answer-box.visible {
+      display: block;
+    }
+
+    .toggle-btn {
+      background: var(--primary);
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.9em;
+      margin-top: 8px;
+    }
+
+    .toggle-btn:hover {
+      background: #1e3a8a;
+    }
+
     footer {
-      margin-top: 3em;
+      background: #1f2937;
+      color: white;
       text-align: center;
+      padding: 24px;
+      font-size: 0.9em;
+    }
+
+    .badge-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 12px 0;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 6px 12px;
+      border-radius: 999px;
+      background: white;
+      border: 1px solid #cbd5e1;
       font-size: 0.85em;
-      color: #333;
+      font-weight: 600;
+      color: var(--ink);
+    }
+
+    .fab-btn,
+    .scroll-top {
+      position: fixed;
+      right: 28px;
+      border: none;
+      border-radius: 999px;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 18px 52px rgba(15, 23, 42, 0.2);
+      z-index: 120;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      text-decoration: none;
+    }
+
+    .fab-btn {
+      width: 60px;
+      height: 60px;
+      bottom: 28px;
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      font-size: 28px;
+    }
+
+    .scroll-top {
+      width: 52px;
+      height: 52px;
+      bottom: 100px;
+      background: linear-gradient(135deg, var(--secondary), #0284c7);
+      font-size: 20px;
+      opacity: 0;
+      visibility: hidden;
+    }
+
+    .scroll-top.visible {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .fab-btn:hover,
+    .scroll-top:hover {
+      transform: translateY(-3px);
+    }
+
+    @media (max-width: 768px) {
+      body {
+        padding: 10px;
+      }
+
+      .content {
+        padding: 20px;
+      }
+
+      .fab-btn {
+        width: 54px;
+        height: 54px;
+        right: 18px;
+        bottom: 18px;
+      }
+
+      .scroll-top {
+        right: 18px;
+        bottom: 82px;
+      }
     }
   </style>
-
-<style>
-.fab-btn {
-  position: fixed;
-  bottom: 24px;
-  right: 24px;
-  width: 56px;
-  height: 56px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #3b82f6, #2563eb);
-  color: white;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-  cursor: pointer;
-  z-index: 1000;
-  border: none;
-  font-size: 24px;
-  transition: transform 0.2s, box-shadow 0.2s;
-  text-decoration: none;
-}
-.fab-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(0,0,0,0.3);
-}
-</style>
-
 </head>
 
 <body>
+  <div class="container">
+    <header>
+      <h1>CS 637: Mathematics-II</h1>
+      <div class="subtitle">Tutorial 7: Based on Lectures 20-23</div>
+      <div class="instructor">
+        <strong>Instructor:</strong> <a href="https://drdebmath.github.io/" target="_blank">Dr. Debasish Pattanayak</a>
+      </div>
+    </header>
 
-<h1>CS 637: Mathematics-II</h1>
-<div class="instructor">
-  <strong>Instructor:</strong> <a href="https://drdebmath.github.io" target="_blank">Dr. Debasish Pattanayak</a>
-</div>
-<h2>Tutorial 7 Update</h2>
+    <div class="content">
+      <p style="margin-bottom: 24px; color: var(--muted);">
+        This tutorial covers material from Lectures 20-23: Structural Graph Proofs, 2-Regular Graphs, Dirac's Theorem, Matchings, Konig's Theorem, Domination, and Planar Graphs.
+      </p>
 
-<p style="text-align: center; margin-top: 2.5em; font-size: 1.05em;">
-  The April 9, 2026 tutorial slot was used for
-  <a href="lecture21.html">Lecture 21: 2-Regular Graphs, Dirac's Theorem, and Matchings</a>.
-</p>
+      <div class="badge-row">
+        <span class="badge">Lecture 20</span>
+        <span class="badge">Lecture 21</span>
+        <span class="badge">Lecture 22</span>
+        <span class="badge">Lecture 23</span>
+      </div>
 
-<footer>
-  
-</footer>
+      <h2>Part I: Structural Graph Proofs (Lecture 20)</h2>
 
-<script>
-document.addEventListener("DOMContentLoaded", function() {
-    renderMathInElement(document.body, {
-        delimiters: [
-            {left: "31952", right: "31952", display: true},
-            {left: "\[", right: "\]", display: true},
-            {left: "\(", right: "\)", display: false}
-        ]
+      <div class="question">
+        <span class="question-number">1.</span>
+        A connected graph $G$ represents a network. When a vertex $v$ is removed, $G-v$ has three connected components of sizes $4, 5,$ and $7$. Apply the cut-vertex characterization (a vertex is a cut vertex exactly when removing it increases the number of connected components) to explain why $v$ is an articulation point and identify the natural partition of $G-v$.
+      </div>
+
+      <div class="question">
+        <span class="question-number">2.</span>
+        A connected graph has exactly two vertices whose removal does not disconnect the graph. Apply the characterization that a connected graph with exactly two non-cut vertices must be a path to decide the structure of $G$, and draw one example on $6$ vertices.
+      </div>
+
+      <div class="question">
+        <span class="question-number">3.</span>
+        A connected graph $G$ represents a network and has $18$ vertices and $18$ edges. Use the unicyclic-graph theorem (a connected graph with $n$ vertices and $n$ edges has exactly one cycle) to determine how many cycles $G$ contains. What changes if a graph with the same numbers of vertices and edges is disconnected?
+      </div>
+
+      <div class="question">
+        <span class="question-number">4.</span>
+        Let $T$ be a tree on $15$ vertices. Apply the centroid theorem for trees (every tree has either one centroid or two adjacent centroids, where deleting a centroid leaves no component with more than half the vertices) to identify what kind of vertex, or pair of adjacent vertices, can be chosen so that the remaining components are balanced.
+      </div>
+
+      <div class="question">
+        <span class="question-number">5.</span>
+        A tree has internal vertex degrees $4,3,3,2,2$. Apply the leaf-count identity for trees ($\sum_{v:\deg(v)\geq 2}(\deg(v)-2)=\ell-2$, where $\ell$ is the number of leaves) to determine the number of leaves and the total number of vertices.
+      </div>
+
+      <div class="question">
+        <span class="question-number">6.</span>
+        Use the degree-sum theorem for trees (a tree on $n$ vertices has degree sum $2(n-1)$) to test whether a tree with $12$ vertices can have exactly $5$ leaves and $7$ vertices of degree at least $2$. If it is possible, give one construction; if not, explain which count fails.
+      </div>
+
+      <div class="question">
+        <span class="question-number">7.</span>
+        In a tree $T$, define one pruning round as the deletion of all current leaves. Apply the pruning behavior of trees (repeatedly deleting leaves eventually leaves either one vertex or one edge) to the path $P_{11}$ and the star $K_{1,10}$. How many rounds are needed in each case?
+      </div>
+
+      <div class="question">
+        <span class="question-number">8.</span>
+        A finite tree has maximum degree $\Delta=3$. Apply the embedding theorem for trees (any tree with maximum degree at most $\Delta$ can be embedded in the infinite $\Delta$-regular tree) to place it inside the infinite $3$-regular tree. Use this viewpoint to estimate how many vertices can lie within distance $r$ of a chosen root.
+      </div>
+
+      <h2>Part II: 2-Regular Graphs, Dirac's Theorem, and Matchings (Lecture 21)</h2>
+
+      <div class="question">
+        <span class="question-number">9.</span>
+        A connected graph has $10$ vertices and every vertex has degree $2$. Apply the classification of connected $2$-regular graphs (every connected $2$-regular graph is a cycle) to identify the graph. If the graph is not connected and has $10$ vertices, list two possible component decompositions.
+      </div>
+
+      <div class="question">
+        <span class="question-number">10.</span>
+        A simple graph has $12$ vertices and minimum degree $6$. Apply Dirac's theorem (if $n\geq 3$ and $\delta(G)\geq n/2$, then $G$ is Hamiltonian) to decide whether it must contain a Hamiltonian cycle. Then compare this with a graph on $12$ vertices with minimum degree $5$.
+      </div>
+
+      <div class="question">
+        <span class="question-number">11.</span>
+        For graphs on $9, 10,$ and $11$ vertices, compute the minimum-degree threshold that guarantees a Hamiltonian path by the Hamiltonian-path corollary of Dirac's theorem (if $\delta(G)\geq (n-1)/2$, then $G$ has a Hamiltonian path). Give one example where the path guarantee applies but Dirac's cycle guarantee does not.
+      </div>
+
+      <div class="question">
+        <span class="question-number">12.</span>
+        A matching $M$ in a graph leaves two unmatched vertices connected by an $M$-augmenting path of length $5$. Apply Berge's augmenting-path theorem (a matching is maximum if and only if there is no augmenting path) to decide whether $M$ is maximum, and describe how to improve it.
+      </div>
+
+      <div class="question">
+        <span class="question-number">13.</span>
+        A bipartite graph has parts $X=\{a,b,c,d\}$ and $Y=\{1,2,3,4\}$ with neighborhoods $N(a)=\{1,2\}$, $N(b)=\{1,2\}$, $N(c)=\{2,3,4\}$, and $N(d)=\{3,4\}$. Apply Hall's theorem (there is a matching saturating $X$ if and only if $|N(S)|\geq |S|$ for every $S\subseteq X$) to decide whether there is a matching that saturates $X$.
+      </div>
+
+      <div class="question">
+        <span class="question-number">14.</span>
+        A bipartite graph with $|X|=|Y|=6$ has a matching of size $5$ but no perfect matching. Use Hall's theorem (there is a perfect matching saturating $X$ if and only if $|N(S)|\geq |S|$ for every $S\subseteq X$) to find what kind of subset $S\subseteq X$ must witness the failure, and construct one example.
+      </div>
+
+      <div class="question">
+        <span class="question-number">15.</span>
+        Apply the formula for matchings in a path (the number of matchings of size $k$ in $P_n$ is $\binom{n-k}{k}$) to compute the number of matchings of size $3$ in $P_8$. Interpret the same count as choosing $3$ non-adjacent edges from a line of $7$ edges.
+      </div>
+
+      <div class="question">
+        <span class="question-number">16.</span>
+        A connected graph has a unique perfect matching. Apply the bridge theorem for unique perfect matchings (every connected graph with a unique perfect matching contains a bridge that belongs to the matching) to identify a structural feature that must be present. Give an example showing why the converse should be checked carefully.
+      </div>
+
+      <h2>Part III: Order, Vertex Covers, Konig's Theorem (Lecture 22)</h2>
+
+      <div class="question">
+        <span class="question-number">17.</span>
+        A graph has $20$ vertices and independence number $\alpha(G)=8$. Apply Gallai's identity ($\alpha(G)+\tau(G)=|V(G)|$) to determine the minimum vertex-cover size $\tau(G)$. Explain how a maximum independent set gives a minimum vertex cover in this case.
+      </div>
+
+      <div class="question">
+        <span class="question-number">18.</span>
+        In a bipartite graph, a maximum matching has size $7$. Apply Konig's theorem (in a bipartite graph, the maximum matching size equals the minimum vertex-cover size) to determine the size of a minimum vertex cover. Compare with the triangle $K_3$ to see what can fail outside bipartite graphs.
+      </div>
+
+      <div class="question">
+        <span class="question-number">19.</span>
+        Given a bipartite graph and a maximum matching $M$, apply the standard alternating-path construction from Konig's theorem (in a bipartite graph, the maximum matching size equals the minimum vertex-cover size) to find a minimum vertex cover. Work it out on the graph with $U=\{u_1,u_2,u_3\}$, $V=\{v_1,v_2,v_3\}$ and edges $u_1v_1,u_1v_2,u_2v_2,u_3v_2,u_3v_3$.
+      </div>
+
+      <div class="question">
+        <span class="question-number">20.</span>
+        Apply the formula for domination in complete bipartite graphs ($\gamma(K_{m,n})=1$ if $\min\{m,n\}=1$, and $\gamma(K_{m,n})=2$ otherwise) to compute $\gamma(K_{1,8})$, $\gamma(K_{2,5})$, and $\gamma(K_{4,4})$. In each case, describe a minimum dominating set.
+      </div>
+
+      <div class="question">
+        <span class="question-number">21.</span>
+        A graph has $n=30$ vertices and minimum degree $4$. Apply the domination bound in terms of minimum degree ($\gamma(G)\leq n/(\delta(G)+1)$) to estimate how small a dominating set is guaranteed to be. Give a graph family where this estimate is attained exactly.
+      </div>
+
+      <div class="question">
+        <span class="question-number">22.</span>
+        For a graph without isolated vertices, suppose $\gamma(G)=5$. Apply the standard inequality between domination and total domination ($\gamma(G)\leq \gamma_t(G)\leq 2\gamma(G)$) to bound $\gamma_t(G)$. Give an example where the upper bound is close to the truth.
+      </div>
+
+      <h2>Part IV: Planar Graphs (Lecture 23)</h2>
+
+      <div class="question">
+        <span class="question-number">23.</span>
+        A graph contains a subdivision of $K_{3,3}$ as a subgraph. Apply Kuratowski/Wagner-type planarity criteria (a graph is planar exactly when it has no subdivision/minor obstruction of type $K_5$ or $K_{3,3}$) to decide whether the graph can be planar. Then check whether the same reasoning applies to a graph containing a $K_5$ minor.
+      </div>
+
+      <div class="question">
+        <span class="question-number">24.</span>
+        A simple connected planar graph has $n=14$ vertices. Apply Euler's formula ($n-m+f=2$) and the planar edge bound ($m\leq 3n-6$ for simple planar graphs with $n\geq 3$) to find the maximum possible number of edges. Can such a graph have $38$ edges?
+      </div>
+
+      <div class="question">
+        <span class="question-number">25.</span>
+        A simple planar graph is being colored greedily by repeatedly deleting a low-degree vertex. Apply the fact that every planar graph has a vertex of degree at most $5$ to explain why this strategy supports a $6$-coloring. What extra idea is needed to reach $5$ colors?
+      </div>
+
+      <div class="question">
+        <span class="question-number">26.</span>
+        A connected plane graph has $8$ faces. Apply planar duality (vertices of $G^*$ correspond to faces of $G$, and edges cross corresponding primal edges) to determine the number of vertices of $G^*$. If an edge $e$ is a bridge in $G$, describe what happens to the corresponding edge $e^*$ in the dual.
+      </div>
+
+      <div class="question">
+        <span class="question-number">27.</span>
+        A planar graph has been drawn with curved edges and no crossings. Apply Fary's theorem (every simple planar graph has a crossing-free straight-line drawing) to decide whether it can be redrawn with straight-line edges and no crossings. What does this say about planar embeddings?
+      </div>
+
+      <div class="question">
+        <span class="question-number">28.</span>
+        A planar graph has $n=100$ vertices. Apply the grid-embedding theorem (every planar graph on $n$ vertices has a crossing-free drawing on an $O(n)\times O(n)$ grid) to estimate the order of grid size sufficient for a crossing-free drawing. What does this imply about representing planar embeddings with integer coordinates?
+      </div>
+
+      <div class="question">
+        <span class="question-number">29.</span>
+        A planar graph has $n=10{,}000$ vertices. Apply the planar separator theorem (every planar graph on $n$ vertices has a separator of size $O(\sqrt n)$ whose removal leaves components of size at most a fixed fraction of $n$) to estimate the size of a separator guaranteed by the $4\sqrt{n}$ bound. What is the largest allowed size of each remaining component after removal?
+      </div>
+
+      <div class="question">
+        <span class="question-number">30.</span>
+        Suppose an exponential-time algorithm for a graph problem branches only on a planar separator. Apply the planar separator theorem (every planar graph has a separator of size $O(\sqrt n)$ that splits the graph into smaller parts) to explain why the resulting running time can be subexponential in $n$ for planar graphs. How does this differ from arbitrary graphs?
+      </div>
+    </div>
+
+    <footer>
+      <p>© 2026 CS 637 - Mathematics-II | IIT Indore</p>
+    </footer>
+  </div>
+
+  <button class="scroll-top" id="scrollTop" aria-label="Scroll to top">&#8593;</button>
+  <a href="index.html" class="fab-btn" title="Back to Index">🏠</a>
+
+  <script>
+    const scrollTopBtn = document.getElementById("scrollTop");
+
+    function updateScrollTopButton() {
+      if (window.scrollY > 300) {
+        scrollTopBtn.classList.add("visible");
+      } else {
+        scrollTopBtn.classList.remove("visible");
+      }
+    }
+
+    scrollTopBtn.addEventListener("click", () => {
+      window.scrollTo({ top: 0, behavior: "smooth" });
     });
-});
-</script>
 
-<a href="index.html" class="fab-btn" title="Back to Index">🏠</a>
+    window.addEventListener("scroll", updateScrollTopButton);
+    updateScrollTopButton();
+
+    document.addEventListener("DOMContentLoaded", function() {
+      renderMathInElement(document.body, {
+        delimiters: [
+          {left: "$$", right: "$$", display: true},
+          {left: "$", right: "$", display: false}
+        ]
+      });
+    });
+  </script>
 </body>
 </html>
